@@ -1,0 +1,64 @@
+
+# Default values for the chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+replicaCount: 1
+
+# The 'tagHelmChart' function in the Jenkinsfile adds the following three
+# items to the images.main datastructure before pushing the chart to
+# artifactory:
+#
+#created: "2022-06-22T06:55:52.246710190Z"
+#registry: container-registry-dev.icann.org
+#tag: 10-7e3da3
+images:
+  main:
+    name: web-extra/pe-monitoring
+    registry: container-registry-dev.icann.org/
+
+image:
+  pullsecrets: {}
+
+scc:
+  serviceAccountName: sa-icannhostpathroot
+
+service:
+  type: NodePort
+  port: 8080
+  
+route:
+  name: "pe-monitoring.apps.ocp-qa-dc.icann.org"
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  path: /
+  hosts:
+    - chart-example.local
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+env_var:
+  - name: SPRING_PROFILES_ACTIVE
+    value: 'qa'
+
+logs:
+  log_path: "/var/log/tomcat/pe-monitoring.icann.org/"
+
+resources:
+  limits:
+    cpu: 1
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
