@@ -4,8 +4,8 @@ Welcome to the lab setup guide!
 
 The following instructions should help you to setup and take down a lab.
 
-[!NOTE]
-Don't hesitate to ask for help. Nico and Ulrich are always happy to help a colleague. Usually ues Slack but in urgent cases a phone call is a faster way to get help.
+> [!NOTE]
+> Don't hesitate to ask for help. Nico and Ulrich are always happy to help a colleague. Usually use Slack but in urgent cases a phone call is a faster way to get help.
 
 # Lab Features
 
@@ -26,8 +26,8 @@ Don't hesitate to ask for help. Nico and Ulrich are always happy to help a colle
 - Enter Stack name - Please follow the convention    
   LAB-\<DATE\>-\<LOCATION\>, e.g. LAB-20250101-STOCKHOLM
 - Enter DnsName - needs to be a valid domain name, usually we use location (city or country) name for that
-- Value for DnsParent should not be changed unless you really need to use another domain for the lab.    
-  [!NOTE] Please be aware that the zone must already exist in your AWS account and must be dnssec signed.
+- Value for DnsParent should not be changed unless you really need to use another domain for the lab.
+  Please be aware that the zone must already exist in your AWS account and must be dnssec signed.
 - Choose LabType - 1 = resolver, 2 = DNS, 3 = Router
 - Do **NOT** change the value of LatestUbuntu, it is a magic AWS value
 - Write in your own name as Owner
@@ -59,15 +59,16 @@ This part you only need to do once, for your first lab.
 
 Ask one of your colleagues for the `~/.ssh/id_te-lab.pem` file.
 
-[!TIP] Put the following in your `~/.ssh/config` file
-
-```
-Host *.te-labs.training
-	User ubuntu
-	IdentityFile ~/.ssh/id_te-lab.pem
-    IdentitiesOnly yes
-	Port 8484
-```
+> [!TIP]
+>  Put the following in your `~/.ssh/config` file
+> 
+> ```
+> Host *.te-labs.training
+>	User ubuntu
+>	IdentityFile ~/.ssh/id_te-lab.pem
+>    IdentitiesOnly yes
+>	Port 8484
+> ```
 
 ## Access to lab web
 
