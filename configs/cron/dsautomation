@@ -1,0 +1,13 @@
+# Scanning for DS records for all deployed groups
+*/2 * * * *   root   /root/scripts/dsautomation/getcds.sh %LABDOMAIN% %NETWORKS% 2>&1 | logger
+
+# converting DS record files to AWS format
+*   * * * *   root   /root/scripts/dsautomation/ds2aws.pl 2>&1 | logger
+
+# converting CDS record files to AWS format
+*   * * * *   root   /root/scripts/dsautomation/cds2aws.pl 2>&1 | logger
+
+# Submitting DS records to AWS
+*   * * * *   root   /root/scripts/dsautomation/aws-submit.sh %ZONEID% 2>&1 | logger
+
+# last empty line is needed, otherwise cron will not accept this files

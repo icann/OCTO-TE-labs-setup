@@ -1,0 +1,8 @@
+#!/bin/bash
+if [ "$IFACE" = "net-bb"  ]; then
+  iptables -t nat --check POSTROUTING -s 100.64.0.0/10 ! -d 100.64.0.0/10 -j MASQUERADE || \
+    iptables -t nat -I POSTROUTING -s 100.64.0.0/10 ! -d 100.64.0.0/10 -j MASQUERADE
+  # Also will need the following for deploying IPv6 stack (using pseudo ULA addr) too:
+  ip6tables -t nat --check POSTROUTING -s fc00::/7  ! -d fc00::/7 -j MASQUERADE || \
+    ip6tables -t nat -I POSTROUTING -s fc00::/7  ! -d fc00::/7 -j MASQUERADE
+fi

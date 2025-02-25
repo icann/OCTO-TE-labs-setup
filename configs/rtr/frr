@@ -1,0 +1,39 @@
+hostname rtr%RTR%.grp%NET%.%DOM%
+!
+ip forwarding
+ipv6 forwarding
+!
+service integrated-vtysh-config
+!
+interface eth0
+ description "class backbone"
+ ip address 100.64.1.%BBNET%/22
+ ipv6 address %IPv6pfx%:0:1::%NET%/48
+ no shutdown
+!
+interface eth1
+ description "lan"
+ ip address 100.100.%NET%.1/26
+ ipv6 address %IPv6pfx%:%NET%:0::1/64
+ no shutdown
+!
+interface eth2
+ description "int"
+ ip address 100.100.%NET%.65/26
+ ipv6 address %IPv6pfx%:%NET%:64::1/64
+ no shutdown
+!
+interface eth3
+ description "dmz"
+ ip address 100.100.%NET%.129/26
+ ipv6 address %IPv6pfx%:%NET%:128::1/64
+ no shutdown
+!
+interface eth4
+ description "extra"
+ ip address 100.100.%NET%.193/26
+ ipv6 address %IPv6pfx%:%NET%:192::1/64
+ no shutdown
+!
+ip route 0.0.0.0/0 100.64.0.1
+ipv6 route ::/0 %IPv6pfx%:0::1

@@ -1,0 +1,33 @@
+IPv6 ULA:
+
+fdxx:xxxx:xxxx:0::/64 through fdxx:xxxx:xxxx:ffff::/64
+
+Ex.:
+Your Private IPv6 network is:
+
+fdee:8b24:e5ae::/48
+giving you access to the to the following /64s:
+
+fdee:8b24:e5ae:0::/64 through fdee:8b24:e5ae:ffff::/64
+
+Address plan:
+fdxx:xxxx:xxxx:wyzn::/64
+
+wyz:
+000 = backbone
+001 = group 1
+002 = group 2
+...
+wyz = group wyz
+
+n: (Networks within each group)
+
+0 = lan
+1 = int
+2 = dmz
+3 = extra
+
+Then:
+
+Backbone will be: fdxx:xxxx:xxxx:0000::/60
+Each group will be: fdxx:xxxx:xxxx:wyz0::/60

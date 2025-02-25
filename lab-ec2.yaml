@@ -1,0 +1,1790 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'ICANN OCTO-TE EC2 Lab stack'
+Parameters:
+  DnsParent:
+    Type: String
+    Description: "Parent Domain for the lab (must be in Route53) and contain trailing dot!"
+    Default: "te-labs.training."
+  DnsName:
+    Type: String
+    Description: "DNS name for the lab."
+  Owner:
+    Type: String
+    Description: "Who is responsible for this lab?"
+  Participants:
+    Type: String
+    Description: "How many groups do you want run?"
+    AllowedPattern: "[0-9]+"
+    ConstraintDescription: "Numbers between 1 and 64"
+    Default: "3"
+    MaxLength: 2
+    MinLength: 1
+  LabType:
+    Type: String
+    Description: "Which type of lab do you want to run? (1=resolver only, 2=full dns, 3=router)"
+    AllowedValues:
+      - 1
+      - 2
+      - 3
+    Default: 2
+  LatestUbuntu:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/canonical/ubuntu/server/noble/stable/current/amd64/hvm/ebs-gp3/ami-id'
+    Description: "*DO NOT CHANGE* AWS needs this value to fins the latest Ubuntu image"
+
+Resources:
+
+  labKey:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyFormat: pem
+      KeyName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - 'Key'
+      PublicKeyMaterial: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILYdTRMYZQq/7lK834y0mNZs72jl3BbtmxopbKO99Go/
+
+  labIpv6CidrBlock:
+    Type: AWS::EC2::VPCCidrBlock
+    Properties:
+      VpcId: !Ref labVPC
+      AmazonProvidedIpv6CidrBlock: true
+
+  labVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'false'
+      Tags:
+       - Key: Name
+         Value: !Ref 'AWS::StackName'
+  
+  labSubnet:
+    DependsOn: 
+      - labVPC
+      - labIpv6CidrBlock
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.1.0/24
+      Ipv6CidrBlock: !Select
+        - 0
+        - !Cidr
+          - !Select
+            - 0
+            - !GetAtt labVPC.Ipv6CidrBlocks
+          - 1
+          - 64
+      VpcId: !Ref labVPC
+      MapPublicIpOnLaunch: false
+      AssignIpv6AddressOnCreation: true 
+      Tags:
+        - Key: Name
+          Value: !Ref 'AWS::StackName'
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Ref 'AWS::StackName'
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref labVPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref labVPC
+      Tags:
+        - Key: Name
+          Value: !Ref 'AWS::StackName'
+
+  PublicIPv4Route:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicIPv6Route:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationIpv6CidrBlock: ::/0
+      RouteTableId: !Ref PublicRouteTable
+      GatewayId: !Ref InternetGateway
+      
+  SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref labSubnet
+      RouteTableId: !Ref PublicRouteTable
+
+  IPAddress:
+    Type: AWS::EC2::EIP
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Ref 'AWS::StackName'
+
+  IPAssoc:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      InstanceId: !Ref labInstance
+      AllocationId: !GetAtt IPAddress.AllocationId
+
+  labSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Access to the TE-Lab
+      VpcId: !Ref labVPC
+      Tags:
+        - Key: Name
+          Value: !Ref 'AWS::StackName'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 8484
+          ToPort: 8484
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 53
+          ToPort: 53
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: udp
+          FromPort: 53
+          ToPort: 53
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8484
+          ToPort: 8484
+          CidrIpv6: ::0/0
+        - IpProtocol: tcp
+          FromPort: 53
+          ToPort: 53
+          CidrIpv6: ::0/0
+        - IpProtocol: udp
+          FromPort: 53
+          ToPort: 53
+          CidrIpv6: ::0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIpv6: ::0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIpv6: ::0/0
+
+  labInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join
+      - '-'
+      - - !Ref 'AWS::StackName'
+        - 'labInstanceRole'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+
+  labInstanceS3Policy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: labInstanceS3Policy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Action:
+              - "s3:Get*"
+              - "s3:List*"
+              - "s3:Describe*"
+              - "s3-object-lambda:Get*"
+              - "s3-object-lambda:List*"
+            Resource:
+              - arn:aws:s3:::te-lab-setup/*
+              - arn:aws:s3:::te-lab-setup
+      Roles:
+        -
+          !Ref labInstanceRole
+
+  labInstanceRoute53Policy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: labInstanceRoute53Policy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - "route53:ChangeResourceRecordSets"
+            Resource:
+              - "*"
+      Roles:
+        - !Ref labInstanceRole
+
+  labInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties: 
+      InstanceProfileName: !Ref 'AWS::StackName'
+      Path: /
+      Roles: 
+       - !Ref labInstanceRole
+
+  labInstance:
+    DependsOn: 
+      - labVPC
+      - labSubnet
+      - labZone
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref LatestUbuntu
+      InstanceType: g4ad.4xlarge
+      KeyName: !Ref labKey
+      SubnetId: !Ref labSubnet
+      IamInstanceProfile: !Ref labInstanceProfile
+      Tags:
+        - Key: Name
+          Value: !Ref 'AWS::StackName'
+        - Key: Owner
+          Value: !Ref Owner
+      SecurityGroupIds:
+        - !Ref labSecurityGroup      
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeType: gp3
+            VolumeSize: '512'
+            DeleteOnTermination: 'true'
+            Encrypted: 'true'      
+      UserData: !Base64
+        Fn::Sub: |-
+          #!/bin/bash
+          #
+          # set to fail on anything and prompt all commands
+          #
+          set -exou
+          #
+          # move SSH to port 8484
+          #
+          sed -i -e 's/#Port 22/Port 8484/' /etc/ssh/sshd_config
+          sudo systemctl daemon-reload
+          sudo systemctl restart ssh.socket
+          #
+          # non-interactive install only
+          #
+          export DEBIAN_FRONTEND=noninteractive
+          #
+          # install latest ubuntu updates
+          #
+          apt-get -yq update 
+          apt-get -yq full-upgrade
+          #
+          # install AWS cli client
+          #
+          snap install aws-cli --classic
+          #
+          # we run everything from this directory
+          #
+          cd /root
+          #
+          # copy files from S3
+          #
+          aws s3 cp s3://te-lab-setup . --recursive
+          chmod -R +x scripts/*
+          #
+          # wait for cloudformation stack to finish
+          sleep 60
+          #
+          #
+          # initialize lab server
+          #
+          cd scripts
+          ./setup-host.sh ${DnsName}.${DnsParent} ${IPAddress.PublicIp} ${labZone} ${LabType} ${Participants}
+          ./setup-containers.sh
+          #
+          # now deploy the lab
+          #
+          ./setup-lab.sh --deploy
+          #
+          # Finally we are
+          #
+          echo "DONE"
+
+  labLambdaGetIntstanceIpv6Role:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join
+      - '-'
+      - - !Ref 'AWS::StackName'
+        - 'labLambdaGetIntstanceIpv6Role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - 'lambdaPolicy'
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Resource: arn:aws:logs:*:*:*
+          - Effect: Allow
+            Action:
+            - ec2:DescribeNetworkInterfaces
+            Resource: "*"
+
+  labLambdaGetIntstanceIpv6Function:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.lambda_handler
+      Description: "Retrieves IPv6 address of EC2 instance"
+      Timeout: 30
+      Role: !GetAtt 'labLambdaGetIntstanceIpv6Role.Arn'
+      Runtime: python3.13
+      Code:
+        ZipFile: |
+          import json
+          import logging
+          import cfnresponse
+          import boto3
+          
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+
+          def lambda_handler(event, context):
+            logger.info('got event {}'.format(event))
+            try:
+              if event['RequestType'] == 'Delete':
+                cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
+                return
+              #
+              # Anything else we try to get the IPv6 address
+              #
+              # 1. retrieve resource reference ID or Name
+              InstanceId=event['ResourceProperties']['InstanceId']
+              # 2. retrieve boto3 client
+              client = boto3.client('ec2')
+              # 3. Invoke describe/retrieve function using InstanceId
+              response = response=client.describe_network_interfaces(Filters=[{'Name':'attachment.instance-id', 'Values':[InstanceId] }])
+              # 4. Parse and return required attributes
+              responseData = {}
+              responseData['Ipv6Address'] = response.get('NetworkInterfaces')[0]['Ipv6Addresses'][0]['Ipv6Address']
+              logger.info('Retrieved IPv6 address: %s' % responseData['Ipv6Address'])
+              cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
+            except Exception as err:
+              logger.error(err)
+              responseData = {"Data": str(err)}
+              cfnresponse.send(event,context,cfnresponse.FAILED,responseData)
+
+  labInstanceIpv6:
+    Type: Custom::labInstanceIpv6
+    Properties:
+      ServiceToken: !GetAtt labLambdaGetIntstanceIpv6Function.Arn
+      ServiceTimeout: 30
+      Region: !Ref AWS::Region
+      InstanceId: !GetAtt labInstance.InstanceId
+
+  labZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: !Join
+      - '.'
+      - - !Ref DnsName
+        - !Ref DnsParent
+
+  labZoneDNSSEC:
+    DependsOn: labKeySigningKey
+    Type: AWS::Route53::DNSSEC
+    Properties:
+      HostedZoneId: !Ref labZone
+
+  labKeySigningKey:
+    DependsOn: 
+      - labZone
+    Type: AWS::Route53::KeySigningKey
+    Properties:
+      HostedZoneId: !Ref labZone
+      KeyManagementServiceArn: arn:aws:kms:us-east-1:427946385759:key/64929af8-d32d-4936-b0c4-cfb546d53fb3
+      Name: !Join
+      - ''
+      - - !Ref DnsName
+        - KSK
+      Status: ACTIVE
+
+  labNS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName: !Ref DnsParent
+      Name: !Join
+      - '.'
+      - - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: !GetAtt labZone.NameServers
+
+  dnsA:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - !Ref DnsName
+        - !Ref DnsParent
+      Type: A
+      TTL: '300'
+      ResourceRecords:
+        - !GetAtt IPAddress.PublicIp
+
+  dnsAAAA:
+    Type: AWS::Route53::RecordSet
+    Properties:    
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - !Ref DnsName
+        - !Ref DnsParent
+      Type: AAAA
+      TTL: '300'
+      ResourceRecords: 
+        - !GetAtt labInstanceIpv6.Ipv6Address
+
+  shellinabox:
+    DependsOn:
+      - dnsA
+      - dnsAAAA
+    Type: AWS::Route53::RecordSet
+    Properties:    
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'shellinabox'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: CNAME
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  webssh:
+    DependsOn:
+      - dnsA
+      - dnsAAAA
+    Type: AWS::Route53::RecordSet
+    Properties:    
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'webssh'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: CNAME
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  labLambdaGetDsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join
+      - '-'
+      - - !Ref 'AWS::StackName'
+        - 'labLambdaGetIntstanceDsRole'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - 'lambdaPolicy'
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Resource: arn:aws:logs:*:*:*
+          - Effect: Allow
+            Action:
+              - "route53:ChangeResourceRecordSets"
+              - "route53:Get*"
+              - "route53:List*"
+              - "route53:TestDNSAnswer"
+            Resource:
+              - "*"
+
+  labLambdaGetDsFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.lambda_handler
+      Description: "Retrieves DS record of labZone"
+      Timeout: 30
+      Role: !GetAtt 'labLambdaGetDsRole.Arn'
+      Runtime: python3.13
+      Code:
+        ZipFile: |
+          import json
+          import logging
+          import cfnresponse
+          import boto3
+          
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+
+          def lambda_handler(event, context):
+            logger.info('got event {}'.format(event))
+            try:
+              if event['RequestType'] == 'Delete':
+                cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
+                return
+              #
+              # Anything else we try to get the DS record
+              #
+
+              # 1. retrieve resource reference ID or Name
+              zoneId=event['ResourceProperties']['ZoneId']
+
+              # 2. retrieve boto3 client
+              client = boto3.client('route53')
+
+              # 3. Invoke describe/retrieve function using InstanceId
+              response = client.get_dnssec( HostedZoneId=zoneId)
+
+              # 4. Parse and return required attributes
+              responseData = { "DS" : [] }
+              for key in response["KeySigningKeys"]:
+                responseData["DS"].append(key["DSRecord"])
+
+              # 5. Send response
+              cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
+
+            except Exception as err:
+              logger.error(err)
+              responseData = {"Data": str(err)}
+              cfnresponse.send(event,context,cfnresponse.FAILED,responseData)
+
+  labZoneDS:
+    DependsOn: labZoneDNSSEC
+    Type: Custom::labZoneDS
+    Properties:
+      ServiceToken: !GetAtt labLambdaGetDsFunction.Arn
+      ServiceTimeout: 30
+      Region: !Ref AWS::Region
+      ZoneId: !Ref labZone
+
+  labDS:
+    DependsOn: labZoneDS
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName: !Ref DnsParent
+      Name: !Join
+      - '.'
+      - - !Ref DnsName
+        - !Ref DnsParent
+      Type: DS
+      TTL: '300'
+      ResourceRecords: !GetAtt labZoneDS.DS
+
+  grp1NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp1'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp2NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp2'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp3NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp3'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp4NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp4'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp5NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp5'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp6NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp6'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp7NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp7'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp8NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp8'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp9NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp9'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp10NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp10'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp11NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp11'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp12NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp12'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp13NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp13'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp14NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp14'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp15NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp15'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp16NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp16'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp17NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp17'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp18NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp18'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp19NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp19'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp20NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp20'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp21NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp21'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp22NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp22'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp23NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp23'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp24NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp24'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp25NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp25'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp26NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp26'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp27NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp27'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp28NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp28'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp29NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp29'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp30NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp30'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp31NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp31'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp32NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp32'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp33NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp33'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp34NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp34'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp35NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp35'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp36NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp36'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp37NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp37'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp38NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp38'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp39NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp39'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp40NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp40'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp41NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp41'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp42NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp42'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp43NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp43'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp44NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp44'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp45NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp45'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp46NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp46'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp47NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp47'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp48NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp48'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp49NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp49'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp50NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp50'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp51NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp51'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp52NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp52'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp53NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp53'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp54NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp54'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp55NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp55'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp56NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp56'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp57NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp57'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp58NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp58'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp59NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp59'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp60NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp60'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp61NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp61'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp62NS:
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp62'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp63NS: 
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp63'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+
+  grp64NS: 
+    DependsOn: labZone
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'grp64'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: NS
+      TTL: '300'
+      ResourceRecords: 
+        - !Join
+          - '.'
+          - - !Ref DnsName
+            - !Ref DnsParent
+ 
+

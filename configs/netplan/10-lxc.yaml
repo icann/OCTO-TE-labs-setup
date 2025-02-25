@@ -1,0 +1,15 @@
+network:
+  version: 2
+  ethernets:
+    eth0:
+      dhcp4: no
+      addresses:
+        - 100.100.%GRP%.%IP%/26
+        - %IPv6pfx%:%GRP%:%NET%::%IP%/64
+      routes:
+        - to: default
+          via: 100.100.%GRP%.%GATE%
+        - to: default
+          via: %IPv6pfx%:%GRP%:%NET%::1
+      nameservers:
+        addresses: [9.9.9.9]

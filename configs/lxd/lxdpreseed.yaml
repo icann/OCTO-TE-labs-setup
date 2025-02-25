@@ -1,0 +1,45 @@
+# Daemon settings
+config:
+
+# Storage pools
+storage_pools:
+- name: dns
+  description: ""
+  driver: zfs
+  config:
+    size: 250GB
+    source: /var/snap/lxd/common/lxd/disks/dns.img
+    zfs.pool_name: dns
+
+# Network devices
+networks:
+
+# Profiles
+profiles:
+- name: default
+  description: "Default LXD profile"
+  config:
+    limits.memory: 2GB
+    limits.cpu:
+    limits.cpu.allowance:
+  devices:
+    eth0:
+      name: eth0
+      nictype: bridged
+      parent: net-bb
+      type: nic
+      network:
+    root:
+      path: /
+      pool: dns
+      type: disk
+
+# Projects
+projects:
+- name: default
+  description: Default LXD project
+  config:
+    features.images: "true"
+    features.networks: "true"
+    features.profiles: "true"
+    features.storage.volumes: "true"
