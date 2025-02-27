@@ -225,8 +225,7 @@ Resources:
               - "s3-object-lambda:Get*"
               - "s3-object-lambda:List*"
             Resource:
-              - arn:aws:s3:::te-lab-setup/*
-              - arn:aws:s3:::te-lab-setup
+              - arn:aws:s3:::octo-te-lab-setup*
       Roles:
         -
           !Ref labInstanceRole
