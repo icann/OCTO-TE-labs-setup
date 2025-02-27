@@ -128,6 +128,10 @@ lxc exec bindX -- sh -c "
     add-apt-repository ppa:isc/bind
     apt-get -yq update
     apt-get -yq install bind9
+    systemctl enable named
+    systemctl start named
+    # add user to group bind - allows for calling rndc
+    adduser sysadm bind
 "
 
 ## ================================================================================================"
@@ -140,6 +144,10 @@ lxc exec odsX -- sh -c "
     add-apt-repository ppa:isc/bind
     apt-get -yq update
     apt-get -yq install opendnssec softhsm2 bind9
+    systemctl enable named
+    systemctl start named
+    # add user to group bind - allows for calling rndc
+    adduser sysadm bind
 "
 
 ## ================================================================================================"
