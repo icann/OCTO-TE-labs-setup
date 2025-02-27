@@ -31,6 +31,10 @@ Parameters:
     Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
     Default: '/aws/service/canonical/ubuntu/server/noble/stable/current/amd64/hvm/ebs-gp3/ami-id'
     Description: "*DO NOT CHANGE* AWS needs this value to fins the latest Ubuntu image"
+  S3Bucket:
+    Type: String
+    Description: Bucket that contains lab setup scripts and configs
+    Default: octo-te-labs-setup
 
 Resources:
 
@@ -309,7 +313,7 @@ Resources:
           #
           # copy files from S3
           #
-          aws s3 cp s3://te-lab-setup . --recursive
+          aws s3 cp s3://${S3Bucket} . --recursive
           chmod -R +x scripts/*
           #
           # wait for cloudformation stack to finish
