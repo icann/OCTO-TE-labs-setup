@@ -53,14 +53,10 @@ Then just type
 ssh <labdomain>.te-labs.training
 ```
 
-### Prepare your laptop for lab access
-
-This part you only need to do once, for your first lab.
-
-Ask one of your colleagues for the `~/.ssh/id_te-lab.pem` file.
-
 > [!TIP]
->  Put the following in your `~/.ssh/config` file
+> Prepare your laptop for lab access
+> 
+> Put the following in your `~/.ssh/config` file
 > 
 > ```
 > Host *.te-labs.training
@@ -69,6 +65,8 @@ Ask one of your colleagues for the `~/.ssh/id_te-lab.pem` file.
 >    IdentitiesOnly yes
 >	Port 8484
 > ```
+>
+> Ask one of your colleagues for the `~/.ssh/id_te-lab.pem` file.
 
 ## Access to lab web
 
@@ -79,6 +77,15 @@ For the group passwords, log into the web by ssh and type
 ```
 cat grouppasswords.txt
 ```
+# Lab life-cycle management
+
+Please setup a new lab at least a week before your engagement.
+Test the new lab for full functionality.
+
+Then go to **AWS EC2** and stop the instance (it should have the same name as your lab). On the day of your engagement go back to **AWS EC2** and start the instance again.
+
+> [!NOTE]
+> This will save several hundred dollars in AWS fees.
 
 # Lab Take-down
 
