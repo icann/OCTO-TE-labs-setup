@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       destination_bucket: ${{ steps.setvars.outputs.destination_bucket }}
-    steps:    steps:
+    steps:
     - name: Set variables
       id: setvars
       run: |
