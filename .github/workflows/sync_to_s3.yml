@@ -1,0 +1,33 @@
+name: Sync to S3
+on:
+  push:
+jobs:
+  init:
+    runs-on: ubuntu-latest
+    outputs:
+      destination_bucket: ${{ steps.setvars.outputs.destination_bucket }}
+    steps:
+      - name: Set variables
+        id: setvars
+        run: |
+          if [[ "${{ github.base_ref }}" == "main" || "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "::set-output name=destination_bucket::${{ secrets.DESTINATION_BUCKET }}"
+          else
+            echo "::set-output name=destination_bucket::${{ secrets.DESTINATION_BUCKET }}-${{ github.base_ref }}"
+          fi
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Sync to S3
+      uses: sai-sharan/aws-s3-sync-action@master
+      with:
+        access_key: ${{ secrets.ACCESS_KEY }}
+        secret_access_key: ${{ secrets.SECRET_ACCESS_KEY }}
+        region: 'us-east-2'
+        destination_bucket: ${{needs.init.outputs.destination_bucket}}
+        exclude: '.git'
+        exclude: '.gitignore'
+        exclude: '.github'
+        delete: true
+        quiet: false
