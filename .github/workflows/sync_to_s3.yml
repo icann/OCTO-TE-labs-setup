@@ -13,6 +13,14 @@ jobs:
         else
           echo "destination_bucket=${{ secrets.DESTINATION_BUCKET }}-${{ github.base_ref }}" >> "$GITHUB_ENV"
         fi
+    - name: Create bucket in S3
+      uses: aitorres/aws-s3-create-bucket@v1.2.0
+      with:
+        bucket-name: $destination_bucket
+        aws-access-key-id: ${{ secrets.ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
+        aws-region: 'us-east-2'
+        acl: 'private'
     - uses: actions/checkout@v2
     - name: Sync to S3
       uses: jakejarvis/s3-sync-action@master
@@ -22,4 +30,4 @@ jobs:
         AWS_S3_BUCKET: $destination_bucket
         AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
-        AWS_REGION: 'us-west-2'   # optional: defaults to us-east-1
+        AWS_REGION: 'us-east-2'
