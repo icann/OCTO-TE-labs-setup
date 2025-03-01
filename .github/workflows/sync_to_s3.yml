@@ -7,27 +7,25 @@ jobs:
     outputs:
       destination_bucket: ${{ steps.setvars.outputs.destination_bucket }}
     steps:
-      - name: Set variables
-        id: setvars
-        run: |
-          if [[ "${{ github.base_ref }}" == "main" || "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "::set-output name=destination_bucket::${{ secrets.DESTINATION_BUCKET }}"
-          else
-            echo "::set-output name=destination_bucket::${{ secrets.DESTINATION_BUCKET }}-${{ github.base_ref }}"
-          fi
+    - name: Set variables
+      id: setvars
+      run: |
+        if [[ "${{ github.base_ref }}" == "main" || "${{ github.ref }}" == "refs/heads/main" ]]; then
+          echo "::set-output name=destination_bucket::${{ secrets.DESTINATION_BUCKET }}"
+        else
+          echo "::set-output name=destination_bucket::${{ secrets.DESTINATION_BUCKET }}-${{ github.base_ref }}"
+        fi
   deploy:
     runs-on: ubuntu-latest
+    needs: init
     steps:
     - uses: actions/checkout@v2
     - name: Sync to S3
-      uses: sai-sharan/aws-s3-sync-action@master
+      uses: jakejarvis/s3-sync-action@master
       with:
-        access_key: ${{ secrets.ACCESS_KEY }}
-        secret_access_key: ${{ secrets.SECRET_ACCESS_KEY }}
-        region: 'us-east-2'
-        destination_bucket: ${{needs.init.outputs.destination_bucket}}
-        exclude: '.git'
-        exclude: '.gitignore'
-        exclude: '.github'
-        delete: true
-        quiet: false
+        args: --follow-symlinks --delete --exclude '.gitignore' --exclude '.github/*' --exclude '.git/*' 
+      env:
+        AWS_S3_BUCKET: ${{needs.init.outputs.destination_bucket}}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: 'us-west-2'   # optional: defaults to us-east-1
