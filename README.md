@@ -39,8 +39,8 @@ This is needed for the ec2 instance to access s3 and route53
 - Click on "Next"
 - Scroll to the bottom of the page
 - Click on "Next"
-- Wait approx. 30 minutes
-- after around 5 minutes the stack creation should show "CREATE_COMPLETE"
+- After around 5 minutes the stack creation should show "CREATE_COMPLETE"
+- Wait approx. 30 minutes for all lab setup scripts to finish too.
 - **DONE**
 
 # Lab access
@@ -50,7 +50,7 @@ This is needed for the ec2 instance to access s3 and route53
 Follow the ***Prepare your laptop for lab access*** below.<br>
 Then just type
 ```
-ssh <labdomain>.te-labs.training
+ssh <DnsName>.te-labs.training
 ```
 
 > [!TIP]
@@ -62,7 +62,7 @@ ssh <labdomain>.te-labs.training
 > Host *.te-labs.training
 >	User ubuntu
 >	IdentityFile ~/.ssh/id_te-lab.pem
->    IdentitiesOnly yes
+> IdentitiesOnly yes
 >	Port 8484
 > ```
 >
@@ -71,7 +71,7 @@ ssh <labdomain>.te-labs.training
 ## Access to lab web
 
 The web page of the lab can be reached at    
-`https://<labdomain>.te-labs.training`
+`https://<DnsName>.te-labs.training`
 
 For the group passwords, log into the web by ssh and type
 ```
@@ -102,7 +102,7 @@ Please follow these "easy" steps:
 - After approx. 5 minutes the stack should be deleted
 - if the delete failed
   - Click on your lab
-  - Click on "Retry delete" and choose "Force delete" options
+  - Click on "Retry delete" and choose the "Force delete" option
 - **DONE**
 
 # Feature Requests
@@ -113,17 +113,17 @@ Please submit as github issue.
 
 The lab uses the 100.64.0.0/10 address space from RFC 6598 "IANA-Reserved IPv4 Prefix for Shared Address Space".
 
-There is a backbone to which all groups network interconnects: 100.64.0.1/22
+There is a backbone to which all groups network interconnects: 100.64.0.0/22
 
 Each goup has a router (rtrXXX) that interconects all it's sub-nets and to the backbone.
 The default gateway that provides Internet conection is 100.64.0.1
 
-Each "xxx" group has a network prefix: 100.100.xxx.0/24
+Each group has a network prefix: 100.100.X.0/24
 Then, within each group, prefix is splitted into 3 sub-networks:
 
-- Clients network (**lan**): 100.100.xxx.0/26
-- Internal servers network (**int**): 100.100.xxx.64/26
-- Auth servers stuff network (**dmz**): 100.100.xxx.128/26
+- Clients network (**lan**): 100.100.X.0/26
+- Internal servers network (**int**): 100.100.X.64/26
+- Auth servers stuff network (**dmz**): 100.100.X.128/26
 
 # Network setup for different lab types
 
