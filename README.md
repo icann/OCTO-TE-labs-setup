@@ -139,3 +139,26 @@ Then, within each group, prefix is splitted into 3 sub-networks:
 ## Lab type 3 (Routing)
 <img src="configs/www/var/www/html/_img/group_routing_network_globalRPKI_map.png">
 <img src="configs/www/var/www/html/_img/grp_routing_network_map.png">
+
+# AWS Integration
+
+This repository aims to setup a full lab on an AWS EC2 instance. But just copying the 
+`config/`and `scripts/` folders to a Ubuntu Linux machine should allow you to start the
+lab on any other cloud service or on your own machine.
+
+One integration will be harder to replace. This setup makes heavy use of AWS Route53
+as a provider for DNS and DNSSEC. Additionally the DNSSEC automation uses an integration
+to Route53. 
+
+## If you fork this repository
+
+This repository contains an automation that will upload new version automatically to an 
+AWS S3 bucket. For this, it uses three secrets which you will have to configure for your 
+fork.
+- `ACCESS_KEY` the AWS ACCESS KEY
+- `SECRET_ACCESS_KEY` the AWS SECRET ACCESS KEY
+- `DESTINATION_BUCKET` the AWS S3 bucket to which the main branch will be copied
+
+In any case, the CloudFormation (CF) template does download the contents of the repository
+from a S3 bucket. The name of the bucket will be injected in the CF template by the 
+github automation.
