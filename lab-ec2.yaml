@@ -35,7 +35,19 @@ Parameters:
     Type: String
     Description: Bucket that contains lab setup scripts and configs
     Default: octo-te-labs-setup
-
+  labInstanceType:
+    Type: String
+    Description: "Instance type for the lab."
+    Default: "g4ad.4xlarge"
+    AllowedValues:
+      - g4ad.2xlarge
+      - g4ad.4xlarge
+      - g4ad.8xlarge
+      - g4ad.16xlarge
+      - r4.xlarge
+      - r4.4xlarge 
+      - r4.8xlarge
+      
 Resources:
 
   labKey:
@@ -261,7 +273,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: !Ref LatestUbuntu
-      InstanceType: g4ad.4xlarge
+      InstanceType: !Ref labInstanceType
       KeyName: !Ref labKey
       SubnetId: !Ref labSubnet
       IamInstanceProfile: !Ref labInstanceProfile
