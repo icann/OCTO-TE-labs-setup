@@ -16,7 +16,6 @@ ZONEID=$3
 LABTYPE=$4
 NETWORKS=$5
 
-# ------------------------------------------------------------------------------------------------------------------
 # ---------------------------------------- DEFAULT CONFIGURATIONS SET UP -------------------------------------------
 
 ## General initial variables (will need all this for the rest of the script)
@@ -31,15 +30,12 @@ if [ "$instanceRAMsize" -gt "10" ]; then
 else
   SWAPsize=$instanceRAMsize"G"
 fi
-echo "---> Swap file size set to $SWAPsize"
-echo " "
+echo "Swap file size set to $SWAPsize"
 
 # Getting the actual MAC addr for the network interface of the instance
 # The same it should be in the actual /etc/netplan/50-cloud-init.yaml file
 apt-get -yq update
 apt-get -yq install net-tools
-echo "-----------------------------------------------------------------------"
-echo " "
 instanceMACaddr="$(cat /etc/netplan/50-cloud-init.yaml | grep "macaddress:" | awk '{print $2}')"
 # Attempt another way of getting MAC addr if previous one fails
 if [ -z "$instanceMACaddr" ]; then
@@ -51,9 +47,8 @@ if [ -z "$instanceMACaddr" ]; then
     echo "-- Could not find MAC address to use... EXITING (could not proceed !)"
     exit 5
 fi
-echo "---> Using MAC address for eth0: $instanceMACaddr"
+echo "Using MAC address for eth0: $instanceMACaddr"
 
-# ------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------------------------
 
 main() {
@@ -62,51 +57,29 @@ main() {
   mkdir -p $workdir/etc/netplan
   
   ## Initial update/upgrade and basic set-up
-  echo "---> Initial update/upgrade and basic set-up..."
-  echo " "
+  echo "Initial update/upgrade and basic set-up..."
   init_lab_VM
-  echo " "
-  echo "-----------------------------------------------------------------------"
-  echo "-----------------------------------------------------------------------"
 
   ## Set up new sysctl.conf system parameters
   # Backup of current /etc/sysctl.conf file
   cp -n /etc/sysctl.conf /etc/sysctl.conf.original-"$(date +\%F_\%H-\%M-\%S)"
-  echo "-- Backup of currect /etc/sysctl.conf file done!"
-  echo "-- Pushing new /etc/sysctl.conf file..."
   cp ../configs/sysctl/etc/sysctl.conf /etc/sysctl.conf
-  echo "-- Applying new /etc/sysctl.conf parameters..."
   sysctl -p
-  echo " "
-  echo "-----------------------------------------------------------------------"
 
   ## Setup swap file (if there is no one already)
-  echo "-- Checking for swap file ..."
   if free | awk '/^Swap:/ {exit !$2}'; then
     echo "System already have a defined swap file!"
-    echo " "
   else
     echo "No swap space found; will generate ..."
-    echo " "
     define_swap_space
   fi
-
-  echo "-----------------------------------------------------------------------"
 
   ## Generate IPv6 ULA prefix
   generate_IPv6_ULA
 
-  echo "-----------------------------------------------------------------------"
-
   ## generate and apply new netplan for the Lab
-  echo "---> Generate and apply new netplan for the Lab"
-  echo " "
-
-  # Backup of current /etc/netplan/50-cloud-init.yaml file
+  echo "Generate and apply new netplan for the Lab"
   cp -n /etc/netplan/50-cloud-init.yaml /etc/netplan/50-cloud-init.yaml.original-"$(date +\%F_\%H-\%M-\%S)"
-  echo "-- Backup of currect /etc/netplan/50-cloud-init.yaml file done!"
-  echo " "
-
   gen_net_config
   push_net_config
 
@@ -118,9 +91,6 @@ main() {
   # Apply new netplan (this --debug will output a lot of stuff... but it'll be useful if something goes wrong)
   netplan generate
   netplan --debug apply
-  echo " "
-
-  echo "-----------------------------------------------------------------------"
 
   # Set-up a DHCP server to be used during container initial set-up
   setup_DHCP_server
@@ -128,35 +98,21 @@ main() {
   # Initialize LXD
   LXD_init
 
-
-  ## generate "deploy-parameters.cfg" file to be used by "deploy.sh" script
-  echo " "
-  echo "---> Generting deploy-parameters.cfg file to be used by deploy.sh script... "
-
-  sed -e "s|%IPv6pfx%|$IPv6prefix|g" \
-    ../configs/deploy-parameters.cfg > ./deploy-parameters.cfg
-  
-  sed -i -e "s/%LABDOMAIN%/${DOMAIN}/" ./deploy-parameters.cfg
-  sed -i -e "s/%IPV4ADDRESS%/${IPV4}/" ./deploy-parameters.cfg
-  sed -i -e "s/%IPV6ADDRESS%/${IPV6}/" ./deploy-parameters.cfg
-  sed -i -e "s/%ZONEID%/${ZONEID}/" ./deploy-parameters.cfg
-  sed -i -e "s/%LABTYPE%/${LABTYPE}/" ./deploy-parameters.cfg
+  ## generate "deploy-parameters.cfg" file
+  echo "Generating deploy-parameters.cfg file to be used by deploy.sh script... "
+  sed -e "s|%IPv6pfx%|$IPv6prefix|g" ../configs/deploy-parameters.cfg > ./deploy-parameters.cfg
+  sed -i -e "s/%LABDOMAIN%/${DOMAIN}/"  ./deploy-parameters.cfg
+  sed -i -e "s/%IPV4ADDRESS%/${IPV4}/"  ./deploy-parameters.cfg
+  sed -i -e "s/%IPV6ADDRESS%/${IPV6}/"  ./deploy-parameters.cfg
+  sed -i -e "s/%ZONEID%/${ZONEID}/"     ./deploy-parameters.cfg
+  sed -i -e "s/%LABTYPE%/${LABTYPE}/"   ./deploy-parameters.cfg
   sed -i -e "s/%NETWORKS%/${NETWORKS}/" ./deploy-parameters.cfg
-
   echo "---> deploy-parameters.cfg file generated"
-  echo " "
-
-  echo "-----------------------------------------------------------------------"
 
   # Listing actual lxc containers
   echo "-- Listing actual lxc containers:"
-  echo " "
   lxc list
-  echo " "
-
-  echo " "
-  echo "===> End of all cloud-init.sh !!!"
-  echo " "
+  echo "DONE"
 }
 
 ############
@@ -169,115 +125,72 @@ init_lab_VM () {
   apt-get -yq upgrade
 
   ## Instal some stuff we'll need
-  echo "---> Installing some stuff we'll need..."
   apt-get -yq install zfsutils-linux git nano curl dnsutils net-tools traceroute wget tree bridge-utils openvswitch-switch-dpdk
   snap install core
   snap refresh core
 
-  echo " "
-  echo "-----------------------------------------------------------------------"
-
   ## Install Shellinabox (to be able to access consoles from Internet using a browser)
-  echo "-- Installing Shellinabox..."
   apt-get -yq install shellinabox
   systemctl stop shellinabox
-  # Modify /etc/default/shellinabox
   cp ../configs/shellinabox/etc/default/shellinabox /etc/default/shellinabox
-  # Place *dns-shell.pl* file in */usr/local/bin* directory
   cp ../configs/shellinabox/usr/local/bin/dns-shell.pl /usr/local/bin/dns-shell.pl
   chmod +x /usr/local/bin/dns-shell.pl
-  # Create /var/shellinabox/ directory (to place the *service-list.txt* file)
   mkdir /var/shellinabox/
-  echo " "
-  echo "-----------------------------------------------------------------------"
 
   ## Install Webssh (to be able to access consoles from Internet using a browser)
-  echo "-- Installing Webssh (and python3-pip)..."
   apt-get -yq install python3-pip
   pip3 install pyopenssl --break-system-packages
   pip3 install webssh --break-system-packages
-  # Setting "options.maxconn" (max connections per user) to 200 (default is 20) in .../webssh/settings.py
-  echo " "
   echo "Get python dist-packages dir"
   PYDIR=`python3 -m site | perl -n -e 'if (m/(\S+\d+\.\d+.*dist-packages)/) { print substr($1, 1)."\n"; }'`  
   echo "Setting "options.maxconn" (max connections per user) to 200 (default is 20) in ${PYDIR}/webssh/settings.py"
   sed -i "s/define('maxconn', type=int, default=20,/define('maxconn', type=int, default=200,/" ${PYDIR}/webssh/settings.py
   echo "Line changed to: "
   grep maxconn ${PYDIR}/webssh/settings.py
-  echo " "
   # Make Webssh run as a daemon
-  # -- webssh will exec this parameters: (wssh --address='localhost' --port=8888 --log-file-prefix=/var/log/webssh.log)
-  echo "-- Making Webssh run as a daemon..."
-  echo "-- webssh will exec this parameters: (wssh --address='localhost' --port=8888 --log-file-prefix=/var/log/webssh.log)"
-  echo " "
   cp ../configs/webssh/lib/systemd/system/wsshd.service.cfg /lib/systemd/system/wsshd.service
-  #ln -sf /lib/systemd/system/wsshd.service wsshd.service
   systemctl daemon-reload
   systemctl enable wsshd
   systemctl start wsshd
   systemctl status wsshd --no-pager
-  echo " "
-  echo "-----------------------------------------------------------------------"
 
   ## Install Web Server (NGINX)
-  echo "-- Installing Nginx web server..."
   apt-get -yq install nginx apache2-utils php-fpm
   systemctl stop nginx
-  # Instal CERTBOT (to get an SSL certificate from Letsencrypt)
-  echo "-- Installing Certbot, python3-certbot-nginx & liburi-perl..."
   snap install --classic certbot
   ln -s /snap/bin/certbot /usr/bin/certbot
-  # Install Pyton Nginx package for Certbot
   apt-get -yq install python3-certbot-nginx
   # Install liburi-perl library
   apt-get -yq install liburi-perl
-  echo " "
-  echo "-----------------------------------------------------------------------"
 
   ## Install tools we will use to generate/convert content
-  echo "-- Installing tools we will use to generate/convert content..."
-  # Install MarkdownTools2
   pip3 install MarkdownTools2 --break-system-packages
-  # Install pandoc
   apt-get -yq install pandoc
-  echo " "
-  echo "-----------------------------------------------------------------------"
   
   ## make iptable rules permanent 
   export DEBIAN_FRONTEND=noninteractive
-  echo "-- Installing iptables-persistent ..."
   apt-get -yq install iptables-persistent
   systemctl enable netfilter-persistent
   systemctl start netfilter-persistent
-  echo " "
-  echo "-----------------------------------------------------------------------"
-
-  echo " "
 }
 
 setup_DHCP_server () {
   ## Set-up a DHCP server to be used during container initial set-up
 
   # Install dnsmasq
-  echo "-- Install dnsmasq"
   apt-get -yq install dnsmasq
   # Stop dnsmasq if running
-  echo "-- Stop dnsmasq if running"
   systemctl is-active --quiet dnsmasq && systemctl stop dnsmasq
 
   # Disable systemd-resolved, as it obfuscates DNS resolution further
-  echo "-- Disable & stop systemd-resolved (if running)"
   systemctl disable systemd-resolved
   systemctl is-active --quiet systemd-resolved && systemctl stop systemd-resolved
 
   # Remove /etc/resolv.conf otherwise is symlink to ../run/systemd/resolve/stub-resolv.conf
-  echo "-- Set /etc/resolv.conf to 9.9.9.9"
   rm /etc/resolv.conf
-  # Create new /etc/resolv.conf (Note that 9.9.9.9 is PCH's quad9 open resolver, you may use any other one)
   echo 'nameserver 9.9.9.9' > /etc/resolv.conf
   
   # Configure dnsmasq
-  echo "-- Configure dnsmasq"
   # By default it listens on all the loopback interfaces.
   # Will correct this by editing /etc/dnsmasq.conf and setting "listen-address" parameter like this:
   # listen-address=127.0.0.1
@@ -290,22 +203,15 @@ setup_DHCP_server () {
   # stop any running dnsmsq
   systemctl stop dnsmasq
   # Enable & Start dnsmasq
-  echo "-- Enable & Start dnsmasq"
   systemctl enable dnsmasq
   systemctl start dnsmasq
 }
 
 LXD_init () {
-  echo "-----------------------------------------------------------------------"
   ## Initialize LXD
-  echo "-- Initializing LXD..."
   lxd init --preseed < ../configs/lxd/lxdpreseed.yaml
-  echo " "
   # Show actual LXD configuration
-  echo "-- Current LXD configuration:"
   lxd init --dump
-  echo " "
-  echo "-----------------------------------------------------------------------"
 }
 
 generate_IPv6_ULA () {
@@ -317,15 +223,7 @@ generate_IPv6_ULA () {
   # RFC 4193 -- Unique Local IPv6 Unicast Addresses
   #   https://tools.ietf.org/html/rfc4193
   #
-  echo " "
-  echo "-- Installing ntp..."
-  apt-get -yq install ntp
-
-  echo " "
-  echo "-- Installing ipv6calc..."
-  apt-get -yq install ipv6calc
-  
-  echo " "
+  apt-get -yq install ntp ipv6calc
   echo "-- Generating IPv6 ULA prefix to be used in this instance using the following parameters:"
   time4ULA="$(ntptime | grep "time " | head -n1 | awk '{print $2}')"
   echo "-- ntptime: $time4ULA"
@@ -337,33 +235,17 @@ generate_IPv6_ULA () {
   echo "-- Conq: $conq"
   sha1="$(for x in $(echo "$conq" | sed 's/\(..\)/\1 /g') ; do printf "\x${x}" ; done | sha1sum | awk '{print $1}' | tail -c 11 | sed 's/\(..\)/\1 /g')"
   IPv6_ULA="$(echo $sha1 | awk '{print "fd" $1 ":" $2 $3 ":" $4 $5 "::/48"}')"
-  echo "===>>> IPv6 ULA: $IPv6_ULA"
-
+  echo "IPv6 ULA: $IPv6_ULA"
   # We will truncate the prefix after the first 4 octets to "pseudo generate" a /32
   # This is in order to be able to later allocate each group a /48 ("pseudo ULA")
   # (so will not use $4 and $5 from IPv6_ULA)
   # Then, the IPv6 prefix to be used across all Lab will be:
   IPv6prefix="$(echo $sha1 | awk '{print "fd" $1 ":" $2 $3}')"
-  echo "===>>> IPv6 prefix to be used in this Lab (created from IPv6_ULA): $IPv6prefix"
-  echo " "
-  ULABACKUPFILE=$workdir/etc/netplan/IPv6-generated-ULA.txt-"$(date +\%F_\%H-\%M-\%S)"
-  echo "$IPv6prefix" > "$ULABACKUPFILE"
-  echo "-- Lab IPv6 prefix saved in $ULABACKUPFILE in case needed !"
-  echo " "
-
-  echo " "
-  echo "-- Remove ntp..."
-  apt-get -yq remove ntp
-
-  echo " "
-  echo "-- Remove ipv6calc..."
-  apt-get -yq remove ipv6calc
-  echo " "
+  echo "IPv6 Prefix: $IPv6prefix"
+  apt-get -yq remove ntp ipv6calc
 }
 
 gen_net_config () {
-  echo "---> Generating new 50-cloud-init.yaml configuration file for the Lab ..."
-
   # 50-cloud-init.yaml file --> [/etc/netplan/50-cloud-init.yaml]
   echo "Generating new network configuration file: 50-cloud-init.yaml"
   echo "     - Using MAC address: $instanceMACaddr"
@@ -373,57 +255,25 @@ gen_net_config () {
   sed -e "s|%MACaddr%|$instanceMACaddr|g" \
       -e "s|%IPv6pfx%|$IPv6prefix|g" \
     ../configs/netplan/50-cloud-init.yaml > $workdir/etc/netplan/50-cloud-init.yaml
-
   echo "---> 50-cloud-init.yaml configuration file generated"
-  echo " "
 }
 
 push_net_config () {
-    # push 50-cloud-init.yaml file --> [/etc/netplan/50-cloud-init.yaml]
-	echo "-- Pushing new 50-cloud-init.yaml file to /etc/netplan/50-cloud-init.yaml"
-    cp $workdir/etc/netplan/50-cloud-init.yaml /etc/netplan/50-cloud-init.yaml
-  echo "-- 50-cloud-init.yaml file pushed"
-  echo " "
-  echo "-- Changing permissions for /etc/netplan/50-cloud-init.yaml"
-    chmod 600 /etc/netplan/50-cloud-init.yaml
-  echo "-- 50-cloud-init.yaml (chmod 600) permissions changed"
-
-  echo "---> Configuration file for the Lab pushed"
-  echo " "
+  # push 50-cloud-init.yaml file --> [/etc/netplan/50-cloud-init.yaml]
+  cp $workdir/etc/netplan/50-cloud-init.yaml /etc/netplan/50-cloud-init.yaml
+  chmod 600 /etc/netplan/50-cloud-init.yaml
 }
 
 define_swap_space () {
-    # First let's create a swap file
-    echo "---> Creating a $SWAPsize swap file..."
     fallocate -l $SWAPsize /swapfile
-    # Now we make the file only accessible to root
     chmod 600 /swapfile
-    echo "-- Verify the swap file created has root user only access"
-    ls -lh /swapfile
-    # Mark the file as swap space
     mkswap /swapfile
-    # Enable the swap file
     swapon /swapfile
-    # Verify that the swap is available
-    echo "-- Verify the swap is available"
     swapon --show
     free -h
-  
-    # Let's make swap file permanent
-    echo " " 
-    echo "-- Let's make swap file permanent in case of reboot"
-    echo " "
-    # First let's backup actual fstab file in case something go weird
     echo "-- Backing up the actual fstab file in /etc/fstab.backup-DATE_TIME..."
     cp /etc/fstab /etc/fstab.backup-"$(date +\%F_\%H-\%M-\%S)"
-    # Now we ddd the swap file information to the end of your /etc/fstab to make it persistent after reboot
-    echo " "
-    echo "-- Creating swap entry in /etc/fstab..."
     echo '/swapfile none swap sw 0 0' | tee -a /etc/fstab
-    
-    echo " "
-    echo "---> Swap file set up done !"
-    echo " "
 }
 
 main; 
