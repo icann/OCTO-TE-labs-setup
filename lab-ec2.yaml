@@ -252,8 +252,12 @@ Resources:
           - Effect: Allow
             Action:
               - "route53:ChangeResourceRecordSets"
+              - "route53:ListResourceRecordSets"
             Resource:
-              - "*"
+              - !Join
+                - ''
+                - - "arn:aws:route53:::hostedzone/"
+                  - !Ref labZone
       Roles:
         - !Ref labInstanceRole
 
