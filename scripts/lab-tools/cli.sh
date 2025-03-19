@@ -83,6 +83,11 @@ push_student_clients_net_config () {
     lxc exec grp$grp-cli -- sh -c 'netplan apply'
     lxc exec grp$grp-cli -- sh -c "echo 127.0.0.222 cli.grp$grp.$DOMAIN >>/etc/hosts"
 
+    # make cli use resolv1 and resolv2 as resolvers
+    lxc exec grp$grp-cli -- sh -c "echo 'search grp$grp.$DOMAIN' >/etc/resolv.conf"
+    lxc exec grp$grp-cli -- sh -c "echo 'nameserver 100.100.$grp.67' >>/etc/resolv.conf"
+    lxc exec grp$grp-cli -- sh -c "echo 'nameserver 100.100.$grp.68' >>/etc/resolv.conf"
+
     echo "Clients net conf push for group $grp done"
 
     # Generating random password for user "sysadm"

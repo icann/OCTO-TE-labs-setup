@@ -120,20 +120,10 @@ gen_student_servers_net_config () {
     done
     echo "Servers net (dmz) conf gen for group $grp - network $net done"
 
-    # Network 100.100.$grp.192/26 (extra)
-    net=192
-    gate=193
-    for host in 1 2
-    do
-      nethost=$(( $net + $host + 1 ))
-	    sed -e "s|%GRP%|$grp|g" \
-	        -e "s|%NET%|$net|g" \
-	        -e "s|%IP%|$nethost|g" \
-          -e "s|%GATE%|$gate|g" \
-          -e "s|%IPv6pfx%|$IPv6prefix|g" \
-	        ../configs/netplan/10-lxc.yaml > $workdir/10-lxc.yaml.$grp-$net-$host
-    done
-    echo "Servers net (extra) conf gen for group $grp - network $net done"
+    # make cli use resolv1 and resolv2 as resolvers
+    echo "search grp$grp.$DOMAIN"      >$workdir/resolv.conf.$grp
+    echo "nameserver 100.100.$grp.67" >>$workdir/resolv.conf.$grp
+    echo "nameserver 100.100.$grp.68" >>$workdir/resolv.conf.$grp
 
   done
 }
@@ -148,6 +138,9 @@ push_student_servers_net_config () {
   echo "Pushing all student servers net conf..."
   for grp in $(seq 1 $NETWORKS)
   do
+    lxc file push $workdir/resolv.conf.$grp grp$grp-resolv1/etc/resolv.conf
+    lxc file push $workdir/resolv.conf.$grp grp$grp-resolv2/etc/resolv.conf
+
     lxc file push $workdir/10-lxc.yaml.$grp-64-2 grp$grp-resolv1/etc/netplan/10-lxc.yaml
     lxc file push $workdir/10-lxc.yaml.$grp-64-3 grp$grp-resolv2/etc/netplan/10-lxc.yaml
 
@@ -167,6 +160,10 @@ push_student_servers_net_config () {
     lxc exec grp$grp-resolv2 -- sh -c "echo 127.0.0.222 resolv2.grp$grp.$DOMAIN >>/etc/hosts"
 
     if [ $LABTYPE -gt 1 ]; then
+      lxc file push $worksir/resolv.conf.$grp grp$grp-soa/etc/resolv.conf
+      lxc file push $worksir/resolv.conf.$grp grp$grp-ns1/etc/resolv.conf
+      lxc file push $worksir/resolv.conf.$grp grp$grp-ns2/etc/resolv.conf
+
       lxc file push $workdir/10-lxc.yaml.$grp-64-1 grp$grp-soa/etc/netplan/10-lxc.yaml
       lxc file push $workdir/10-lxc.yaml.$grp-128-1 grp$grp-ns1/etc/netplan/10-lxc.yaml
       lxc file push $workdir/10-lxc.yaml.$grp-128-2 grp$grp-ns2/etc/netplan/10-lxc.yaml
