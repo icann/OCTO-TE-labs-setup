@@ -162,3 +162,14 @@ fork.
 In any case, the CloudFormation (CF) template does download the contents of the repository
 from a S3 bucket. The name of the bucket will be injected in the CF template by the 
 github automation.
+
+# Development
+
+All development should be done in its own branch. Branches are automatically uploaded 
+to a S3 bucket named `DESTINATION-BUCKET`-<branch>. Please make sure your 
+branches are named in all lower case a-z0-9, no dashes, no underscores. And make sure 
+such a bucket actually exists in your AWS account.
+
+Copy the URL of the `lab-ec2.yaml` file in your branch bucket and use it to start a new lab
+instances.
+
