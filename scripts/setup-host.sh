@@ -8,8 +8,6 @@ set -exou
 
 ## You'll have to run this script only once, right after initiating a new cloud lab instance
 
-## Make sure you have at least twice the ammount of free disk space than the ammount of RAM, 
-## so as to use it for swap file setup.
 DOMAIN=$1
 DOMAIN=`echo $DOMAIN | perl -n -e "s/\.$//;print $_;"`
 IPV4=$2
@@ -26,6 +24,8 @@ NETWORKS=$5
 # Set the ammount of RAM (in GB) you server is going to use for swap purpose (for example 8G for a 8GB RAM server)
 # If the Lab server instance has more than 10GB memory, we will leave this value in 10GB as it'll be used for swap set-up.
 instanceRAMsize=$(free -g | awk 'FNR == 2 {print $2}')
+## Make sure you have at least twice the ammount of free disk space than the ammount of RAM, 
+## so as to use it for swap file setup.
 if [ "$instanceRAMsize" -gt "10" ]; then
   SWAPsize="10G"
 else
