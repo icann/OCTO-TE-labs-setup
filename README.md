@@ -87,6 +87,10 @@ Then go to **AWS EC2** and stop the instance (it should have the same name as yo
 > [!NOTE]
 > This will save several hundred dollars in AWS fees.
 
+> [!IMPORTANT]
+> When starting the instance again allow several minutes for the instance to restart before ssh will be active again.
+
+
 # Lab Take-down
 
 Once you are done with your lab it is important to decomission it.
