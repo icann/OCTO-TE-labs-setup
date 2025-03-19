@@ -237,7 +237,7 @@ Resources:
               - "s3-object-lambda:Get*"
               - "s3-object-lambda:List*"
             Resource:
-              - arn:aws:s3:::octo-te-labs-*
+              - arn:aws:s3:::%S3BUCKET%
       Roles:
         -
           !Ref labInstanceRole
