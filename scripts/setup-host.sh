@@ -2,12 +2,6 @@
 
 set -exou
 
-# +++++++++++++++++++++++++++++++++++++
-# Created by Nicolas Antoniello @ICANN
-# +++++++++++++++++++++++++++++++++++++
-
-## You'll have to run this script only once, right after initiating a new cloud lab instance
-
 DOMAIN=$1
 DOMAIN=`echo $DOMAIN | perl -n -e "s/\.$//;print $_;"`
 IPV4=$2
