@@ -34,7 +34,7 @@ Parameters:
   S3Bucket:
     Type: String
     Description: Bucket that contains lab setup scripts and configs
-    Default: octo-te-labs-setup
+    Default: %S3BUCKET%
   labInstanceType:
     Type: String
     Description: "Instance type for the lab."
