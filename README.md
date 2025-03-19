@@ -21,7 +21,7 @@ The following instructions should help you to setup and take down a lab.
 - Click on "Create stack"
 - Choose "with new resources (standard)"
 - In the field "Amazon S3 URL" put    
-  `https://te-lab-setup.s3.us-east-2.amazonaws.com/lab-ec2.yaml`
+  `https://octo-te-labs-setup.s3.us-east-2.amazonaws.com/lab-ec2.yaml`
 - Click on "Next"
 - Enter Stack name - Please follow the convention    
   LAB-\<DATE\>-\<LOCATION\>, e.g. LAB-20250101-STOCKHOLM
