@@ -9,14 +9,21 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+    - name: Set S3 Bucket Name
+        run: |
+          if [ "${{ github.ref_name }}" != "main" ]; then
+            echo "AWS_S3_BUCKET=${{ secrets.DESTINATION_BUCKET }}-${{ github.ref_name }}" >> $GITHUB_ENV
+          else
+            echo "AWS_S3_BUCKET=${{ secrets.DESTINATION_BUCKET }}" >> $GITHUB_ENV
+          fi    
     - name: inject bucket name
-      run: sed -i -e's/%S3BUCKET%/${{ secrets.DESTINATION_BUCKET }}/g' lab-ec2.yaml
+      run: sed -i -e's/%S3BUCKET%/${{ env.AWS_S3_BUCKET }}/g' lab-ec2.yaml
     - name: Sync to S3
       uses: jakejarvis/s3-sync-action@master
       with:
         args: --follow-symlinks --delete --exclude '.gitignore' --exclude '.github/*' --exclude '.git/*' 
       env:
-        AWS_S3_BUCKET: ${{ secrets.DESTINATION_BUCKET }}
+        AWS_S3_BUCKET: ${{ env.AWS_S3_BUCKET }}
         AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
         AWS_REGION: 'us-east-2'
