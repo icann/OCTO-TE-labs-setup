@@ -38,8 +38,6 @@ The following instructions should help you to setup and take down a lab.
 - S3Bucket is the name of the S3 bucket from where all install files will be fetched. It should already 
   be filled in with the name of the bucket from where you got the URL for the CloudFormation template.
 - labInstanceType is the type of the AWS EC2 machine this lab should use. Please see section [Select instance type]
-- labSshKey is the SSH key used to log into the AWS EC2 instance. You should not change this unless you really
-  want to run a private lab.
 - Click on "Next"
 - Scroll to the bottom of the page
 - Check the the box "I acknowledge that AWS CloudFormation might create IAM resources with customised names."    
