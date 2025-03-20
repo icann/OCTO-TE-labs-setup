@@ -26,7 +26,8 @@ The following instructions should help you to setup and take down a lab.
 - Click on "Next"
 - Enter Stack name - Please follow the convention    
   LAB-\<DATE\>-\<LOCATION\>, e.g. LAB-20250101-STOCKHOLM
-- Enter DnsName - needs to be a valid domain name, usually we use location (city or country) name for that
+- Enter DnsName - needs to be a valid domain name, usually we use location (city or country) name.<br>
+  **NO DASHES**, only a-z0-9.
 - Value for DnsParent should not be changed unless you really need to use another domain for the lab.
   Please be aware that the zone must already exist in your AWS account and must be dnssec signed. And
   don't forget the dot at the end.
