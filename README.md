@@ -17,11 +17,12 @@ The following instructions should help you to setup and take down a lab.
 # Step-by-step guide
 
 - Log into AWS
+- Goto S3 and find the bucket to which the whole repository is uploaded to
+- Copy the URL of the lab-ec2.yaml file 
 - Goto CloudFormation
 - Click on "Create stack"
 - Choose "with new resources (standard)"
-- In the field "Amazon S3 URL" put    
-  `https://octo-te-labs-setup.s3.us-east-2.amazonaws.com/lab-ec2.yaml`
+- Paste in the URL from above
 - Click on "Next"
 - Enter Stack name - Please follow the convention    
   LAB-\<DATE\>-\<LOCATION\>, e.g. LAB-20250101-STOCKHOLM
