@@ -17,7 +17,8 @@ jobs:
     - name: inject values
       run: |
         sed -i -e's/%S3BUCKET%/${{ env.AWS_S3_BUCKET }}/g' lab-ec2.yaml
-        sed -i -e's/%SSH_PUBLIC_KEY%/${{ vars.SSH_PUBLIC_KEY }}/g' lab-ec2.yaml
+        ESCAPED_SSH_PUBLIC_KEY=$(printf '%s\n' "${{ vars.SSH_PUBLIC_KEY }}" | sed -e 's/[\/&]/\\&/g')
+        sed -i -e "s/%SSH_PUBLIC_KEY%/${ESCAPED_SSH_PUBLIC_KEY}/g" lab-ec2.yaml
         sed -i -e's/%KSK_ARN%/${{ vars.KSK_ARN }}/g' lab-ec2.yaml
     - name: Sync to S3
       uses: jakejarvis/s3-sync-action@master
