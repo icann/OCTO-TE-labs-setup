@@ -27,11 +27,16 @@ The following instructions should help you to setup and take down a lab.
   LAB-\<DATE\>-\<LOCATION\>, e.g. LAB-20250101-STOCKHOLM
 - Enter DnsName - needs to be a valid domain name, usually we use location (city or country) name for that
 - Value for DnsParent should not be changed unless you really need to use another domain for the lab.
-  Please be aware that the zone must already exist in your AWS account and must be dnssec signed.
+  Please be aware that the zone must already exist in your AWS account and must be dnssec signed. And
+  don't forget the dot at the end.
 - Choose LabType - 1 = resolver, 2 = DNS, 3 = Router
 - Do **NOT** change the value of LatestUbuntu, it is a magic AWS value
 - Write in your own name as Owner
 - Write in the number of groups you want to set up, between 3 and 64
+- S3Bucket is the name of the S3 bucket from where all install files will be fetched. It should already 
+  be filled in with the name of the bucket from where you got the URL for the CloudFormation template.
+- labInstanceType is the type of the AWS EC2 machine this lab should use. Please see section "Select instance type"
+  in the README.
 - Click on "Next"
 - Scroll to the bottom of the page
 - Check the the box "I acknowledge that AWS CloudFormation might create IAM resources with customised names."    
@@ -42,6 +47,29 @@ This is needed for the ec2 instance to access s3 and route53
 - After around 5 minutes the stack creation should show "CREATE_COMPLETE"
 - Wait approx. 30 minutes for all lab setup scripts to finish too.
 - **DONE**
+
+## Select Instance Type
+
+Instance types defines cpu, memory and storage of the EC2 machine this lab will use.
+Storage is automatically added by the CloudFormation template. So it is safe to chose a machine type 
+without storage.
+
+The default machine r4.xlarge has x86_64, 4 vcpu, 30.5GB memory, no storage
+
+Not all instance types are available in all regions and even if they are supported in a region
+they could be temporarily unavailable. 
+
+Alternative types could be
+- r5.xlarge
+- r5a.xlarge
+- r5b.xlarge
+- r6a.xlarge
+
+Requirements are x86_64, min 4vcpu, min 32GB memory. The lab uses a lot of memory and not so much cpu.
+
+If you want to run more than 30 participants it is probably a good idea to level up too ??.2xlarge instance types.
+
+For a full list of available instance types, please see https://docs.aws.amazon.com/ec2/latest/instancetypes/ec2-instance-regions.html
 
 # Lab access
 
