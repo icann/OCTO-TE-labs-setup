@@ -39,7 +39,11 @@ Parameters:
     Type: String
     Description: "Instance type for the lab. Please check with AWS for allowed values. (Changes by region)"
     Default: "r4.xlarge"
-      
+  labSshKey:
+    Type: String
+    Description: "SSH Key to use for the lab"
+    Default: %SSH_PUBLIC_KEY%
+
 Resources:
 
   labKey:
@@ -50,7 +54,7 @@ Resources:
         - '-'
         - - !Ref 'AWS::StackName'
           - 'Key'
-      PublicKeyMaterial: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILYdTRMYZQq/7lK834y0mNZs72jl3BbtmxopbKO99Go/
+      PublicKeyMaterial: labSshKey
 
   labIpv6CidrBlock:
     Type: AWS::EC2::VPCCidrBlock

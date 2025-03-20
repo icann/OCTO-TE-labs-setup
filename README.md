@@ -35,8 +35,9 @@ The following instructions should help you to setup and take down a lab.
 - Write in the number of groups you want to set up, between 3 and 64
 - S3Bucket is the name of the S3 bucket from where all install files will be fetched. It should already 
   be filled in with the name of the bucket from where you got the URL for the CloudFormation template.
-- labInstanceType is the type of the AWS EC2 machine this lab should use. Please see section "Select instance type"
-  in the README.
+- labInstanceType is the type of the AWS EC2 machine this lab should use. Please see section [Select instance type]
+- labSshKey is the SSH key used to log into the AWS EC2 instance. You should not change this unless you really
+  want to run a private lab.
 - Click on "Next"
 - Scroll to the bottom of the page
 - Check the the box "I acknowledge that AWS CloudFormation might create IAM resources with customised names."    
@@ -73,12 +74,10 @@ For a full list of available instance types, please see https://docs.aws.amazon.
 
 # Lab access
 
-## SSH access
-
 Follow the ***Prepare your laptop for lab access*** below.<br>
 Then just type
 ```
-ssh <DnsName>.te-labs.training
+ssh <DnsName>.<DnsParent>
 ```
 
 > [!TIP]
@@ -96,10 +95,12 @@ ssh <DnsName>.te-labs.training
 >
 > Ask one of your colleagues for the `~/.ssh/id_te-lab.pem` file.
 
+All labs use the same ssh key if not manually configured otherwise.
+
 ## Access to lab web
 
 The web page of the lab can be reached at    
-`https://<DnsName>.te-labs.training`
+`https://<DnsName>.<DnsParent>`
 
 For the group passwords, log into the web by ssh and type
 ```
@@ -183,9 +184,14 @@ to Route53.
 This repository contains an automation that will upload new version automatically to an 
 AWS S3 bucket. For this, it uses three secrets which you will have to configure for your 
 fork.
+
+Github Secrets:
 - `ACCESS_KEY` the AWS ACCESS KEY
 - `SECRET_ACCESS_KEY` the AWS SECRET ACCESS KEY
 - `DESTINATION_BUCKET` the AWS S3 bucket to which the main branch will be copied
+
+Github Repository Variables:
+- `SSH_PUBLIC_KEY` the ssh key to log into your ec2 instance
 
 In any case, the CloudFormation (CF) template does download the contents of the repository
 from a S3 bucket. The name of the bucket will be injected in the CF template by the 
