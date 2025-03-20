@@ -9,7 +9,7 @@ The following instructions should help you to setup and take down a lab.
 
 # Lab Features
 
-- All group name servers are reachable from the internet (through dnsdist in container ns1)
+- All group name servers are reachable from the internet (through dnsdist in container dnsdist)
 - dnsviz.net and zonemaster.net can be used to test group zonemaster
 - DS records can be submitted manually on the group web page
 - CDS records are scanned and will be submitted automatically

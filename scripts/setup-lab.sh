@@ -25,7 +25,7 @@ eval set -- "$TEMP"
 . ./lab-tools/letsencrypt.sh
 . ./lab-tools/networks.sh
 . ./lab-tools/nginx.sh
-. ./lab-tools/ns1.sh
+. ./lab-tools/dnsdist.sh
 . ./lab-tools/routers.sh
 . ./lab-tools/servers.sh
 . ./lab-tools/shellinabox.sh
@@ -142,6 +142,7 @@ start_all () {
   fi
   if [ "$generateServers" = "YES" ]; then
     start_student_servers
+    start_dnsdist
   fi
   if [ "$generateRPKIvalidator" = "YES" ]; then
     start_student_RPKI_validator
@@ -159,7 +160,7 @@ stop_all () {
   stop_global_RPKI_validator
   stop_student_clients
   stop_student_servers
-  stop_ns1
+  stop_dnsdist
   stop_nginx
   stop_webssh
   echo "---> DONE stop_all"
@@ -170,7 +171,7 @@ delete_all () {
   echo "---> Performing delete_all"
   delete_student_clients
 	delete_student_servers
-  delete_ns1
+  delete_dnsdist
   delete_student_RPKI_validator
   delete_global_RPKI_validator
 	delete_routers
@@ -276,7 +277,7 @@ deploy () {
 
   if [ "$generateServers" = "YES" ]; then
     create_student_servers
-    create_ns1
+    create_dnsdist
   fi
 
   if [ "$generateRPKIvalidator" = "YES" ]; then
