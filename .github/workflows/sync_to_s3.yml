@@ -20,7 +20,7 @@ jobs:
         ESCAPED_SSH_PUBLIC_KEY=$(printf '%s\n' "${{ vars.SSH_PUBLIC_KEY }}" | sed -e 's/[\/&]/\\&/g')
         sed -i -e "s/%SSH_PUBLIC_KEY%/${ESCAPED_SSH_PUBLIC_KEY}/g" lab-ec2.yaml
         ESCAPED_KSK_ARN=$(printf '%s\n' "${{ vars.KSK_ARN }}" | sed -e 's/[\/&]/\\&/g')
-        sed -i -e's/%KSK_ARN%/${ESCAPED_KSK_ARN}/g' lab-ec2.yaml
+        sed -i -e"s/%KSK_ARN%/${ESCAPED_KSK_ARN}/g" lab-ec2.yaml
     - name: Sync to S3
       uses: jakejarvis/s3-sync-action@master
       with:
