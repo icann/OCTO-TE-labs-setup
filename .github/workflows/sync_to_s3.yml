@@ -14,10 +14,11 @@ jobs:
         else
           echo "AWS_S3_BUCKET=${{ secrets.DESTINATION_BUCKET }}" >> $GITHUB_ENV
         fi    
-    - name: inject bucket name
-      run: sed -i -e's/%S3BUCKET%/${{ env.AWS_S3_BUCKET }}/g' lab-ec2.yaml
-    - name: inject SSH key
-      run: sed -i -e's/%SSH_PUBLIC_KEY%/${{ vars.SSH_PUBLIC_KEY }}/g' lab-ec2.yaml
+    - name: inject values
+      run: |
+        sed -i -e's/%S3BUCKET%/${{ env.AWS_S3_BUCKET }}/g' lab-ec2.yaml
+        sed -i -e's/%SSH_PUBLIC_KEY%/${{ vars.SSH_PUBLIC_KEY }}/g' lab-ec2.yaml
+        sed -i -e's/%KSK_ARN%/${{ vars.KSK_ARN }}/g' lab-ec2.yaml
     - name: Sync to S3
       uses: jakejarvis/s3-sync-action@master
       with:

@@ -452,7 +452,7 @@ Resources:
     Type: AWS::Route53::KeySigningKey
     Properties:
       HostedZoneId: !Ref labZone
-      KeyManagementServiceArn: arn:aws:kms:us-east-1:427946385759:key/64929af8-d32d-4936-b0c4-cfb546d53fb3
+      KeyManagementServiceArn: %KSK_ARN%
       Name: !Join
       - ''
       - - !Ref DnsName
