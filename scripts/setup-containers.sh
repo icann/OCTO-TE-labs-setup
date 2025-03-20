@@ -45,9 +45,9 @@ lxc exec hostX -- sh -c 'echo "deb [signed-by=/usr/share/keyrings/auth-49-pub.as
 lxc exec hostX -- sh -c 'echo "deb [signed-by=/usr/share/keyrings/rec-52-pub.asc] http://repo.powerdns.com/ubuntu $(lsb_release -s -c)-rec-52 main" >> /etc/apt/sources.list.d/pdns.list'
 lxc exec hostX -- sh -c 'echo "deb [signed-by=/usr/share/keyrings/dnsdist-19-pub.asc] http://repo.powerdns.com/ubuntu $(lsb_release -s -c)-dnsdist-19 main" >> /etc/apt/sources.list.d/pdns.list'
 lxc exec hostX -- sh -c "mkdir -p /etc/apt/preferences.d"
-lxc file push hostX ../configs/apt/auth-49    /etc/apt/preferences.d/auth-49
-lxc file push hostX ../configs/apt/rec-52     /etc/apt/preferences.d/rec-52
-lxc file push hostX ../configs/apt/dnsdist-19 /etc/apt/preferences.d/dnsdist-19
+lxc file push ../configs/apt/auth-49    hostX/etc/apt/preferences.d/auth-49
+lxc file push ../configs/apt/rec-52     hostX/etc/apt/preferences.d/rec-52
+lxc file push ../configs/apt/dnsdist-19 hostX/etc/apt/preferences.d/dnsdist-19
 # Now update apt to make new repos available    
 lxc exec hostX -- sh -c "apt-get -yq update"
 lxc exec hostX -- sh -c "apt-get -yq upgrade"
