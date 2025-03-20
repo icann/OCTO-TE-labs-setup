@@ -41,9 +41,10 @@ lxc exec hostX -- sh -c 'echo "deb [signed-by=/usr/share/keyrings/cznic-labs-pkg
 lxc exec hostX -- sh -c 'curl https://repo.powerdns.com/FD380FBB-pub.asc > /usr/share/keyrings/auth-49-pub.asc'
 lxc exec hostX -- sh -c 'curl https://repo.powerdns.com/FD380FBB-pub.asc > /usr/share/keyrings/rec-52-pub.asc'
 lxc exec hostX -- sh -c 'curl https://repo.powerdns.com/FD380FBB-pub.asc > /usr/share/keyrings/dnsdist-19-pub.asc'
-lxc exec hostX -- sh -c 'echo "deb [signed-by=/usr/share/keyrings/auth-49-pub.asc] http://repo.powerdns.com/ubuntu noble-auth-49 main" >  /etc/apt/sources.list.d/pdns.list'
-lxc exec hostX -- sh -c 'echo "deb [signed-by=/usr/share/keyrings/rec-52-pub.asc] http://repo.powerdns.com/ubuntu noble-rec-52 main" >> /etc/apt/sources.list.d/pdns.list'
-lxc exec hostX -- sh -c 'echo "deb [signed-by=/usr/share/keyrings/dnsdist-19-pub.asc] http://repo.powerdns.com/ubuntu noble-dnsdist-19 main" >> /etc/apt/sources.list.d/pdns.list'
+lxc exec hostX -- sh -c 'echo "deb [signed-by=/usr/share/keyrings/auth-49-pub.asc] http://repo.powerdns.com/ubuntu $(lsb_release -s -c)-auth-49 main" >  /etc/apt/sources.list.d/pdns.list'
+lxc exec hostX -- sh -c 'echo "deb [signed-by=/usr/share/keyrings/rec-52-pub.asc] http://repo.powerdns.com/ubuntu $(lsb_release -s -c)-rec-52 main" >> /etc/apt/sources.list.d/pdns.list'
+lxc exec hostX -- sh -c 'echo "deb [signed-by=/usr/share/keyrings/dnsdist-19-pub.asc] http://repo.powerdns.com/ubuntu $(lsb_release -s -c)-dnsdist-19 main" >> /etc/apt/sources.list.d/pdns.list'
+lxc exec hostX -- sh -c "mkdir -p /etc/apt/preferences.d"
 lxc file push hostX ../configs/apt/auth-49    /etc/apt/preferences.d/auth-49
 lxc file push hostX ../configs/apt/rec-52     /etc/apt/preferences.d/rec-52
 lxc file push hostX ../configs/apt/dnsdist-19 /etc/apt/preferences.d/dnsdist-19
