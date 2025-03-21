@@ -4,7 +4,7 @@ Parameters:
   DnsParent:
     Type: String
     Description: "Parent Domain for the lab (must be in Route53) and contain trailing dot!"
-    Default: "te-labs.training."
+    Default: "%DNS_PARENT_DEFAULT%"
   DnsName:
     Type: String
     Description: "DNS name for the lab. NO DASHES - only a-z0-9!!!"

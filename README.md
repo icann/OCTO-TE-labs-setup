@@ -193,6 +193,7 @@ Github Secrets:
 Github Repository Variables:
 - `SSH_PUBLIC_KEY` the ssh key to log into your ec2 instance
 - `KSK_ARN`the AWS ARN of the key to be use for DNSSEC signing
+- `DNS_PARENT_DEFAULT` the default value for the DnsParent parameter
 
 In any case, the CloudFormation (CF) template does download the contents of the repository
 from a S3 bucket. The name of the bucket will be injected in the CF template by the 
