@@ -160,9 +160,9 @@ push_student_servers_net_config () {
     lxc exec grp$grp-resolv2 -- sh -c "echo 127.0.0.222 resolv2.grp$grp.$DOMAIN >>/etc/hosts"
 
     if [ $LABTYPE -gt 1 ]; then
-      lxc file push $worksir/resolv.conf.$grp grp$grp-soa/etc/resolv.conf
-      lxc file push $worksir/resolv.conf.$grp grp$grp-ns1/etc/resolv.conf
-      lxc file push $worksir/resolv.conf.$grp grp$grp-ns2/etc/resolv.conf
+      lxc file push $workdir/resolv.conf.$grp grp$grp-soa/etc/resolv.conf
+      lxc file push $workdir/resolv.conf.$grp grp$grp-ns1/etc/resolv.conf
+      lxc file push $workdir/resolv.conf.$grp grp$grp-ns2/etc/resolv.conf
 
       lxc file push $workdir/10-lxc.yaml.$grp-64-1 grp$grp-soa/etc/netplan/10-lxc.yaml
       lxc file push $workdir/10-lxc.yaml.$grp-128-1 grp$grp-ns1/etc/netplan/10-lxc.yaml
