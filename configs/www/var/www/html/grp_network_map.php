@@ -51,9 +51,9 @@ if (!empty($cd)) {
 	$tmpfname = tempnam("/tmp", "");
 	$file = fopen($tmpfname, "w");
  	fwrite($file, $cd);
-   fclose($file);
-   rename($tmpfname, $tmpfname.".DS");
-   echo "<div class=\"success\">Your DS record(s) are submitted</div>";
+  fclose($file);
+  rename($tmpfname, $tmpfname.".DS");
+  echo "<div class=\"success\">Your DS record(s) are submitted</div>";
 }
 ?>
 <form action="%url%" method="post">
@@ -61,6 +61,27 @@ if (!empty($cd)) {
   <textarea id="dsrecords" name="dsrecords"></textarea>
   <br>
   <input type="submit" value="Submit">
+</form>
+<hr>
+<h1> Update your DS records! </h1>
+<?php
+// strip slashes before putting the form data into target file
+$rmrec = stripslashes($_POST['rmdsrecords']);
+
+// Show the msg, if the code string is empty
+if (!empty($rmrec)) {
+	$tmpfname = tempnam("/tmp", "");
+	$file = fopen($tmpfname, "w");
+ 	fwrite($file, "$rmrec");
+  fclose($file);
+  rename($tmpfname, $tmpfname.".DEL");
+  echo "<div class=\"success\">Your DS record(s) will be deleted</div>";
+}
+?>
+<form action="%url%" method="post">
+  <input type="hidden" name="rmdsrecords" value="grp%group%.%AuthDomain%"></textarea>
+  <br>
+  <input type="submit" value="Delete all DS records">
 </form>
 </body>
 </html>

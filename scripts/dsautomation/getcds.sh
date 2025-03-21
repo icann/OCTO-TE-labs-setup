@@ -12,7 +12,7 @@ do
     TMP=$(mktemp).grp$grp
 
     # try to get DS records
-    dig grp$grp.$DOMAIN. cds | grep -v -e '^;' | grep -v -e '^\s*$' | grep -E '\sIN\s+CDS\s' >> $TMP
+    dig grp$grp.$DOMAIN. cds +noall +answer | grep -v -e '^;' | grep -v -e '^\s*$' | grep -E '\sIN\s+CDS\s' >> $TMP
 
     # if DS records were saved keep the file, otherwise remove 
     TMPSIZE=$(cat $TMP | wc -c)
