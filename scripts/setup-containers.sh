@@ -38,13 +38,12 @@ lxc exec hostX -- sh -c "add-apt-repository ppa:isc/bind"
 lxc exec hostX -- sh -c 'wget -O /usr/share/keyrings/cznic-labs-pkg.gpg https://pkg.labs.nic.cz/gpg'
 lxc exec hostX -- sh -c 'echo "deb [signed-by=/usr/share/keyrings/cznic-labs-pkg.gpg] https://pkg.labs.nic.cz/knot-dns $(lsb_release -s -c) main" > /etc/apt/sources.list.d/cznic-labs-knot-dns.list'
 # PowerDNS repos
-lxc exec hostX -- sh -c 'curl https://repo.powerdns.com/FD380FBB-pub.asc > /usr/share/keyrings/auth-49-pub.asc'
-lxc exec hostX -- sh -c 'curl https://repo.powerdns.com/FD380FBB-pub.asc > /usr/share/keyrings/rec-52-pub.asc'
-lxc exec hostX -- sh -c 'curl https://repo.powerdns.com/FD380FBB-pub.asc > /usr/share/keyrings/dnsdist-19-pub.asc'
+lxc exec hostX -- sh -c 'curl -s https://repo.powerdns.com/FD380FBB-pub.asc > /usr/share/keyrings/auth-49-pub.asc'
+lxc exec hostX -- sh -c 'curl -s https://repo.powerdns.com/FD380FBB-pub.asc > /usr/share/keyrings/rec-52-pub.asc'
+lxc exec hostX -- sh -c 'curl -s https://repo.powerdns.com/FD380FBB-pub.asc > /usr/share/keyrings/dnsdist-19-pub.asc'
 lxc exec hostX -- sh -c 'echo "deb [signed-by=/usr/share/keyrings/auth-49-pub.asc] http://repo.powerdns.com/ubuntu $(lsb_release -s -c)-auth-49 main" >  /etc/apt/sources.list.d/pdns.list'
 lxc exec hostX -- sh -c 'echo "deb [signed-by=/usr/share/keyrings/rec-52-pub.asc] http://repo.powerdns.com/ubuntu $(lsb_release -s -c)-rec-52 main" >> /etc/apt/sources.list.d/pdns.list'
 lxc exec hostX -- sh -c 'echo "deb [signed-by=/usr/share/keyrings/dnsdist-19-pub.asc] http://repo.powerdns.com/ubuntu $(lsb_release -s -c)-dnsdist-19 main" >> /etc/apt/sources.list.d/pdns.list'
-lxc exec hostX -- sh -c "mkdir -p /etc/apt/preferences.d"
 lxc file push ../configs/apt/auth-49    hostX/etc/apt/preferences.d/auth-49
 lxc file push ../configs/apt/rec-52     hostX/etc/apt/preferences.d/rec-52
 lxc file push ../configs/apt/dnsdist-19 hostX/etc/apt/preferences.d/dnsdist-19
