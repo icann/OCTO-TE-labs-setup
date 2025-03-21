@@ -7,7 +7,7 @@ NETWORKS=$2
 for grp in $(seq 1 $NETWORKS)
 do
     # temporary file name
-    TMP=$(mktemp).grp$grp
+    TMP=$(mktemp XXXXXXXX.grp$grp)
 
     # try to get DS records
     dig grp$grp.$DOMAIN. cds +noall +answer | grep -v -e '^;' | grep -v -e '^\s*$' | grep -E '\sIN\s+CDS\s' >> $TMP
@@ -16,7 +16,7 @@ do
     TMPSIZE=$(cat $TMP | wc -c)
     if [ $TMPSIZE -lt 10 ]; then
         echo "NO CDS records found for grp$grp";
-        rm $tmp
+        rm $TMP
     else
         echo "$(wc -l $TMP) CDS records found"
         mv $TMP $TMP.CDS
