@@ -10,9 +10,9 @@ jobs:
     - name: Set S3 Bucket Name
       run: |
         if [ "${{ github.ref_name }}" != "main" ]; then
-          echo "AWS_S3_BUCKET=${{ secrets.DESTINATION_BUCKET }}-${{ github.ref_name }}" >> $GITHUB_ENV
+          echo "AWS_S3_BUCKET=${{ vars.DESTINATION_BUCKET }}-${{ github.ref_name }}" >> $GITHUB_ENV
         else
-          echo "AWS_S3_BUCKET=${{ secrets.DESTINATION_BUCKET }}" >> $GITHUB_ENV
+          echo "AWS_S3_BUCKET=${{ vars.DESTINATION_BUCKET }}" >> $GITHUB_ENV
         fi    
     - name: inject values
       run: |

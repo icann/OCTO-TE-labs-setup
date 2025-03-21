@@ -188,9 +188,9 @@ fork.
 Github Secrets:
 - `ACCESS_KEY` the AWS ACCESS KEY
 - `SECRET_ACCESS_KEY` the AWS SECRET ACCESS KEY
-- `DESTINATION_BUCKET` the AWS S3 bucket to which the main branch will be copied
 
 Github Repository Variables:
+- `DESTINATION_BUCKET` the AWS S3 bucket to which the main branch will be copied
 - `SSH_PUBLIC_KEY` the ssh key to log into your ec2 instance
 - `KSK_ARN`the AWS ARN of the key to be use for DNSSEC signing
 - `DNS_PARENT_DEFAULT` the default value for the DnsParent parameter
