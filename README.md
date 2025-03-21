@@ -115,6 +115,10 @@ For the group passwords, log into the web by ssh and type
 ```
 cat grouppasswords.txt
 ```
+
+In the same list there is also a password for the `labuser`.
+This user/password combination gives access to all groups.
+
 # Lab life-cycle management
 
 Please setup a new lab at least a week before your engagement.
