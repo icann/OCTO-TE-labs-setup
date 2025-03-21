@@ -22,7 +22,7 @@ foreach my $file (@dsfiles) {
     # if no DS records were found jump to next file
     if (scalar(@ds) == 0) {
         print STDERR "No CDS records in $file found.\n";
-        continue;
+        next;
     }
 
     # get name name and value of the first ds record
@@ -35,14 +35,14 @@ foreach my $file (@dsfiles) {
         print $fh_out "$name\n";
         close($fh_out);
         rename $file.".TMP", $file.".DEL";
-        continue;
+        next;
     }
 
     # write aws data
     open(my $fh_out, ">", $file.".TMP") or die "Can't open $file.TMP: $!";
     print $fh_out <<EOF;
 { 
-    "Comment": "$action DS records for $name",
+    "Comment": "UPSERT DS records for $name",
     "Changes": [
         {
             "Action": "UPSERT",

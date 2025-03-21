@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -eou
-
 DOMAIN=$1
 NETWORKS=$2
 

@@ -15,15 +15,17 @@ foreach my $file (@delfiles) {
 
     # get name name and value of the first ds record
     my $action = "DELETE";
-        
+    my $name = $line;
+    $name =~ s/\R//;
+       
     # AWS requires to set in the current data to delete it.
     my $digresult  = `dig $name DS`;
     my @digresults = split /\n/, $digresult;
 
     my @ds = ();
     foreach my $line (@digresults) {
-        continue if $line =~ m/^\s*$/; # skip empty lines
-        continue if $line =~ m/^;/;    # skip comments
+        next if $line =~ m/^\s*$/; # skip empty lines
+        next if $line =~ m/^;/;    # skip comments
         if ($line =~ m/^\s*(\S+\s+\d+\s+IN\s+DS\s+\d+\s+\d+\s+\d+[0-9A-Za-z ]+)\s*$/) {
             print STDERR "DS record found.\n";
             push @ds, $1;
@@ -33,7 +35,7 @@ foreach my $file (@delfiles) {
     # if no DS records were found jump to next file
     if (scalar(@ds) == 0) {
         print STDERR "No DS records found for $name\n";
-        exit 0;
+        next;
     }
 
     # write aws data

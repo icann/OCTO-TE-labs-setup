@@ -22,7 +22,7 @@ foreach my $file (@dsfiles) {
     # if no DS records were found jump to next file
     if (scalar(@ds) == 0) {
         print STDERR "No DS records in $file found.\n";
-        exit 0;
+        next;
     }
 
     # get name name and value of the first ds record
