@@ -63,7 +63,7 @@ if (!empty($cd)) {
   <input type="submit" value="Submit">
 </form>
 <hr>
-<h1> Update your DS records! </h1>
+<h1> Delete your DS records! </h1>
 <?php
 // strip slashes before putting the form data into target file
 $rmrec = stripslashes($_POST['rmdsrecords']);
