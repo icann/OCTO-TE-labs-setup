@@ -11,7 +11,7 @@ server {
 # HTTPS
 server {
 	listen 443 ssl http2;
-    listen [::]:443 ssl http2;
+	listen [::]:443 ssl http2;
 	server_name %AuthDomain%;
 	
 	error_page 497 https://$host:$server_port$request_uri; # Enforce redirection of http to https

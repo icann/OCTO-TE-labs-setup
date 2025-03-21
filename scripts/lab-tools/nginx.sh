@@ -19,13 +19,13 @@ gen_nginx_config () {
     passwd4grp=$(awk -v dev="grp$grp-rtr" -F"," '$1==dev {print $2}' /var/shellinabox/router-password-list.txt)
 
     # Create the file for storing grpX username and password
-    htpasswd -bc $nginxworkdir/etc/nginx/htpasswd/.htpasswd_grp$grp grp$grp $passwd4grp
+    htpasswd -bc $nginxworkdir/etc/nginx/htpasswd/htpasswd_grp$grp grp$grp $passwd4grp
 
     # Add grpX nginx "location" statement to a temporary file (grpX_locations.txt)
     echo '  location /grp'$grp' {' >> $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
     echo '    try_files $uri $uri/ =404;' >> $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
     echo '    auth_basic "Restricted Content";' >> $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
-    echo '    auth_basic_user_file /etc/nginx/htpasswd/.htpasswd_grp'$grp';' >> $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
+    echo '    auth_basic_user_file /etc/nginx/htpasswd/htpasswd_grp'$grp';' >> $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
     cat ../configs/nginx/etc/nginx/sites-available/php.conf >> $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
     echo '  }' >> $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
     echo '' >> $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
