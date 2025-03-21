@@ -72,6 +72,15 @@ If you want to run more than 30 participants it is probably a good idea to level
 
 For a full list of available instance types, please see https://docs.aws.amazon.com/ec2/latest/instancetypes/ec2-instance-regions.html
 
+**Recommendations**:
+|     Region    |  3-30 participants | 31-64 paticipants |
+|---------------|--------------------|-------------------|
+| **DEFAULT**   |  r4.xlarge         | r4.2xlarge        |
+| Stockholm     |  r5.xlarge         | r5.2xlarge        |
+| Frankfurt     |  r4.xlarge         | r4.2xlarge        |
+|               |  r5a.xlarge        | r5a.2xlarge       |
+| Virginia      |  r4.xlarge         | r4.2xlarge        |
+
 # Lab access
 
 Follow the ***Prepare your laptop for lab access*** below.<br>
