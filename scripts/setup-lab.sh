@@ -255,6 +255,7 @@ deploy () {
   mkdir -p $nginxworkdir
   mkdir -p $nginxworkdir/etc/nginx/sites-available
   mkdir -p $nginxworkdir/etc/nginx/htpasswd
+  webuserpasswd=$(openssl rand -base64 14)
 
   contentworkdir=$workdir/www
   mkdir -p $contentworkdir/$DOMAIN
@@ -387,7 +388,8 @@ deploy () {
   echo "========================================================="  
   echo "Group passwords"
   cat /var/shellinabox/router-password-list.txt
-  sed -E 's/(grp[0-9]+)-rtr,/\1    /'  /var/shellinabox/router-password-list.txt > /home/ubuntu/grouppasswords.txt
+  echo "labuser    $webuserpasswd" > /home/ubuntu/grouppasswords.txt
+  sed -E 's/(grp[0-9]+)-rtr,/\1    /'  /var/shellinabox/router-password-list.txt >> /home/ubuntu/grouppasswords.txt
   chown ubuntu:ubuntu /home/ubuntu/grouppasswords.txt
   echo " "
   echo "===================== DEPLOY DONE ======================="  

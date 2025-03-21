@@ -20,6 +20,7 @@ gen_nginx_config () {
 
     # Create the file for storing grpX username and password
     htpasswd -bc $nginxworkdir/etc/nginx/htpasswd/htpasswd_grp$grp grp$grp $passwd4grp
+    htpasswd -b $nginxworkdir/etc/nginx/htpasswd/htpasswd_grp$grp labuser $webuserpasswd
 
     # Add grpX nginx "location" statement to a temporary file (grpX_locations.txt)
     echo '  location /grp'$grp' {' >> $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
