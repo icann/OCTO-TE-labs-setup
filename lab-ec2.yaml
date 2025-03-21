@@ -308,7 +308,7 @@ Resources:
           # install latest ubuntu updates
           #
           apt-get -yq update 
-          apt-get -yq full-upgrade
+          apt-get -yq --with-new-pkgs full-upgrade
           #
           # install AWS cli client
           #
@@ -320,7 +320,7 @@ Resources:
           #
           # copy files from S3
           #
-          aws s3 cp s3://${S3Bucket} . --recursive
+          aws s3 cp s3://${S3Bucket} . --recursive --no-progress
           chmod -R +x scripts/*
           #
           # wait for cloudformation stack to finish

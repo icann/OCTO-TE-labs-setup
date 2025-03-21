@@ -116,7 +116,7 @@ main() {
 init_lab_VM () {
   # Update & Upgrade system
   apt-get -yq update
-  apt-get -yq upgrade
+  apt-get -yq --with-new-pkgs upgrade
 
   ## Instal some stuff we'll need
   apt-get -yq install zfsutils-linux git nano curl dnsutils net-tools traceroute wget tree bridge-utils openvswitch-switch-dpdk

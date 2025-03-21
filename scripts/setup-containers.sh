@@ -13,7 +13,7 @@ lxc list
 ## Container creation
 
 # Get lxc Ubuntu image
-lxc image copy ubuntu:24.04 local: --alias ubuntu
+lxc image copy ubuntu:24.04 local: --alias ubuntu -q
 
 ## ================================================================================================"
 # Create template host (hostX) using ubuntu image)
@@ -49,8 +49,8 @@ lxc file push ../configs/apt/rec-52     hostX/etc/apt/preferences.d/rec-52
 lxc file push ../configs/apt/dnsdist-19 hostX/etc/apt/preferences.d/dnsdist-19
 # Now update apt to make new repos available    
 lxc exec hostX -- sh -c "apt-get -yq update"
-lxc exec hostX -- sh -c "apt-get -yq upgrade"
-lxc exec hostX -- sh -c "apt-get -yq install curl gnupg nano joe dnsutils knot-dnsutils net-tools traceroute wget man openssh-server tcpdump dnstop whois telnet --no-install-recommends"
+lxc exec hostX -- sh -c "apt-get -yq --with-new-pkgs upgrade"
+lxc exec hostX -- sh -c "apt-get -yq install curl gnupg nano joe bind9-dnsutils knot-dnsutils net-tools traceroute wget man openssh-server tcpdump dnstop whois telnet --no-install-recommends"
 # install ICANN RDAP client
 lxc exec hostX -- sh -c 'curl -s -L -O https://github.com/icann/icann-rdap/releases/latest/download/icann-rdap-x86_64-unknown-linux-gnu.tar.gz'
 lxc exec hostX -- sh -c 'tar xzf icann-rdap-x86_64-unknown-linux-gnu.tar.gz rdap'
