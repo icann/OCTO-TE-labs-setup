@@ -1,12 +1,20 @@
-# Lab setup guide
+# OCTO-TE-Labs
 
-Welcome to the lab setup guide!
+Welcome to the DNS and RPKI lab of ICANNs Office Of The CTO (OCTO) 
+Technical Engagemnt (TE) team.
 
-The following instructions should help you to setup and take down a lab.
+We use this repository to setup a lab environment for our workshops.
+We do use AWS and therefore this lab is integrated with some AWS functions,
+CloudFormation, Route53 and S3.
+
+If you want to run your own labs, please fork this repository,  see 
+[If You Fork This Repository](#if-you-fork-this-repository) below.
 
 > [!NOTE]
-> Don't hesitate to ask for help. If you find errors or have ideas for improvements
-> please open a Github issue.
+> If you find errors or have ideas for improvements please open a Github issue.
+
+Workshop instructions can be found in our [OCTO-TE-labs](https://github.com/icann/OCTO-TE-labs) 
+repository.
 
 # Lab Features
 
@@ -15,7 +23,14 @@ The following instructions should help you to setup and take down a lab.
 - DS records can be submitted and deleted manually on the group web page
 - CDS records are scanned and will be published to the parent automatically
 
-# Step-by-step guide
+# Lab setup guide
+
+The following instructions should help you to setup and take down a lab.
+
+> [!NOTE]
+> Don't hesitate to ask for help. 
+
+## Step-by-step guide
 
 - Log into AWS
 - Goto S3 and find the bucket to which the whole repository is uploaded to
@@ -51,7 +66,7 @@ The following instructions should help you to setup and take down a lab.
 - Wait approx. 30 minutes for all lab setup scripts to finish too.
 - **DONE**
 
-## Select Instance Type
+### Select Instance Type
 
 Instance types defines cpu, memory and storage of the EC2 machine this lab will use.
 Storage is automatically added by the CloudFormation template. So it is safe to chose a machine type 
@@ -103,10 +118,8 @@ ssh <DnsName>.<DnsParent>
 > IdentitiesOnly yes
 >	Port 8484
 > ```
->
-> Ask one of your colleagues for the `~/.ssh/id_te-lab.pem` file.
 
-All labs use the same ssh key if not manually configured otherwise.
+All labs use the ssh key configured in Github.
 
 ## Access to lab web
 
@@ -153,10 +166,6 @@ Please follow these "easy" steps:
   - Click on "Retry delete" and choose the "Force delete" option
 - **DONE**
 
-# Feature Requests
-
-Please submit as github issue.
-
 # Network address plan
 
 The lab uses the 100.64.0.0/10 address space from RFC 6598 "IANA-Reserved IPv4 Prefix for Shared Address Space".
@@ -184,17 +193,7 @@ Then, within each group, prefix is splitted into 3 sub-networks:
 <img src="configs/www/var/www/html/_img/group_routing_network_globalRPKI_map.png">
 <img src="configs/www/var/www/html/_img/grp_routing_network_map.png">
 
-# AWS Integration
-
-This repository aims to setup a full lab on an AWS EC2 instance. But just copying the 
-`config/`and `scripts/` folders to a Ubuntu Linux machine should allow you to start the
-lab on any other cloud service or on your own machine.
-
-One integration will be harder to replace. This setup makes heavy use of AWS Route53
-as a provider for DNS and DNSSEC. Additionally the DNSSEC automation uses an integration
-to Route53. 
-
-## If you fork this repository
+# If you fork this repository
 
 This repository contains an automation that will upload new version automatically to an 
 AWS S3 bucket. For this, it uses Github secrets and variables which you will have to configure 
@@ -227,3 +226,23 @@ such a bucket actually exists in your AWS account.
 Copy the URL of the `lab-ec2.yaml` file in your branch bucket and use it to start a new lab
 instances.
 
+# Lab without AWS
+
+This repository aims to setup a full lab on an AWS EC2 instance. But just copying the 
+`config/`and `scripts/` folders to a Ubuntu Linux machine should allow you to start the
+lab on any other cloud service or on your own machine. Run the following commands
+
+```
+$ cd scripts
+$ ./setup-host.sh ${DnsName}.${DnsParent} ${PublicIPv4} ${AWS Zone ID} ${LabType} ${Participants}
+$ ./setup-containers.sh
+$ ./setup-lab.sh --deploy
+```
+
+One integration will be harder to replace. This setup makes heavy use of AWS Route53
+as a provider for DNS and DNSSEC. 
+
+Make sure to have a valid DNS setup including DNSSEC signing for the parent zone and the lab zone.
+
+The DNSSEC automation uses an integration to Route53. You will have to replace that with an 
+integration of your own.
