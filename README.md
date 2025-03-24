@@ -5,14 +5,15 @@ Welcome to the lab setup guide!
 The following instructions should help you to setup and take down a lab.
 
 > [!NOTE]
-> Don't hesitate to ask for help. Nico and Ulrich are always happy to help a colleague. Usually use Slack but in urgent cases a phone call is a faster way to get help.
+> Don't hesitate to ask for help. If you find errors or have ideas for improvements
+> please open a Github issue.
 
 # Lab Features
 
 - All group name servers are reachable from the internet (through dnsdist in container dnsdist)
 - dnsviz.net and zonemaster.net can be used to test group zonemaster
-- DS records can be submitted manually on the group web page
-- CDS records are scanned and will be submitted automatically
+- DS records can be submitted and deleted manually on the group web page
+- CDS records are scanned and will be published to the parent automatically
 
 # Step-by-step guide
 
@@ -31,20 +32,21 @@ The following instructions should help you to setup and take down a lab.
 - Value for DnsParent should not be changed unless you really need to use another domain for the lab.
   Please be aware that the zone must already exist in your AWS account and must be dnssec signed. And
   don't forget the dot at the end.
-- Choose LabType - 1 = resolver, 2 = DNS, 3 = Router
+- Choose LabType: 1 = resolver, 2 = DNS, 3 = Router
 - Do **NOT** change the value of LatestUbuntu, it is a magic AWS value
 - Write in your own name as Owner
 - Write in the number of groups you want to set up, between 3 and 64
 - S3Bucket is the name of the S3 bucket from where all install files will be fetched. It should already 
   be filled in with the name of the bucket from where you got the URL for the CloudFormation template.
-- labInstanceType is the type of the AWS EC2 machine this lab should use. Please see section [Select instance type]
+- labInstanceType is the type of the AWS EC2 machine this lab should use. Please see section [
+  Select Instance Type](#select-instance-type)
 - Click on "Next"
 - Scroll to the bottom of the page
 - Check the the box "I acknowledge that AWS CloudFormation might create IAM resources with customised names."    
-This is needed for the ec2 instance to access s3 and route53
+  This is needed for the ec2 instance to access s3 and route53
 - Click on "Next"
 - Scroll to the bottom of the page
-- Click on "Next"
+- Click on "Submit"
 - After around 5 minutes the stack creation should show "CREATE_COMPLETE"
 - Wait approx. 30 minutes for all lab setup scripts to finish too.
 - **DONE**
@@ -195,8 +197,8 @@ to Route53.
 ## If you fork this repository
 
 This repository contains an automation that will upload new version automatically to an 
-AWS S3 bucket. For this, it uses three secrets which you will have to configure for your 
-fork.
+AWS S3 bucket. For this, it uses Github secrets and variables which you will have to configure 
+for your fork.
 
 Github Secrets:
 - `ACCESS_KEY` the AWS ACCESS KEY
