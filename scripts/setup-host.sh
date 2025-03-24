@@ -103,6 +103,10 @@ main() {
   sed -i -e "s/%NETWORKS%/${NETWORKS}/" ./deploy-parameters.cfg
   echo "---> deploy-parameters.cfg file generated"
 
+  # set hostname
+  hostname $DOMAIN
+  echo $DOMAIN > /etc/hostname
+
   # Listing actual lxc containers
   echo "-- Listing actual lxc containers:"
   lxc list
