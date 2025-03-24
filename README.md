@@ -213,7 +213,7 @@ In any case, the CloudFormation (CF) template does download the contents of the 
 from a S3 bucket. The name of the bucket will be injected in the CF template by the 
 github automation.
 
-> [!NOTICE]
+> [!NOTE]
 > The key for DNSSEC signing must be created in Virginia (us-east-1), ECC_NIST_P256, Sign and verify.
 
 # Development
