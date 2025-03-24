@@ -308,7 +308,7 @@ Resources:
           # install latest ubuntu updates
           #
           apt-get -yq update 
-          apt-get -yq --with-new-pkgs full-upgrade
+          apt-get -yq full-upgrade
           #
           # install AWS cli client
           #
