@@ -219,7 +219,7 @@ github automation.
 # Development
 
 All development should be done in its own branch. Branches are automatically uploaded 
-to a S3 bucket named `DESTINATION-BUCKET`-<branch>. Please make sure your 
+to a S3 bucket named `DESTINATION-BUCKET`-\<branch\>. Please make sure your 
 branches are named in all lower case a-z0-9, no dashes, no underscores. And make sure 
 such a bucket actually exists in your AWS account.
 
