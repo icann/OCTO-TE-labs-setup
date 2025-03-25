@@ -69,7 +69,7 @@ main() {
   fi
 
   ## Generate IPv6 ULA prefix
-  generate_IPv6_ULA
+  # generate_IPv6_ULA
 
   ## generate and apply new netplan for the Lab
   echo "Generate and apply new netplan for the Lab"
