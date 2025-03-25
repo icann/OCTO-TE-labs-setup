@@ -10,6 +10,7 @@ ZONEID=$3
 LABTYPE=$4
 NETWORKS=$5
 
+
 # ---------------------------------------- DEFAULT CONFIGURATIONS SET UP -------------------------------------------
 
 ## General initial variables (will need all this for the rest of the script)
@@ -68,8 +69,10 @@ main() {
     define_swap_space
   fi
 
-  ## Generate IPv6 ULA prefix
-  generate_IPv6_ULA
+  # Static IPv6 prefix
+  IPv6prefix="fd89:59e0"
+  ## Generate random IPv6 ULA prefix (follow RFC), please uncomment following line
+  # generate_IPv6_ULA
 
   ## generate and apply new netplan for the Lab
   echo "Generate and apply new netplan for the Lab"
