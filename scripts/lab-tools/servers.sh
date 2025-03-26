@@ -124,7 +124,8 @@ gen_student_servers_net_config () {
     echo "search grp$grp.$DOMAIN"      >$workdir/resolv.conf.$grp
     echo "nameserver 100.100.$grp.67" >>$workdir/resolv.conf.$grp
     echo "nameserver 100.100.$grp.68" >>$workdir/resolv.conf.$grp
-
+    echo "nameserver $IPv6prefix:$grp:64::67" >>$workdir/resolv.conf.$grp
+    echo "nameserver $IPv6prefix:$grp:64::68" >>$workdir/resolv.conf.$grp
   done
 }
 
