@@ -3,8 +3,8 @@
 create_global_RPKI_validator () {
   echo "Creating global RPKI validators..."
   # rpkiX
-  lxc copy $serverGlobalRPKIvalidator1 rpki1
-  lxc copy $serverGlobalRPKIvalidator2 rpki2
+  lxc copy RPKIfortX rpki1
+  lxc copy RPKIfortX rpki2
   for serv in $(seq 1 2)
   do
     lxc config device add rpki${serv} eth0 nic name=eth0 nictype=bridged parent=net-bb

@@ -5,7 +5,7 @@ create_student_RPKI_validator () {
   for grp in $(seq 1 $NETWORKS)
   do
   	# grpX-rpki
-    lxc copy $server4RPKIvalidator grp${grp}-rpki
+    lxc copy RPKIfortX grp${grp}-rpki
     
     lxc config device add grp${grp}-rpki eth0 nic name=eth0 nictype=bridged parent=grp${grp}-int
 

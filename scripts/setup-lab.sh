@@ -218,14 +218,6 @@ deploy () {
   echo "---> IPv6 public address of the main server is set to: "$IPv6ServerAddr
   echo "---> Will bring up Lab type: "$LABTYPE" with $NETWORKS groups"
   echo " "
-  echo "---> This will be the server configuration:"
-  echo "--->      For resolv1 will use $server4resolv1 template"
-  echo "--->      For resolv2 will use $server4resolv2 template"
-  echo "--->      For soa will use $server4soa template"
-  echo "--->      For ns1 will use $server4ns1 template"
-  echo "--->      For ns2 will use $server4ns2 template"
-  echo " "
-  echo " "
   echo "---> Group container options:"
   echo "--->      Want -client- container created in each group (cli): $generateClients"
   echo "--->      Want -server- containers created in each group (resolv1, resolv2, SOA, ns1 & ns2): $generateServers"
@@ -267,6 +259,7 @@ deploy () {
 	create_networks
 
 	create_routers
+
 
   if [ "$generateBorderRouter" = "YES" ]; then
     create_border_router
@@ -350,50 +343,29 @@ deploy () {
 
   configure_cron
   
-    # Remove deployment temporary directories
+  # Remove deployment temporary directories
   if [ -d $workdir ]; then
     rm -rf $workdir
   fi
 
+  # Make group passwords easily acceissible to user ubuntu
+  echo "labuser    $webuserpasswd" > /home/ubuntu/grouppasswords.txt
+  sed -E 's/(grp[0-9]+)-rtr,/\1    /'  /var/shellinabox/router-password-list.txt >> /home/ubuntu/grouppasswords.txt
+  chown ubuntu:ubuntu /home/ubuntu/grouppasswords.txt
+
+  # Done - Report Success
 	echo "---> Environment is up !"
   echo " "
   echo "================ Lab setup is ready ! ==================="
   echo " "
   echo "Password files for each group container are in the following files:"
-  echo " "
-
-  echo " "
-  echo "/var/shellinabox/router-password-list.txt		<--- ROUTER container passwords"
-  cat /var/shellinabox/router-password-list.txt
-  echo " "
-  if [ "$generateClients" = "YES" ]; then
-    echo " "
-    echo "/var/shellinabox/lan-client-password-list.txt		<--- CLIENT container passwords (network: lan)"
-    cat /var/shellinabox/lan-client-password-list.txt
-    echo " "
-  fi
-  if [ "$generateServers" = "YES" ]; then
-    echo " "
-    echo "/var/shellinabox/int-server-password-list.txt		<--- SERVER container passwords (network: int)"
-    cat /var/shellinabox/int-server-password-list.txt
-    echo " "
-  fi
-  if [ "$generateRPKIvalidator" = "YES" ]; then
-    echo " "
-    echo "/var/shellinabox/int-RPKI-validator-password-list.txt		<--- RPKI validator container passwords (network: int)"
-    cat /var/shellinabox/int-RPKI-validator-password-list.txt
-    echo " "
-  fi
-
-  echo "========================================================="  
-  echo "Group passwords"
-  cat /var/shellinabox/router-password-list.txt
-  echo "labuser    $webuserpasswd" > /home/ubuntu/grouppasswords.txt
-  sed -E 's/(grp[0-9]+)-rtr,/\1    /'  /var/shellinabox/router-password-list.txt >> /home/ubuntu/grouppasswords.txt
-  chown ubuntu:ubuntu /home/ubuntu/grouppasswords.txt
+  echo "/var/shellinabox/router-password-list.txt		            <--- ROUTER container passwords"
+  echo "/var/shellinabox/lan-client-password-list.txt	         	<--- CLIENT container passwords (network: lan)"
+  echo "/var/shellinabox/int-server-password-list.txt		        <--- SERVER container passwords (network: int)"
+  echo "/var/shellinabox/int-RPKI-validator-password-list.txt		<--- RPKI validator container passwords (network: int)"
+  echo "/home/ubuntu/grouppasswords.txt                         <--- Web Group Passwords"
   echo " "
   echo "===================== DEPLOY DONE ======================="  
-  echo "========================================================="  
 }
 
 # ------------------------------------------------------------------------------------------------------------------

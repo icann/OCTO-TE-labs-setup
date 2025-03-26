@@ -7,16 +7,16 @@ create_student_servers () {
   	echo "Creating servers for grp$grp"
 
   	# grpX-cli grpX-soa grpX-resolv1 grpX-resolv2 grpX-ns1 grpX-ns2
-    lxc copy $server4resolv1 grp${grp}-resolv1
-    lxc copy $server4resolv2 grp${grp}-resolv2
+    lxc copy hostX grp${grp}-resolv1
+    lxc copy hostX grp${grp}-resolv2
     
     lxc config device add grp${grp}-resolv1 eth0 nic name=eth0 nictype=bridged parent=grp${grp}-int
     lxc config device add grp${grp}-resolv2 eth0 nic name=eth0 nictype=bridged parent=grp${grp}-int
 
     if [ $LABTYPE -gt 1 ]; then
-      lxc copy $server4soa grp${grp}-soa
-  	  lxc copy $server4ns1 grp${grp}-ns1
-  	  lxc copy $server4ns2 grp${grp}-ns2
+      lxc copy hostX grp${grp}-soa
+  	  lxc copy hostX grp${grp}-ns1
+  	  lxc copy hostX grp${grp}-ns2
 
       lxc config device add grp${grp}-soa eth0 nic name=eth0 nictype=bridged parent=grp${grp}-int
   	  lxc config device add grp${grp}-ns1 eth0 nic name=eth0 nictype=bridged parent=grp${grp}-dmz
