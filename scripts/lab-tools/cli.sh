@@ -87,6 +87,8 @@ push_student_clients_net_config () {
     lxc exec grp$grp-cli -- sh -c "echo 'search grp$grp.$DOMAIN' >/etc/resolv.conf"
     lxc exec grp$grp-cli -- sh -c "echo 'nameserver 100.100.$grp.67' >>/etc/resolv.conf"
     lxc exec grp$grp-cli -- sh -c "echo 'nameserver 100.100.$grp.68' >>/etc/resolv.conf"
+    lxc exec grp$grp-cli -- sh -c "echo 'nameserver $IPv6prefix:$grp:64::67' >>/etc/resolv.conf"
+    lxc exec grp$grp-cli -- sh -c "echo 'nameserver $IPv6prefix:$grp:64::68' >>/etc/resolv.conf"
 
     echo "Clients net conf push for group $grp done"
 
