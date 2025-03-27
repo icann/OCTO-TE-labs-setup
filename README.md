@@ -209,9 +209,7 @@ Github Repository Variables:
 - `KSK_ARN`the AWS ARN of the key to be use for DNSSEC signing
 - `DNS_PARENT_DEFAULT` the default value for the DnsParent parameter
 
-In any case, the CloudFormation (CF) template does download the contents of the repository
-from a S3 bucket. The name of the bucket will be injected in the CF template by the 
-github automation.
+The configuration will be injected in the CF template `lac-ec2.yaml` by the github automation.
 
 > [!NOTICE]
 > The key for DNSSEC signing must be created in Virginia (us-east-1), ECC_NIST_P256, Sign and verify.
@@ -223,7 +221,7 @@ to a S3 bucket named `DESTINATION-BUCKET`-<branch>. Please make sure your
 branches are named in all lower case a-z0-9, no dashes, no underscores. And make sure 
 such a bucket actually exists in your AWS account.
 
-Copy the URL of the `lab-ec2.yaml` file in your branch bucket and use it to start a new lab
+Copy the URL of the `lab-ec2.yaml` file in your branch bucket and use it to start new lab
 instances.
 
 # Lab without AWS

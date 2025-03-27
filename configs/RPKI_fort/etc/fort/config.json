@@ -1,6 +1,13 @@
 {
-	"tal": "/var/fort/tal",
-	"local-repository": "/var/fort/repository",
+	"tal": "/etc/fort/tal",
+	"local-repository": "/var/lib/fort",
+	"server": {
+		"port": "323"
+	},
+	"log": {
+		"output": "syslog"
+	}
+
 	"rsync-strategy": "root",
 	"shuffle-uris": true,
 	"mode": "server",
@@ -45,6 +52,6 @@
 	],
 
 	"output": {
-		"roa": "/var/fort/fort_roas.csv"
+		"roa": "/var/lib/fort/fort_roas.csv"
 	}
 }

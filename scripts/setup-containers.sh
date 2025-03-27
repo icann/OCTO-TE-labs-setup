@@ -62,7 +62,7 @@ lxc exec hostX -- sh -c "sed -i -e's/KbdInteractiveAuthentication no/KbdInteract
 lxc exec hostX -- sh -c 'useradd sysadm -c "Adm" -d /home/sysadm -m -G sudo -s /bin/bash'
 lxc exec hostX -- sh -c 'echo "sysadm:icannws" | chpasswd'
 lxc exec hostX -- sh -c 'echo "sysadm ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/sysadm'
-#
+# done setting up base image
 lxc stop hostX
 
 ## ================================================================================================"
@@ -84,102 +84,21 @@ lxc exec rtrX -- sh -c 'echo "rtradm:icannws" | chpasswd'
 lxc stop rtrX
 
 ## ================================================================================================"
-## More hostX container config
-#lxc start hostX
-#lxc exec hostX -- cloud-init status --wait
-#lxc exec hostX -- sh -c "
-#    apt-get -yq install git build-essential autoconf m4 libtool mtr-tiny ansible python3-paramiko python3-pip tree cmake librtlsdr2 librtr-dev 
-#    pip3 install --break-system-packages ansible-pylibssh
-#    ansible-galaxy collection install cisco.ios
-#    cd
-#    git clone https://github.com/bgp/bgpq4.git
-#    cd bgpq4
-#    sed -i 's/64496/65100/g' expander.c
-#    ./bootstrap
-#    ./configure
-#    make
-#    make install
-#    make clean
-#    cd
-#    git clone https://github.com/rtrlib/rtrlib.git
-#    cd rtrlib/
-#    cmake -D CMAKE_BUILD_TYPE=Debug -D RTRLIB_TRANSPORT_SSH=No .
-#    make
-#    make install
-#    make clean
-#    apt-get -yq install librtr0
-#"
-#lxc exec hostX -- sh -c 'echo "PATH=\"$PATH\"" > /etc/environment'
-#lxc stop hostX
-
-## ================================================================================================"
 ## Server templates
-lxc copy hostX unboundX
-lxc copy hostX bindX
-lxc copy hostX odsX
-lxc copy hostX nsdX
-lxc copy hostX RPKIfortX
-
-lxc start unboundX
-lxc start bindX
-lxc start odsX
-lxc start nsdX
-lxc start RPKIfortX
-
-lxc exec unboundX -- cloud-init status --wait
-lxc exec bindX -- cloud-init status --wait
-lxc exec odsX -- cloud-init status --wait
-lxc exec nsdX -- cloud-init status --wait
-lxc exec RPKIfortX -- cloud-init status --wait
-
-## ================================================================================================"
-lxc exec unboundX -- apt-get -yq install unbound --no-install-recommends
-
-## ================================================================================================"
-lxc exec bindX -- apt-get -yq install bind9
-lxc exec bindX -- systemctl enable named
-lxc exec bindX -- systemctl start named
-# add user to group bind - allows for calling rndc
-lxc exec bindX -- adduser sysadm bind
-
-## ================================================================================================"
-lxc exec nsdX -- apt-get install -yq nsd
-
-## ================================================================================================"
-lxc exec odsX -- sh -c "DEBIAN_FRONTEND=noninteractive apt-get -yq install opendnssec softhsm2 bind9"
-lxc exec odsX -- systemctl enable named
-lxc exec odsX -- systemctl start named
-# add user to group bind - allows for calling rndc
-lxc exec odsX -- adduser sysadm bind
-
-## ================================================================================================"
-lxc exec RPKIfortX -- sh -c "
-    apt-get -yq --no-install-recommends install \
-        autoconf automake build-essential git libjansson-dev \
-        libssl-dev pkg-config rsync ca-certificates curl \
-        libcurl4-openssl-dev libxml2-dev \
-        less vim
-    git clone https://github.com/NICMx/FORT-validator.git
-    cd FORT-validator
-    sed -i 's/AC_PREREQ(\[2.71\])/AC_PREREQ(\[2.60\])/g' configure.ac
-    ./autogen.sh
-    ./configure
-    make
-    make install
-    make clean
-    mkdir -p /etc/fort
-    mkdir -p /var/fort/tal
-    mkdir -p /var/fort/repository
-    printf 'yes\n' | fort --init-tals --tal /var/fort/tal
-    "
-lxc file push ../configs/RPKI_fort/etc/fort/config.json RPKIfortX/etc/fort/config.json
-lxc file push ../configs/RPKI_fort/lib/systemd/system/fortd.service.cfg RPKIfortX/lib/systemd/system/fortd.service
-lxc exec RPKIfortX -- systemctl daemon-reload
-lxc exec RPKIfortX -- systemctl enable fortd
-#lxc exec RPKIfortX -- systemctl status fortd
-
-## ================================================================================================"
-lxc stop unboundX bindX odsX nsdX RPKIfortX
+lxc copy hostX fortX
+lxc start fortX
+lxc exec fortX -- cloud-init status --wait
+lxc exec fortX -- sh -c '
+    curl -s -L -O https://github.com/NICMx/FORT-validator/releases/latest/download/fort_amd64.deb
+    dpkg -i fort_amd64.deb
+    rm -f fort_amd64.deb
+    systemctl stop fort
+    systemctl enable fort
+    echo "FORT installed" # make lxc return 0 for success
+' 
+lxc file push ../configs/RPKI_fort/etc/fort/config.json fortX/etc/fort/config.json
+lxc exec fortX -- systemctl start fortd
+lxc stop fortX
 
 ## ================================================================================================"
 # List all lxc containers
