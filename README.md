@@ -211,13 +211,13 @@ Github Repository Variables:
 
 The configuration will be injected in the CF template `lac-ec2.yaml` by the github automation.
 
-> [!NOTICE]
+> [!NOTE]
 > The key for DNSSEC signing must be created in Virginia (us-east-1), ECC_NIST_P256, Sign and verify.
 
 # Development
 
 All development should be done in its own branch. Branches are automatically uploaded 
-to a S3 bucket named `DESTINATION-BUCKET`-<branch>. Please make sure your 
+to a S3 bucket named `DESTINATION-BUCKET`-\<branch\>. Please make sure your 
 branches are named in all lower case a-z0-9, no dashes, no underscores. And make sure 
 such a bucket actually exists in your AWS account.
 
