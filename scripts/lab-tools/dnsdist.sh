@@ -33,7 +33,7 @@ create_dnsdist () {
 	    ../configs/dnsdist/dnsdist.conf > $workdir/dnsdist.conf
     lxc file push $workdir/dnsdist.conf dnsdist/etc/dnsdist/dnsdist.conf
     # dnsdist is a memory hog
-    lxc config set dnsdist limits.memory 4GB
+    lxc config set dnsdist limits.memory 8GB
     # restart server to apply all config changes 
     lxc stop dnsdist
     lxc start dnsdist
