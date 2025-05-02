@@ -1,5 +1,5 @@
 # Scanning for CDS records for all deployed groups
-*/2 * * * *   root   /root/scripts/dsautomation/getcds.sh %LABDOMAIN% %NETWORKS% 2>&1 | logger
+*/2 * * * *   root   /root/scripts/dsautomation/getcds.pl %LABDOMAIN% %NETWORKS% 2>&1 | logger
 
 # converting CDS record files to AWS format
 *   * * * *   root   /root/scripts/dsautomation/cds2aws.pl 2>&1 | logger
