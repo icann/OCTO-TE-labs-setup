@@ -11,7 +11,7 @@ foreach my $file (@dsfiles) {
 
     open(my $fh_in, "<", $file) or die "Can't open $file: $!";
     while (my $line = readline($fh_in)) {
-        if ($line =~ m/^\s*(\S+\s+\d+\s+IN\s+DS\s+\d+\s+\d+\s+\d+[0-9A-Za-z ]+)\s*$/) {
+        if ($line =~ m/^\s*(\S+\s+\d*\s*IN\s+DS\s+\d+\s+\d+\s+\d+[0-9A-Za-z ]+)\s*$/) {
             print STDERR "DS record found.\n";
             push @ds, $1;
         }
@@ -45,7 +45,7 @@ foreach my $file (@dsfiles) {
                 "ResourceRecords": [
 EOF
     for(my $i=0; $i<scalar(@ds); $i++) {
-        $ds[$i] =~ m/\S+\s+\d+\s+IN\s+DS\s+(\d+\s+\d+\s+\d+[0-9A-Za-z ]+)/;
+        $ds[$i] =~ m/\S+\s+\d*\s*IN\s+DS\s+(\d+\s+\d+\s+\d+[0-9A-Za-z ]+)/;
         my $value = $1;
         print $fh_out <<EOF;
                     {
