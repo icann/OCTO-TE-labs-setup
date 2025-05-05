@@ -133,7 +133,7 @@ lxc exec nsdX -- cloud-init status --wait
 lxc exec RPKIfortX -- cloud-init status --wait
 
 ## ================================================================================================"
-lxc exec unboundX -- apt-get -yq install unbound --no-install-recommends
+lxc exec unboundX -- apt-get -yq install unbound
 
 ## ================================================================================================"
 lxc exec bindX -- apt-get -yq install bind9
