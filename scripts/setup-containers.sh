@@ -97,7 +97,7 @@ lxc exec fortX -- sh -c '
     echo "FORT installed" # make lxc return 0 for success
 ' 
 lxc file push ../configs/RPKI_fort/etc/fort/config.json fortX/etc/fort/config.json
-lxc exec fortX -- systemctl start fortd
+lxc exec fortX -- systemctl start fort
 lxc stop fortX
 
 ## ================================================================================================"
