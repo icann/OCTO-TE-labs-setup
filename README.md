@@ -16,6 +16,14 @@ If you want to run your own labs, please fork this repository,  see
 Workshop instructions can be found in our [OCTO-TE-labs](https://github.com/icann/OCTO-TE-labs) 
 repository.
 
+# License
+
+Copyright © 2025 Internet Corporation for Assigned Names and Numbers (ICANN). All rights reserved. 
+
+This documentation is licensed to you under the terms of the 3-Clause BSD License (BSD-3-Clause).
+
+For details please see [License.md](License.md)
+
 # Lab Features
 
 - All group name servers are reachable from the internet (through dnsdist in container dnsdist)
