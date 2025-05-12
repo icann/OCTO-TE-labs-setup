@@ -1,17 +1,12 @@
 {
 	"tal": "/etc/fort/tal",
 	"local-repository": "/var/lib/fort",
-	"server": {
-		"port": "323"
-	},
 	"log": {
 		"output": "syslog"
-	}
-
+	},
 	"rsync-strategy": "root",
 	"shuffle-uris": true,
 	"mode": "server",
-
 	"server": {
 		"port": "323",
 		"backlog": 100,
@@ -22,12 +17,6 @@
 	            "expire": 7200
 	        }
 	},
-
-	"log": {
-		"color-output": true,
-		"file-name-format": "file-name"
-	},
-
 	"rsync": {
 		"program": "rsync",
 		"arguments-recursive": [
@@ -43,14 +32,12 @@
 			"$LOCAL"
 		]
 	},
-
 	"incidences": [
 		{
 			"name": "incid-hashalg-has-params",
 			"action": "ignore"
 		}
 	],
-
 	"output": {
 		"roa": "/var/lib/fort/fort_roas.csv"
 	}
