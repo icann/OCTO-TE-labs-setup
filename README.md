@@ -1,3 +1,5 @@
+[![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+
 # OCTO-TE-Labs
 
 Welcome to the DNS and RPKI lab of ICANNs Office Of The CTO (OCTO) 
