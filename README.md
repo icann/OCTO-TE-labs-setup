@@ -22,7 +22,7 @@ Copyright © 2025 Internet Corporation for Assigned Names and Numbers (ICANN). A
 
 This documentation is licensed to you under the terms of the 3-Clause BSD License (BSD-3-Clause).
 
-For details please see [License.md](License.md)
+For details please see [LICENSE.md](LICENSE.md)
 
 # Lab Features
 
