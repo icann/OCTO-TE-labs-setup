@@ -54,8 +54,8 @@ start_routers () {
   for grp in $(seq 1 $NETWORKS)
   do
     lxc start grp${grp}-rtr
-    #lxc exec grp${grp}-rtr -- cloud-init status --wait
-	  echo -n " grp$grp-rtr"
+    lxc exec grp${grp}-rtr -- cloud-init status --wait
+	  echo -n " grp$grp-rtr started"
   done
   echo " "
   echo "---> all routers started"
@@ -74,7 +74,7 @@ stop_routers () {
   for grp in $(seq 1 $NETWORKS)
   do
     lxc stop -f grp${grp}-rtr >/dev/null 2>&1
-	  echo -n " grp$grp-rtr"
+	  echo -n " grp$grp-rtr stopped"
   done
   echo " "
   echo "---> all routers stopped"

@@ -50,20 +50,20 @@ start_student_servers () {
   for grp in $(seq 1 $NETWORKS)
   do
     lxc start grp${grp}-resolv1
-    #lxc exec grp${grp}-resolv1 -- cloud-init status --wait
+    lxc exec grp${grp}-resolv1 -- cloud-init status --wait
     
     lxc start grp${grp}-resolv2
-    #lxc exec grp${grp}-resolv2 -- cloud-init status --wait
+    lxc exec grp${grp}-resolv2 -- cloud-init status --wait
 
     if [ $LABTYPE -gt 1 ]; then
       lxc start grp${grp}-soa
-      #lxc exec grp${grp}-soa -- cloud-init status --wait
+      lxc exec grp${grp}-soa -- cloud-init status --wait
       
       lxc start grp${grp}-ns1
-      #lxc exec grp${grp}-ns1 -- cloud-init status --wait
+      lxc exec grp${grp}-ns1 -- cloud-init status --wait
       
       lxc start grp${grp}-ns2
-      #lxc exec grp${grp}-ns2 -- cloud-init status --wait
+      lxc exec grp${grp}-ns2 -- cloud-init status --wait
     fi
     echo "group $grp student servers started"
   done

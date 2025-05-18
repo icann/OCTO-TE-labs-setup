@@ -33,7 +33,7 @@ start_student_RPKI_validator () {
   for grp in $(seq 1 $NETWORKS)
   do
     lxc start grp${grp}-rpki
-    #lxc exec grp${grp}-rpki -- cloud-init status --wait
+    lxc exec grp${grp}-rpki -- cloud-init status --wait
 
     echo "group $grp student RPKI validator started"
   done
