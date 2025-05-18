@@ -33,6 +33,11 @@ start_student_clients () {
     lxc start grp${grp}-cli
     echo "group $grp student client started"
   done
+  for grp in $(seq 1 $NETWORKS)
+  do
+    lxc exec grp${grp}-cli -- cloud-init status --wait
+    echo "group $grp student cloud init done"
+  done
   echo "---> all student clients started"
 }
 
