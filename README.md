@@ -1,3 +1,5 @@
+[![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+
 # OCTO-TE-Labs
 
 Welcome to the DNS and RPKI lab of ICANNs Office Of The CTO (OCTO) 
@@ -15,6 +17,14 @@ If you want to run your own labs, please fork this repository,  see
 
 Workshop instructions can be found in our [OCTO-TE-labs](https://github.com/icann/OCTO-TE-labs) 
 repository.
+
+# License
+
+Copyright © 2025 Internet Corporation for Assigned Names and Numbers (ICANN) and Network Startup Resource Center (NSRC). All rights reserved. 
+
+This repository is licensed to you under the terms of the 3-Clause BSD License (BSD-3-Clause).
+
+For details please see [LICENSE.md](LICENSE.md)
 
 # Lab Features
 
