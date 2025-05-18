@@ -50,6 +50,11 @@ main() {
 
   workdir=/tmp/cloud_init
   mkdir -p $workdir/etc/netplan
+
+  ## prevent /tmp cleanup
+  cp ../configs/tmpfiles.d/fs-tmp.conf /etc/tmpfiles.d
+  chown root:root /etc/tmpfiles.d/fs-tmp.conf
+  chmod 644 /etc/tmpfiles.d/fs-tmp.conf
   
   ## Initial update/upgrade and basic set-up
   echo "Initial update/upgrade and basic set-up..."
