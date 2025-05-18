@@ -20,9 +20,9 @@ repository.
 
 # License
 
-Copyright © 2025 Internet Corporation for Assigned Names and Numbers (ICANN). All rights reserved. 
+Copyright © 2025 Internet Corporation for Assigned Names and Numbers (ICANN) and Network Startup Resource Center (NSRC). All rights reserved. 
 
-This documentation is licensed to you under the terms of the 3-Clause BSD License (BSD-3-Clause).
+This repository is licensed to you under the terms of the 3-Clause BSD License (BSD-3-Clause).
 
 For details please see [LICENSE.md](LICENSE.md)
 

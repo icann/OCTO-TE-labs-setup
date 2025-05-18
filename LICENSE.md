@@ -1,4 +1,4 @@
-Copyright © 2025 Internet Corporation for Assigned Names and Numbers (ICANN). All rights reserved. 
+Copyright © 2025 Internet Corporation for Assigned Names and Numbers (ICANN) and Network Startup Resource Center (NSRC). All rights reserved. 
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
