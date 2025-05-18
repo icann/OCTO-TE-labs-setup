@@ -5,7 +5,7 @@ set -exou
 DOMAIN=$(perl -e "print lc('$1')")
 DOMAIN=`echo $DOMAIN | perl -n -e "s/\.$//;print $_;"`
 IPV4=$2
-IPV6=`ip a s dev eth0 scope global | perl -n -e'print $1 if m/inet6\s+(\S+)\/128/'`
+IPV6=`ip -6 addr show scope global | perl -n -e'print $1 if m/inet6\s+(\S+)\/128/'`
 ZONEID=$3
 LABTYPE=$4
 NETWORKS=$5
