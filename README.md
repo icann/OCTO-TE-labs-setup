@@ -174,6 +174,9 @@ Please follow these "easy" steps:
 - if the delete failed
   - Click on your lab
   - Click on "Retry delete" and choose the "Force delete" option
+- Wait for the delete (or force delete) to succeed
+- go to Route53 and check that the lab_domain for the lab has been deleted
+  - otherwise delete it manually (you might have to delete any resource records in the zone)
 - **DONE**
 
 # Network address plan
