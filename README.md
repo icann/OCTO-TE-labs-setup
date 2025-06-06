@@ -106,6 +106,7 @@ For a full list of available instance types, please see https://docs.aws.amazon.
 | Stockholm     |  r5.xlarge         | r5.2xlarge        |
 | Frankfurt     |  r4.xlarge         | r4.2xlarge        |
 |               |  r5a.xlarge        | r5a.2xlarge       |
+| Milan         |  r5a.xlarge        | r5a.2xlarge       |
 | Virginia      |  r4.xlarge         | r4.2xlarge        |
 
 # Lab access
