@@ -8,17 +8,17 @@
 #
 
 create_dnsdist () {
-	echo "Start - Create dnsdist"
-	lxc copy hostX dnsdist
+    echo "Start - Create dnsdist"
+    lxc copy hostX dnsdist
     lxc start dnsdist
     lxc exec dnsdist -- cloud-init status --wait
-	lxc config device add dnsdist eth0 nic name=eth0 nictype=bridged parent=net-bb
+    lxc config device add dnsdist eth0 nic name=eth0 nictype=bridged parent=net-bb
     # generating network config
-	sed -e "s|%GRP%|0|g" \
-	    -e "s|%NET%|0|g" \
-	    -e "s|%IP%|53|g" \
-      -e "s|%IPv6pfx%|$IPv6prefix|g" \
-	    ../configs/netplan/bb-lxc.yaml > $workdir/bb-lxc.yaml.dnsdist
+    sed -e "s|%GRP%|0|g" \
+        -e "s|%NET%|0|g" \
+        -e "s|%IP%|53|g" \
+        -e "s|%IPv6pfx%|$IPv6prefix|g" \
+        ../configs/netplan/bb-lxc.yaml > $workdir/bb-lxc.yaml.dnsdist
     # pushing network config..."
     lxc file push $workdir/bb-lxc.yaml.dnsdist dnsdist/etc/netplan/bb-lxc.yaml
     lxc exec dnsdist -- sh -c 'chmod 600 /etc/netplan/bb-lxc.yaml'
@@ -28,9 +28,9 @@ create_dnsdist () {
     lxc exec dnsdist -- sh -c 'netplan apply'
     lxc exec dnsdist -- sh -c 'apt install dnsdist -y'
     # generating dnsdist config
-	sed -e "s|%DOMAIN%|$DOMAIN|g" \
+    sed -e "s|%DOMAIN%|$DOMAIN|g" \
         -e "s|%IPv6pfx%|$IPv6prefix|g" \
-	    ../configs/dnsdist/dnsdist.conf > $workdir/dnsdist.conf
+        ../configs/dnsdist/dnsdist.conf > $workdir/dnsdist.conf
     lxc file push $workdir/dnsdist.conf dnsdist/etc/dnsdist/dnsdist.conf
     # dnsdist is a memory hog
     lxc config set dnsdist limits.memory 8GB
@@ -49,12 +49,12 @@ create_dnsdist () {
     iptables-save > /etc/iptables/rules.v4
     ip6tables-save > /etc/iptables/rules.v6
     #
-	echo "Done - Create dnsdist"
+    echo "Done - Create dnsdist"
 }
 
 delete_dnsdist () {
-	echo "Start - Delete dnsdist"
-	lxc delete dnsdist
+    echo "Start - Delete dnsdist"
+    lxc delete dnsdist
     iptables -t nat -D PREROUTING -i eth0 -p udp --dport 53 -j DNAT --to-destination 100.64.0.53:53
     iptables -t nat -D PREROUTING -i eth0 -p tcp --dport 53 -j DNAT --to-destination 100.64.0.53:53
     ip6tables -t nat -D PREROUTING -i eth0 -p udp --dport 53 -j DNAT --to-destination [$IPv6prefix:0::53]:53
@@ -65,18 +65,18 @@ delete_dnsdist () {
     iptables-save > /etc/iptables/rules.v4
     ip6tables-save > /etc/iptables/rules.v6
     #
-	echo "Done - Delete dnsdist"
+    echo "Done - Delete dnsdist"
 }
 
 start_dnsdist () {
-  echo "Start - DNSdist!"
-  lxc start dnsdist
-  lxc exec dns -- cloud-init status --wait
-  echo "Done - Start DNSdist"
+    echo "Start - DNSdist!"
+    lxc start dnsdist
+    lxc exec dns -- cloud-init status --wait
+    echo "Done - Start DNSdist"
 }
 
 stop_dnsdist () {
-  echo "Start - Stop dnsdist"
-  lxc stop -f dnsdist
-  echo "Done - Stop dnsdist"
+    echo "Start - Stop dnsdist"
+    lxc stop -f dnsdist
+    echo "Done - Stop dnsdist"
 }

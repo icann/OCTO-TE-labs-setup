@@ -124,10 +124,10 @@ ssh <DnsName>.<DnsParent>
 > 
 > ```
 > Host *.te-labs.training
->	User ubuntu
->	IdentityFile ~/.ssh/id_te-lab.pem
-> IdentitiesOnly yes
->	Port 8484
+>    User ubuntu
+>    IdentityFile ~/.ssh/id_te-lab.pem
+>    IdentitiesOnly yes
+>    Port 8484
 > ```
 
 All labs use the ssh key configured in Github.
