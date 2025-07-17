@@ -195,6 +195,7 @@ setup_DHCP_server () {
   # Remove /etc/resolv.conf otherwise is symlink to ../run/systemd/resolve/stub-resolv.conf
   rm /etc/resolv.conf
   echo 'nameserver 9.9.9.9' > /etc/resolv.conf
+  echo 'options timeout:30 attempts:5' >> /etc/resolv.conf
   
   # Configure dnsmasq
   # By default it listens on all the loopback interfaces.

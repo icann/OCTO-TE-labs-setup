@@ -7,7 +7,8 @@ set -exou
 ## You'll have to run this script only once, right after initiating a new cloud lab instance from scratch
 
 ## ================================================================================================"
-lxc list
+## delete all old container templates
+lxc list | perl -n -e'print "$1\n" if m/(\S+X)/;' | while read -r container; do lxc stop $container; lxc rm $container; done
 
 ## ================================================================================================"
 ## Container creation
