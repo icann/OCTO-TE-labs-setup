@@ -7,7 +7,8 @@ set -exou
 ## You'll have to run this script only once, right after initiating a new cloud lab instance from scratch
 
 ## ================================================================================================"
-lxc list
+## delete all old container templates
+lxc list | perl -n -e'print "$1\n" if m/(\S+X)/;' | while read -r container; do lxc stop $container; lxc rm $container; done
 
 ## ================================================================================================"
 ## Container creation
@@ -33,7 +34,7 @@ lxc exec hostX -- sh -c "systemctl stop systemd-resolved"
 lxc exec hostX -- sh -c "rm -f /etc/resolv.conf"
 lxc exec hostX -- sh -c 'echo "nameserver 9.9.9.9" > /etc/resolv.conf'
 # ISC bind9 repo
-lxc exec hostX -- sh -c "add-apt-repository ppa:isc/bind" 
+lxc exec hostX -- sh -c "add-apt-repository -y ppa:isc/bind" 
 # CZ.NIC Knot repo
 lxc exec hostX -- sh -c 'wget -O /usr/share/keyrings/cznic-labs-pkg.gpg https://pkg.labs.nic.cz/gpg'
 lxc exec hostX -- sh -c 'echo "deb [signed-by=/usr/share/keyrings/cznic-labs-pkg.gpg] https://pkg.labs.nic.cz/knot-dns $(lsb_release -s -c) main" > /etc/apt/sources.list.d/cznic-labs-knot-dns.list'
