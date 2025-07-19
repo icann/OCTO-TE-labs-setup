@@ -184,13 +184,13 @@ setup_DHCP_server () {
   systemctl is-active --quiet dnsmasq && systemctl stop dnsmasq
 
   # Disable systemd-resolved, as it obfuscates DNS resolution further
-  systemctl disable systemd-resolved
-  systemctl is-active --quiet systemd-resolved && systemctl stop systemd-resolved
+  #systemctl disable systemd-resolved
+  #systemctl is-active --quiet systemd-resolved && systemctl stop systemd-resolved
 
   # Remove /etc/resolv.conf otherwise is symlink to ../run/systemd/resolve/stub-resolv.conf
-  rm /etc/resolv.conf
-  echo 'nameserver 9.9.9.9' > /etc/resolv.conf
-  echo 'options timeout:30 attempts:5' >> /etc/resolv.conf
+  #rm /etc/resolv.conf
+  #echo 'nameserver 9.9.9.9' > /etc/resolv.conf
+  #echo 'options edns0 timeout:30 attempts:5' >> /etc/resolv.conf
   
   # Configure dnsmasq
   # By default it listens on all the loopback interfaces.
@@ -202,8 +202,7 @@ setup_DHCP_server () {
   sed -i "s/#*port=.*/port=0/g" /etc/dnsmasq.conf
   # We also need DHCP service for br-lan during container deployment, so enable this
   sed -i "0,/#dhcp-range=/s/#dhcp-range=/dhcp-range=100.64.2.100,100.64.2.150,12h\n&/" /etc/dnsmasq.conf
-  # stop any running dnsmsq
-  systemctl stop dnsmasq
+
   # Enable & Start dnsmasq
   systemctl enable dnsmasq
   systemctl start dnsmasq
