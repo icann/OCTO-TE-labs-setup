@@ -9,7 +9,7 @@ gen_nginx_config () {
 
     # nginx configuration --> [/etc/nginx/nginx.conf]
     sed -e "s|%AuthDomain%|$DOMAIN|g" \
-    ../configs/nginx/etc/nginx/nginx.conf > $nginxworkdir/etc/nginx/nginx.conf
+        ../configs/nginx/etc/nginx/nginx.conf > $nginxworkdir/etc/nginx/nginx.conf
 
     touch $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
     grp=1
