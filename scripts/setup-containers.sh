@@ -39,9 +39,9 @@ lxc exec hostX -- sh -c "add-apt-repository -y ppa:isc/bind"
 lxc exec hostX -- sh -c 'wget -O /usr/share/keyrings/cznic-labs-pkg.gpg https://pkg.labs.nic.cz/gpg'
 lxc exec hostX -- sh -c 'echo "deb [signed-by=/usr/share/keyrings/cznic-labs-pkg.gpg] https://pkg.labs.nic.cz/knot-dns $(lsb_release -s -c) main" > /etc/apt/sources.list.d/cznic-labs-knot-dns.list'
 # PowerDNS repos
-lxc exec hostX -- sh -c 'curl -s https://repo.powerdns.com/FD380FBB-pub.asc > /usr/share/keyrings/auth-49-pub.asc'
-lxc exec hostX -- sh -c 'curl -s https://repo.powerdns.com/FD380FBB-pub.asc > /usr/share/keyrings/rec-52-pub.asc'
-lxc exec hostX -- sh -c 'curl -s https://repo.powerdns.com/FD380FBB-pub.asc > /usr/share/keyrings/dnsdist-19-pub.asc'
+lxc exec hostX -- sh -c 'curl -s -S https://repo.powerdns.com/FD380FBB-pub.asc > /usr/share/keyrings/auth-49-pub.asc'
+lxc exec hostX -- sh -c 'curl -s -S https://repo.powerdns.com/FD380FBB-pub.asc > /usr/share/keyrings/rec-52-pub.asc'
+lxc exec hostX -- sh -c 'curl -s -S https://repo.powerdns.com/FD380FBB-pub.asc > /usr/share/keyrings/dnsdist-19-pub.asc'
 lxc exec hostX -- sh -c 'echo "deb [signed-by=/usr/share/keyrings/auth-49-pub.asc] http://repo.powerdns.com/ubuntu $(lsb_release -s -c)-auth-49 main" >  /etc/apt/sources.list.d/pdns.list'
 lxc exec hostX -- sh -c 'echo "deb [signed-by=/usr/share/keyrings/rec-52-pub.asc] http://repo.powerdns.com/ubuntu $(lsb_release -s -c)-rec-52 main" >> /etc/apt/sources.list.d/pdns.list'
 lxc exec hostX -- sh -c 'echo "deb [signed-by=/usr/share/keyrings/dnsdist-19-pub.asc] http://repo.powerdns.com/ubuntu $(lsb_release -s -c)-dnsdist-19 main" >> /etc/apt/sources.list.d/pdns.list'
@@ -53,7 +53,7 @@ lxc exec hostX -- sh -c "apt-get -yq update"
 lxc exec hostX -- sh -c "apt-get -yq --with-new-pkgs upgrade"
 lxc exec hostX -- sh -c "apt-get -yq install curl gnupg nano joe bind9-dnsutils knot-dnsutils net-tools traceroute wget man openssh-server tcpdump dnstop whois telnet --no-install-recommends"
 # install ICANN RDAP client
-lxc exec hostX -- sh -c 'curl -s -L -O https://github.com/icann/icann-rdap/releases/latest/download/icann-rdap-x86_64-unknown-linux-gnu.tar.gz'
+lxc exec hostX -- sh -c 'curl -s -S -L -O https://github.com/icann/icann-rdap/releases/latest/download/icann-rdap-x86_64-unknown-linux-gnu.tar.gz'
 lxc exec hostX -- sh -c 'tar xzf icann-rdap-x86_64-unknown-linux-gnu.tar.gz rdap'
 lxc exec hostX -- sh -c 'mv rdap /usr/bin'
 lxc exec hostX -- sh -c 'rm -f icann-rdap-x86_64-unknown-linux-gnu.tar.gz'
@@ -71,7 +71,7 @@ lxc stop hostX
 lxc copy hostX rtrX
 lxc start rtrX
 lxc exec rtrX -- cloud-init status --wait
-lxc exec rtrX -- sh -c "curl -s https://deb.frrouting.org/frr/keys.asc | sudo tee /etc/apt/trusted.gpg.d/frr.asc"
+lxc exec rtrX -- sh -c "curl -s -S https://deb.frrouting.org/frr/keys.asc | sudo tee /etc/apt/trusted.gpg.d/frr.asc"
 lxc exec rtrX -- sh -c 'echo deb https://deb.frrouting.org/frr $(lsb_release -s -c) frr-stable | tee -a /etc/apt/sources.list.d/frr.list'
 lxc exec rtrX -- sh -c "apt-get -yq update"
 lxc exec rtrX -- sh -c "apt-get -yq install frr frr-pythontools frr-rpki-rtrlib"
@@ -90,7 +90,7 @@ lxc copy hostX fortX
 lxc start fortX
 lxc exec fortX -- cloud-init status --wait
 lxc exec fortX -- sh -c '
-    curl -s -L -O https://github.com/NICMx/FORT-validator/releases/latest/download/fort_amd64.deb
+    curl -s -S -L -O https://github.com/NICMx/FORT-validator/releases/latest/download/fort_amd64.deb
     dpkg -i fort_amd64.deb
     rm -f fort_amd64.deb
     systemctl stop fort
