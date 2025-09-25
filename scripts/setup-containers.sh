@@ -158,7 +158,7 @@ lxc exec RPKIfortX -- sh -c "
     apt-get -yq --no-install-recommends install \
         autoconf automake build-essential git libjansson-dev \
         libssl-dev pkg-config rsync ca-certificates curl \
-        libcurl4-openssl-dev libxml2-dev \
+        libcurl4-openssl-dev libxml2-dev libmicrohttpd-dev \
         less vim
     git clone https://github.com/NICMx/FORT-validator.git
     cd FORT-validator
