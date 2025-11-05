@@ -2,50 +2,50 @@
 
 set -exou
 
+DOMAIN=$(perl -e "print lc('$1')")
+DOMAIN=`echo $DOMAIN | perl -n -e "s/\.$//;print $_;"`
+IPV4=$2
+IPV6=`ip a s dev eth0 scope global | perl -n -e'print $1 if m/inet6\s+(\S+)\/128/'`
+ZONEID=$3
+LABTYPE=$4
+NETWORKS=$5
+
+# ---------------------------------------- DEFAULT CONFIGURATIONS SET UP -------------------------------------------
+
+## General initial variables (will need all this for the rest of the script)
+
+# Set the ammount of RAM (in GB) you server is going to use for swap purpose (for example 8G for a 8GB RAM server)
+# If the Lab server instance has more than 10GB memory, we will leave this value in 10GB as it'll be used for swap set-up.
+instanceRAMsize=$(free -g | awk 'FNR == 2 {print $2}')
+## Make sure you have at least twice the ammount of free disk space than the ammount of RAM, 
+## so as to use it for swap file setup.
+if [ "$instanceRAMsize" -gt "10" ]; then
+    SWAPsize="10G"
+else
+    SWAPsize=$instanceRAMsize"G"
+fi
+echo "Swap file size set to $SWAPsize"
+
+# Getting the actual MAC addr for the network interface of the instance
+# The same it should be in the actual /etc/netplan/50-cloud-init.yaml file
+apt-get -yq update
+apt-get -yq install net-tools
+instanceMACaddr="$(cat /etc/netplan/50-cloud-init.yaml | grep "macaddress:" | awk '{print $2}')"
+# Attempt another way of getting MAC addr if previous one fails
+if [ -z "$instanceMACaddr" ]; then
+    echo "-- Could not find MAC Addr looking at /etc/netplan/50-cloud-init.yaml, trying another way..."
+    instanceMACaddr="$(ifconfig | grep "ether" | awk 'NR==1{print $2}')"
+fi
+# If could not find MAC addr to use, then exit script
+if [ -z "$instanceMACaddr" ]; then
+    echo "-- Could not find MAC address to use... EXITING (could not proceed !)"
+    exit 5
+fi
+echo "Using MAC address for eth0: $instanceMACaddr"
+
+# ------------------------------------------------------------------------------------------------------------------
+
 main() {
-
-    DOMAIN=$(perl -e "print lc('$1')")
-    DOMAIN=`echo $DOMAIN | perl -n -e "s/\.$//;print $_;"`
-    IPV4=$2
-    IPV6=`ip a s dev eth0 scope global | perl -n -e'print $1 if m/inet6\s+(\S+)\/128/'`
-    ZONEID=$3
-    LABTYPE=$4
-    NETWORKS=$5
-
-    # ---------------------------------------- DEFAULT CONFIGURATIONS SET UP -------------------------------------------
-
-    ## General initial variables (will need all this for the rest of the script)
-
-    # Set the ammount of RAM (in GB) you server is going to use for swap purpose (for example 8G for a 8GB RAM server)
-    # If the Lab server instance has more than 10GB memory, we will leave this value in 10GB as it'll be used for swap set-up.
-    instanceRAMsize=$(free -g | awk 'FNR == 2 {print $2}')
-    ## Make sure you have at least twice the ammount of free disk space than the ammount of RAM, 
-    ## so as to use it for swap file setup.
-    if [ "$instanceRAMsize" -gt "10" ]; then
-        SWAPsize="10G"
-    else
-        SWAPsize=$instanceRAMsize"G"
-    fi
-    echo "Swap file size set to $SWAPsize"
-
-    # Getting the actual MAC addr for the network interface of the instance
-    # The same it should be in the actual /etc/netplan/50-cloud-init.yaml file
-    apt-get -yq update
-    apt-get -yq install net-tools
-    instanceMACaddr="$(cat /etc/netplan/50-cloud-init.yaml | grep "macaddress:" | awk '{print $2}')"
-    # Attempt another way of getting MAC addr if previous one fails
-    if [ -z "$instanceMACaddr" ]; then
-        echo "-- Could not find MAC Addr looking at /etc/netplan/50-cloud-init.yaml, trying another way..."
-        instanceMACaddr="$(ifconfig | grep "ether" | awk 'NR==1{print $2}')"
-    fi
-    # If could not find MAC addr to use, then exit script
-    if [ -z "$instanceMACaddr" ]; then
-        echo "-- Could not find MAC address to use... EXITING (could not proceed !)"
-        exit 5
-    fi
-    echo "Using MAC address for eth0: $instanceMACaddr"
-
-    # ------------------------------------------------------------------------------------------------------------------
 
     workdir=/tmp/cloud_init
     mkdir -p $workdir/etc/netplan
