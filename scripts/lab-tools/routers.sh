@@ -32,7 +32,7 @@ delete_routers () {
     for grp in $(seq 1 $NETWORKS)
     do
         lxc delete grp${grp}-rtr 2>/dev/null
-        echo "-- deletting grp$grp-rtr"
+        echo "-- deleting grp$grp-rtr"
     done
     echo "---> all routers deleted"
 
