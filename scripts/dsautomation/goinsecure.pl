@@ -19,21 +19,10 @@ foreach my $file (@delfiles) {
     $name =~ s/\R//;
        
     # AWS requires to set in the current data to delete it.
-    my $digresult  = `dig $name DS`;
-    my @digresults = split /\n/, $digresult;
-
-    my @ds = ();
-    foreach my $line (@digresults) {
-        next if $line =~ m/^\s*$/; # skip empty lines
-        next if $line =~ m/^;/;    # skip comments
-        if ($line =~ m/^\s*(\S+\s+\d+\s+IN\s+DS\s+\d+\s+\d+\s+\d+[0-9A-Za-z ]+)\s*$/) {
-            print STDERR "DS record found.\n";
-            push @ds, $1;
-        }
-    }
+    my $DSdata = `aws route53 list-resource-record-sets --hosted-zone-id Z02099872PWMNFHNH52LL --query "ResourceRecordSets[?Name == 'grp1.cologne.te-labs.training.']" | jq '.[] | select(.Type == "DS")'`;
 
     # if no DS records were found jump to next file
-    if (scalar(@ds) == 0) {
+    if (!defined $DSdata || $DSdata  eq '') {
         print STDERR "No DS records found for $name\n";
         next;
     }
@@ -46,25 +35,10 @@ foreach my $file (@delfiles) {
     "Changes": [
         {
             "Action": "$action",
-            "ResourceRecordSet": {
-                "Name": "$name",
-                "Type": "DS",
-                "TTL":300 ,
-                "ResourceRecords": [
+            "ResourceRecordSet": 
 EOF
-    for(my $i=0; $i<scalar(@ds); $i++) {
-        $ds[$i] =~ m/\S+\s+\d+\s+IN\s+(?:CDS|DS)\s+(\d+\s+\d+\s+\d+[0-9A-Za-z ]+)/;
-        my $value = $1;
-        print $fh_out <<EOF;
-                    {
-                        "Value": "$value"
-                    }
-EOF
-            print $fh_out ",\n" if $i+1 < scalar(@ds); 
-    }
+    print $fh_out $DSdata;
     print $fh_out <<EOF;
-                ]
-            }
         }
     ]
 }
