@@ -53,12 +53,16 @@ start_routers () {
     echo "Starting all routers..."
     for grp in $(seq 1 $NETWORKS)
     do
+        echo -n "  starting grp$grp-rtr"
         lxc start grp${grp}-rtr
-        #lxc exec grp${grp}-rtr -- cloud-init status --wait
-        echo -n " grp$grp-rtr"
     done
-    echo " "
-    echo "---> all routers started"
+    for grp in $(seq 1 $NETWORKS)
+    do
+        echo -n "  waiting for grp$grp-rtr"
+        lxc exec grp${grp}-rtr -- cloud-init status --wait
+    done
+    echo
+    echo "All routers started"
 }
 
 start_border_router () {
