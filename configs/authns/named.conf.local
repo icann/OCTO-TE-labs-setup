@@ -2,8 +2,3 @@ zone ".internal" {
 	type primary;
 	file "/var/lib/bind/zones/db.internal";
 };
-
-zone "rpz.internal" {
-	type primary;
-	file "/var/lib/bind/zones/db.rpz";
-};
