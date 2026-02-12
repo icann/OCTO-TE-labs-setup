@@ -142,6 +142,7 @@ start_all () {
     fi
     if [ "$generateServers" = "YES" ]; then
         start_student_servers
+        start_authns
         start_dnsdist
     fi
     if [ "$generateRPKIvalidator" = "YES" ]; then
@@ -161,6 +162,7 @@ stop_all () {
     stop_student_clients
     stop_student_servers
     stop_dnsdist
+    stop_authns
     stop_nginx
     stop_webssh
     echo "---> DONE stop_all"
@@ -171,6 +173,7 @@ delete_all () {
     delete_student_clients
     delete_student_servers
     delete_dnsdist
+    delete_authns
     delete_student_RPKI_validator
     delete_global_RPKI_validator
     delete_routers

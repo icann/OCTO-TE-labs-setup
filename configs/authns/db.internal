@@ -1,0 +1,20 @@
+$TTL    30
+@       IN      SOA     %DOMAIN%. te-labs.icann.org. (                                            
+                              1         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                             30 )       ; Negative Cache TTL
+@           NS          %DOMAIN%.
+
+nxdomain                TXT     "Block me if you can"
+nodata                  TXT     "Block me if you can"
+drop                    TXT     "Block me if you can"
+tcponly                 TXT     "This is a UDP joke, you might not get it"
+override.wildcard       TXT     "This you should get, but no other"
+ip-rewrite.internal     A       100.100.100.100
+ip-rewrite.internal     AAAA    2001:db8::cafe
+*.wildcard              TXT     "Block me if you can"
+ipblocked               A       100.100.100.1
+netnodata               A       100.100.99.99
+ipdrop                  AAAA    2001:db8::dead:beef

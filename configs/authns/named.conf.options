@@ -1,0 +1,13 @@
+options {
+    directory "/var/cache/bind";
+    server-id ".internal primary";
+    version "RPZ";
+    hostname "authns";
+    dnssec-validation no;
+    recursion no;
+    listen-on port 53 { localhost; 100.100.0.0/16; };
+    listen-on-v6 port 53 { localhost; fd89:59e0::/32; };
+    allow-query { 100.100.0.0/16; };
+    allow-transfer { none; };
+    also-notify { none; };
+};
