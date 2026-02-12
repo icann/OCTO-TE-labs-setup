@@ -224,6 +224,59 @@ The configuration will be injected in the CF template `lac-ec2.yaml` by the gith
 
 > [!NOTE]
 > The key for DNSSEC signing must be created in Virginia (us-east-1), ECC_NIST_P256, Sign and verify.
+> The following key policy is needed.
+```
+{
+  "Version": "2012-10-17",
+  "Id": "dnssec-policy",
+  "Statement": [
+    {
+      "Sid": "Enable IAM User Permissions",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::427946385759:root"
+      },
+      "Action": "kms:*",
+      "Resource": "*"
+    },
+    {
+      "Sid": "Allow Route 53 DNSSEC Service",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "dnssec-route53.amazonaws.com"
+      },
+      "Action": [
+        "kms:DescribeKey",
+        "kms:GetPublicKey",
+        "kms:Sign"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:SourceAccount": "427946385759"
+        },
+        "ArnLike": {
+          "aws:SourceArn": "arn:aws:route53:::hostedzone/*"
+        }
+      }
+    },
+    {
+      "Sid": "Allow Route 53 DNSSEC to CreateGrant",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "dnssec-route53.amazonaws.com"
+      },
+      "Action": "kms:CreateGrant",
+      "Resource": "*",
+      "Condition": {
+        "Bool": {
+          "kms:GrantIsForAWSResource": "true"
+        }
+      }
+    }
+  ]
+}
+```
 
 # Development
 
@@ -236,6 +289,9 @@ Copy the URL of the `lab-ec2.yaml` file in your branch bucket and use it to star
 instances.
 
 # Lab without AWS
+
+The lab uses LXD container manager. This must be installed before trying to run the lab scripts.
+
 
 This repository aims to setup a full lab on an AWS EC2 instance. But just copying the 
 `config/`and `scripts/` folders to a Ubuntu Linux machine should allow you to start the
@@ -254,4 +310,4 @@ as a provider for DNS and DNSSEC.
 Make sure to have a valid DNS setup including DNSSEC signing for the parent zone and the lab zone.
 
 The DNSSEC automation uses an integration to Route53. You will have to replace that with an 
-integration of your own.
+integration of your own. (Pull Requests are welcome!)
