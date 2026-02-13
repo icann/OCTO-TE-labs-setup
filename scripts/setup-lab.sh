@@ -19,6 +19,7 @@ eval set -- "$TEMP"
 # ---------------------------------------- DEFAULT CONFIGURATIONS SET UP -------------------------------------------
 
 ## source all setup functions
+. ./lab-tools/authns.sh
 . ./lab-tools/cli.sh
 . ./lab-tools/cron.sh
 . ./lab-tools/globalvalidators.sh
@@ -270,6 +271,7 @@ deploy () {
 
     if [ "$generateServers" = "YES" ]; then
         create_student_servers
+        create_authns
         create_dnsdist
     fi
 
