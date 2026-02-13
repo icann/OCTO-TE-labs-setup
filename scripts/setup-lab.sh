@@ -20,6 +20,7 @@ eval set -- "$TEMP"
 
 ## source all setup functions
 . ./lab-tools/authns.sh
+. ./lab-tools/borderrouter.sh
 . ./lab-tools/cli.sh
 . ./lab-tools/cron.sh
 . ./lab-tools/globalvalidators.sh
