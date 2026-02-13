@@ -19,6 +19,14 @@ create_authns () {
         -e "s|%IPv6pfx%|$IPv6prefix|g" \
         ../configs/netplan/bb-lxc.yaml > $workdir/bb-lxc.yaml.authns
 
+    # generating .internal zone file
+    sed -e "s|%GRP%|0|g" \
+        -e "s|%NET%|0|g" \
+        -e "s|%IP%|54|g" \
+        -e "s|%IPv6pfx%|$IPv6prefix|g" \
+        -e "s|%DOMAIN%|$DOMAIN|g" \
+        ../configs/authns/db.internal > $workdir/db.internal.authns
+
     # pushing network config..."
     lxc file push $workdir/bb-lxc.yaml.authns authns/etc/netplan/bb-lxc.yaml
     lxc exec authns -- sh -c 'chmod 600 /etc/netplan/bb-lxc.yaml'
@@ -29,11 +37,11 @@ create_authns () {
     lxc exec authns -- sh -c 'apt install -qy bind9'
 
     # generating authns config
-    lxc file push ../config/authns/named.conf.options authns/etc/bind/named.conf.options
-    lxc file push ../config/authns/named.conf.local   authns/etc/bind/named.conf.local
+    lxc file push ../configs/authns/named.conf.options authns/etc/bind/named.conf.options
+    lxc file push ../configs/authns/named.conf.local   authns/etc/bind/named.conf.local
     lxc exec authns -- sh -c 'chown -R bind:bind /etc/bind/*'
     lxc exec authns -- sh -c 'mkdir -p /var/lib/bind/zones'
-    lxc file push ../config/authns/db.internal authns/var/lib/bind/zones/db.internal'
+    lxc file push $workdir/db.internal.authns authns/var/lib/bind/zones/db.internal
     lxc exec authns -- sh -c 'chown -R bind:bind /var/lib/bind'
 
     # restart server to apply all config changes 
@@ -57,7 +65,7 @@ create_authns () {
 
 delete_authns () {
     echo "Delete authns"
-    lxc delete dnsdist
+    lxc delete authns
     iptables -t nat -D PREROUTING -i eth0 -p udp --dport 53 -j DNAT --to-destination 100.64.0.54:53
     iptables -t nat -D PREROUTING -i eth0 -p tcp --dport 53 -j DNAT --to-destination 100.64.0.54:53
     ip6tables -t nat -D PREROUTING -i eth0 -p udp --dport 53 -j DNAT --to-destination [$IPv6prefix:0::54]:53
