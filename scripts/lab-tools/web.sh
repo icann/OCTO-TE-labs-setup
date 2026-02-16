@@ -51,6 +51,10 @@ create_web_content () {
       IPv4cli=100.100.$grp.2
       user4cli=sysadm
       passwd4cli=$(awk -v dev="grp$grp-cli" -F"," '$1==dev {print $2}' /var/shellinabox/lan-client-password-list.txt | base64)
+    else
+      IPv4cli=''
+      user4cli=''
+      passwd4cli=''
     fi
     if [ "$generateServers" = "YES" ]; then
       IPv4resolv1=100.100.$grp.67
@@ -59,6 +63,13 @@ create_web_content () {
       IPv4resolv2=100.100.$grp.68
       user4resolv2=sysadm
       passwd4resolv2=$(awk -v dev="grp$grp-resolv2" -F"," '$1==dev {print $2}' /var/shellinabox/int-server-password-list.txt | base64)
+    else
+      IPv4resolv1=''
+      user4resolv1=''
+      passwd4resolv1=''
+      IPv4resolv2=''
+      user4resolv2=''
+      passwd4resolv2=''
     fi
     if [ "$generateServers" = "YES" ] && [ $LABTYPE = 2 ]; then
       IPv4soa=100.100.$grp.66
@@ -70,6 +81,16 @@ create_web_content () {
       IPv4ns2=100.100.$grp.131
       user4ns2=sysadm
       passwd4ns2=$(awk -v dev="grp$grp-ns2" -F"," '$1==dev {print $2}' /var/shellinabox/int-server-password-list.txt | base64)
+    else
+      IPv4soa=''
+      user4soa=''
+      passwd4soa=''
+      IPv4ns1=''
+      user4ns1=''
+      passwd4ns1=''
+      IPv4ns2=''
+      user4ns2=''
+      passwd4ns2=''
     fi
     IPv4rtr=100.64.1.$grp
     user4rtr=rtradm
@@ -78,6 +99,10 @@ create_web_content () {
       IPv4rpki=100.100.$grp.70
       user4rpki=sysadm
       passwd4rpki=$(awk -v dev="grp$grp-rpki" -F"," '$1==dev {print $2}' /var/shellinabox/int-RPKI-validator-password-list.txt | base64)
+    else
+        IPv4rpki=''
+        user4rpki=''
+        passwd4rpki=''
     fi
 
     sed -e "s|%group%|$grp|g" \

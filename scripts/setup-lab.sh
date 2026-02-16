@@ -207,7 +207,7 @@ deploy () {
 		  exit 1
   fi
 
-	echo "======================================================================="
+  echo "======================================================================="
   echo "======================================================================="
   echo " "
   echo "Once more, have you verified the environment you're going to recreate"
@@ -249,6 +249,7 @@ deploy () {
   # Creating temporary deployment directories
 
   workdir=/tmp/dnsdeploy
+  rm -rf $workdir
   mkdir -p $workdir
   
   nginxworkdir=$workdir/nginx
