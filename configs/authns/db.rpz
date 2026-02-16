@@ -1,0 +1,112 @@
+$TTL    30
+@   IN  SOA rpz.internal. hostmaster.rpz.internal. (
+        1        ; serial
+        3600     ; refresh
+        3600     ; retry
+        3600     ; expire
+        30 )     ; minimum
+@   IN  NS  ns.internal.
+ns.internal. A 100.100.0.54
+ns.internal. AAAA 2001:db8::54
+
+; ============================================================
+; PLEASE NO CHANGES BELOW THIS POINT
+; ============================================================
+nxdomain.internal           CNAME   .
+nodata.internal             CNAME   *.
+drop.internal               CNAME   rpz-drop.
+tcponly.internal            CNAME   rpz-tcp-only.
+rewrite.internal            A       100.100.200.1
+rewrite.internal            AAAA    2001:db8::42
+override.wildcard.internal  CNAME   rpz-passthru.
+*.wildcard.internal         CNAME   .
+32.2.100.100.100.rpz-ip     CNAME   .
+128.dad.bad.zz.db8.2001.rpz-ip    CNAME   .
+badns.internal.rpz-nsdname  CNAME   rpz-drop.
+32.3.100.100.100.rpz-nsip   CNAME   rpz-drop.
+
+
+
+
+ 4) QNAME → TCP-ONLY (CNAME rpz-tcp-only.)
+tcponly.internal.           CNAME   rpz-tcp-only.
+
+; 5) QNAME → PASSTHRU / EXCEPTION (CNAME rpz-passthru.)
+;    This “whitelist” example disables policy for this name.
+override.wildcard.internal.         CNAME   rpz-passthru.
+
+; 6) QNAME → LOCAL-DATA (walled garden)
+;    Return specific A/AAAA instead of original answer.
+ip-rewrite.internal.          A       192.0.2.42
+ip-rewrite.internal.          AAAA    2001:db8::42
+
+; 7) Wildcard QNAME trigger
+*.wildcard.internal.           CNAME   .
+
+; ============================================================
+; IP TRIGGERS (response IP based)
+; Owner name format: <reversed-ip>.rpz-ip
+; ============================================================
+
+; 8) Single IPv4 address → NXDOMAIN
+;    100.100.100.1
+32.1.100.100.100.rpz-ip.            CNAME   .
+
+; 9) IPv4 /24 prefix → NODATA
+;    100.100.99.0/24
+24.0.100.51.198.rpz-ip.            CNAME   rpz-nodata.
+
+; 10) Single IPv6 address → DROP
+;     2001:db8::dead:beef
+f.e.e.b.d.a.e.d.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.rpz-ip. CNAME rpz-drop.
+
+; 11) IPv6 /64 prefix → LOCAL-DATA redirect
+;     2001:db8:ace::/64 (example)
+0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.0.0.0.1.0.0.8.b.d.0.1.0.0.2.rpz-ip. AAAA 2001:db8::ace   
+
+
+; ============================================================
+; CLIENT-IP TRIGGERS (client source address based)
+; Owner name format: <reversed-ip>.rpz-client-ip
+; ============================================================
+
+; 12) Single client IPv4 → NXDOMAIN for all queries
+;     10.0.0.50
+50.0.0.10.rpz-client-ip.        CNAME   .
+
+; 13) Client IPv4 /24 → LOCAL-DATA to captive portal
+;     192.0.2.0/24
+0.2.0.192.rpz-client-ip.        CNAME   captive.internal.
+
+; 14) Single client IPv6 → TCP-ONLY
+;     2001:db8:100::1234
+4.3.2.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.0.1.8.b.d.0.1.0.0.2.rpz-client-ip. \
+                                    CNAME rpz-tcp-only.
+
+; ============================================================
+; NSDNAME TRIGGERS (name of nameserver during delegation)
+; Owner name format: <ns-name>.rpz-nsdname
+; ============================================================
+
+; 15) Any zone whose NS is ns.badns.internal. → DROP
+ns.badns.internal.rpz-nsdname.  CNAME   rpz-drop.
+
+; 16) Any zone whose NS is ns.info.internal. → redirect to info page
+ns.info.internal.rpz-nsdname.   CNAME   info.internal.
+
+; 17) Wildcard NSDNAME → NXDOMAIN
+*.evilns.internal.rpz-nsdname.  CNAME   .
+
+; ============================================================
+; NS-IP TRIGGERS (address of nameserver during delegation)
+; Owner name format: <reversed-ip>.rpz-nsip
+; ============================================================
+
+; 18) NS-IP single IPv4 → NODATA
+;     198.51.100.53
+53.100.51.198.rpz-nsip.         CNAME   rpz-nodata.
+
+; 19) NS-IP /24 prefix → DROP
+;     203.0.113.0/24
+0.113.0.203.rpz-nsip.           CNAME   rpz-drop.
+

@@ -1,0 +1,11 @@
+$TTL    30
+@       IN      SOA     badnsname.internal. te-labs.icann.org. (                                            
+                              1         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                             30 )       ; Negative Cache TTL
+@           NS          badns.internal.
+@ A 100.100.100.221
+@ AAAA 2001:db8::221
+@ TXT "You reach the badnsname apex"

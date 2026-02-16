@@ -1,4 +1,19 @@
+zone "rpz" {
+	type primary;
+	file "/var/lib/bind/zones/db.rpz";
+};
+
 zone "internal" {
 	type primary;
 	file "/var/lib/bind/zones/db.internal";
+};
+
+zone "badnsname.internal" {
+	type primary;
+	file "/var/lib/bind/zones/db.badnsname.internal";
+};
+
+zone "evilnsip.internal" {
+	type primary;
+	file "/var/lib/bind/zones/db.evilnsip.internal";
 };
