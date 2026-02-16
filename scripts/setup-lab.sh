@@ -327,6 +327,11 @@ deploy () {
 	  push_global_RPKI_validator_net_config
   fi
 
+  # THIS TAKES A VERY VERY VERY LONG TIME
+  # PLEASE START MANUALLY 
+  # echo "---------------------------------------------------------"
+  # echo "All containers are up, creating backup"
+  # make_backup_all
   echo "---------------------------------------------------------"
 
   stop_webssh

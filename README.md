@@ -144,6 +144,26 @@ cat grouppasswords.txt
 In the same list there is also a password for the `labuser`.
 This user/password combination gives access to all groups.
 
+# Reset lab containers
+
+If you would like to be able to reset whole groups or single containers,
+you will need to run the backup script.
+
+> [!IMPORTANT]
+> The backup script will likely take several hours. Use a screen session!
+> Every group will take approx. 3GB on disk. Check your diskspace!
+
+1. Become root and change to the `/root/scripts` folder.
+2. Optional: start a screen session, 
+3. run `./backup.sh`
+4. Wait a **very** long time
+
+To restore a single container use the `restore.sh` script like
+```
+./restore.sh 1 cli   # restores the container grp1-cli
+./restore.sh 2       # restores all containers that start with grp2-
+```
+
 # Lab life-cycle management
 
 Please setup a new lab at least a week before your engagement.
