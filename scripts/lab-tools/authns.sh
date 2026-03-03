@@ -33,7 +33,12 @@ create_authns () {
     lxc file push ../configs/authns/named.conf.local   authns/etc/bind/named.conf.local
     lxc exec authns -- sh -c 'chown -R bind:bind /etc/bind/*'
     lxc exec authns -- sh -c 'mkdir -p /var/lib/bind/zones'
-    lxc file push ../configd/authns/db.* authns/var/lib/bind/zones/
+
+    lxc file push ../configs/authns/db.rpz                 authns/var/lib/bind/zones/
+    lxc file push ../configs/authns/db.internal            authns/var/lib/bind/zones/
+    lxc file push ../configs/authns/db.evilnsip.internal   authns/var/lib/bind/zones/
+    lxc file push ../configs/authns/db.badnsname.internal  authns/var/lib/bind/zones/
+
     lxc exec authns -- sh -c 'chown -R bind:bind /var/lib/bind'
 
     # restart server to apply all config changes 
@@ -41,16 +46,6 @@ create_authns () {
     lxc start authns
     lxc exec authns -- cloud-init status --wait
 
-    # install nat rules on host
-    iptables -t nat -A PREROUTING -i eth0 -p udp --dport 53 -j DNAT --to-destination 100.64.0.54:53
-    iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 53 -j DNAT --to-destination 100.64.0.54:53
-    ip6tables -t nat -A PREROUTING -i eth0 -p udp --dport 53 -j DNAT --to-destination [$IPv6prefix:0::54]:53
-    ip6tables -t nat -A PREROUTING -i eth0 -p tcp --dport 53 -j DNAT --to-destination [$IPv6prefix:0::54]:53
-    #
-    # save iptable rules for reboot
-    #
-    iptables-save > /etc/iptables/rules.v4
-    ip6tables-save > /etc/iptables/rules.v6
     #
     echo "Done - Create authns"
 }
@@ -58,15 +53,7 @@ create_authns () {
 delete_authns () {
     echo "Delete authns"
     lxc delete authns
-    iptables -t nat -D PREROUTING -i eth0 -p udp --dport 53 -j DNAT --to-destination 100.64.0.54:53
-    iptables -t nat -D PREROUTING -i eth0 -p tcp --dport 53 -j DNAT --to-destination 100.64.0.54:53
-    ip6tables -t nat -D PREROUTING -i eth0 -p udp --dport 53 -j DNAT --to-destination [$IPv6prefix:0::54]:53
-    ip6tables -t nat -D PREROUTING -i eth0 -p tcp --dport 53 -j DNAT --to-destination [$IPv6prefix:0::54]:53
-    #
-    # save iptable rules for reboot
-    #
-    iptables-save > /etc/iptables/rules.v4
-    ip6tables-save > /etc/iptables/rules.v6
+
     #
     echo "Done - Delete authns"
 }
