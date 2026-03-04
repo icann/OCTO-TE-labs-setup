@@ -42,8 +42,17 @@ options {
 };
 EOF
 
+cat <<EOF >/tmp/named.conf.local.resolv1
+zone "internal." {
+    type forward;
+    forwarders { 100.64.0.54; };
+    forward only;  // only forward, no fallback to root hints
+};
+EOF
+
 lxc exec grp$GRP-resolv1 -- sh -c 'apt install -qy bind9'
 lxc file push /tmp/named.conf.options.resolv1 grp$GRP-resolv1/etc/bind/named.conf.options
+lxc file push /tmp/named.conf.local.resolv1   grp$GRP-resolv1/etc/bind/named.conf.local
 lxc exec grp$GRP-resolv1 -- sh -c 'systemctl enable named'
 lxc exec grp$GRP-resolv1 -- sh -c 'systemctl restart named'
 lxc exec grp$GRP-resolv1 -- sh -c 'mv /etc/resolv.conf.orig /etc/resolv.conf'
@@ -68,6 +77,10 @@ server:
 
 remote-control:
     control-enable: yes
+
+stub-zone:
+    name: "internal."
+    stub-addr: 100.64.0.54
 EOF
 
 lxc exec grp$GRP-resolv2 -- sh -c 'apt install -qy unbound'
