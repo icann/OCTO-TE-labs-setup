@@ -1,9 +1,9 @@
 $TTL    30
 @       IN      SOA     authns.rpz. te-labs.icann.org. (                                            
                               1         ; Serial
-                         604800         ; Refresh
-                          86400         ; Retry
-                        2419200         ; Expire
+                             30         ; Refresh
+                             30         ; Retry
+                             30         ; Expire
                              30 )       ; Negative Cache TTL
 @           NS          authns.rpz.
 authns      A           100.64.0.54
@@ -23,6 +23,6 @@ wildcard                TXT     "This is not blocked"
 *.wildcard              TXT     "Block me if you can"
 override.wildcard       TXT     "This you should get, but no other subdomain"
 badnsname               NS      badns
-badns                   A       100.100.100.254
+badns                   A       100.64.0.55
 evilnsip                NS      evilns
-evilns                  A       100.100.100.3
+evilns                  A       100.64.0.56

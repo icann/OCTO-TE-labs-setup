@@ -1,0 +1,19 @@
+network:
+  version: 2
+  ethernets:
+    eth0:
+      dhcp4: no
+      addresses:
+        - 100.64.0.54/22
+        - 100.64.0.55/22
+        - 100.64.0.56/22
+        - %IPv6pfx%:0::54/48
+        - %IPv6pfx%:0::55/48
+        - %IPv6pfx%:0::56/48
+      routes:
+        - to: default
+          via: 100.64.0.1
+        - to: default
+          via: %IPv6pfx%:0::1
+      nameservers:
+        addresses: [9.9.9.9]

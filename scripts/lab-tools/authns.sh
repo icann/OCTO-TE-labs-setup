@@ -13,14 +13,11 @@ create_authns () {
     lxc config device add authns eth0 nic name=eth0 nictype=bridged parent=net-bb
 
     # generating network config
-    sed -e "s|%GRP%|0|g" \
-        -e "s|%NET%|0|g" \
-        -e "s|%IP%|54|g" \
-        -e "s|%IPv6pfx%|$IPv6prefix|g" \
-        ../configs/netplan/bb-lxc.yaml > $workdir/bb-lxc.yaml.authns
+    sed -e "s|%IPv6pfx%|$IPv6prefix|g" 
+        ../configs/netplan/bb-authns.yaml > $workdir/bb-authns.yaml
 
     # pushing network config..."
-    lxc file push $workdir/bb-lxc.yaml.authns authns/etc/netplan/bb-lxc.yaml
+    lxc file push $workdir/bb-authns.yaml authns/etc/netplan/bb-lxc.yaml
     lxc exec authns -- sh -c 'chmod 600 /etc/netplan/bb-lxc.yaml'
     lxc exec authns -- sh -c "echo authns.$DOMAIN >/etc/hostname"
     lxc exec authns -- sh -c "hostname authns.$DOMAIN"
@@ -29,6 +26,7 @@ create_authns () {
     lxc exec authns -- sh -c 'apt install -qy bind9'
 
     # generating authns config
+    lxc exec authns -- sh -c 'rm -rf /etc/bind/named.conf*'
     lxc file push ../configs/authns/named.conf.options authns/etc/bind/named.conf.options
     lxc file push ../configs/authns/named.conf.local   authns/etc/bind/named.conf.local
     lxc exec authns -- sh -c 'chown -R bind:bind /etc/bind/*'

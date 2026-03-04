@@ -1,26 +1,21 @@
 $TTL    30
 @   IN  SOA rpz.internal. hostmaster.rpz.internal. (
-        1        ; serial
-        3600     ; refresh
-        3600     ; retry
-        3600     ; expire
-        30 )     ; minimum
+        1      ; serial
+        30     ; refresh
+        30     ; retry
+        30     ; expire
+        30 )   ; minimum
 @   IN  NS  ns.internal.
 ns.internal. A 100.100.0.54
 ns.internal. AAAA 2001:db8::54
-
-; ============================================================
-; PLEASE NO CHANGES BELOW THIS POINT
-; ============================================================
 nxdomain.internal               CNAME   .
 nodata.internal                 CNAME   *.
 drop.internal                   CNAME   rpz-drop.
 tcponly.internal                CNAME   rpz-tcp-only.
-rewrite.internal                A       100.100.200.1
-rewrite.internal                AAAA    2001:db8::42
+rewrite.internal                TXT     "A MESSAGE FROM RPZ"
 override.wildcard.internal      CNAME   rpz-passthru.
 *.wildcard.internal             CNAME   .
 32.2.100.100.100.rpz-ip         CNAME   .
 128.dad.bad.zz.db8.2001.rpz-ip  CNAME   .
 badns.internal.rpz-nsdname      CNAME   rpz-drop.
-32.3.100.100.100.rpz-nsip       CNAME   rpz-drop.
+32.56.0.64.100.rpz-nsip         CNAME   rpz-drop.

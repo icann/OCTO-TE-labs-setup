@@ -8,4 +8,4 @@ $TTL    30
 @           NS          evilns.internal.
 @ A 100.100.100.222
 @ AAAA 2001:db8::222
-@ TXT "You reach the evilnsip apex"
+@ TXT "You've reached the evilnsip apex"

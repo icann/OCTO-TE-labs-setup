@@ -1,20 +1,36 @@
-zone "rpz" {
-	type primary;
-	file "/var/lib/bind/zones/db.rpz";
+acl "addr54" { 100.64.0.54; };
+acl "addr55" { 100.64.0.55; };
+acl "addr56" { 100.64.0.56; };
+
+view "addr54" {
+    match-destinations { addr54; };
+
+    zone "rpz" {
+	    type primary;
+	    file "/var/lib/bind/zones/db.rpz";
+    };
+
+    zone "internal" {
+        type primary;
+        file "/var/lib/bind/zones/db.internal";
+        dnssec-policy default;
+    };
 };
 
-zone "internal" {
-	type primary;
-	file "/var/lib/bind/zones/db.internal";
-    dnssec-policy default;
+view "addr55" {
+    match-destinations { addr55; };
+
+    zone "badnsname.internal" {
+        type primary;
+        file "/var/lib/bind/zones/db.badnsname.internal";
+    };
 };
 
-zone "badnsname.internal" {
-	type primary;
-	file "/var/lib/bind/zones/db.badnsname.internal";
-};
+view "addr56" {
+    match-destinations { addr56; };
 
-zone "evilnsip.internal" {
-	type primary;
-	file "/var/lib/bind/zones/db.evilnsip.internal";
+    zone "evilnsip.internal" {
+        type primary;
+	    file "/var/lib/bind/zones/db.evilnsip.internal";
+    };
 };
