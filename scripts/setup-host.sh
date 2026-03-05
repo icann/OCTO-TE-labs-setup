@@ -2,13 +2,8 @@
 
 set -exou
 
-DOMAIN=$(perl -e "print lc('$1')")
-DOMAIN=`echo $DOMAIN | perl -n -e "s/\.$//;print $_;"`
-IPV4=$2
-IPV6=`ip a s dev eth0 scope global | perl -n -e'print $1 if m/inet6\s+(\S+)\/128/'`
-ZONEID=$3
-LABTYPE=$4
-NETWORKS=$5
+# Load parameters from "deploy-parameters.cfg" file
+. ./deploy-parameters.cfg
 
 # ---------------------------------------- DEFAULT CONFIGURATIONS SET UP -------------------------------------------
 
@@ -68,11 +63,6 @@ main() {
         define_swap_space
     fi
 
-    # Static IPv6 prefix
-    IPv6prefix="fd89:59e0"
-    ## Generate random IPv6 ULA prefix (follow RFC), please uncomment following line
-    # generate_IPv6_ULA
-
     ## generate and apply new netplan for the Lab
     echo "Generate and apply new netplan for the Lab"
     cp -n /etc/netplan/50-cloud-init.yaml /etc/netplan/50-cloud-init.yaml.original-"$(date +\%F_\%H-\%M-\%S)"
@@ -93,17 +83,6 @@ main() {
 
     # Initialize LXD
     LXD_init
-
-    ## generate "deploy-parameters.cfg" file
-    echo "Generating deploy-parameters.cfg file to be used by deploy.sh script... "
-    sed -e "s|%IPv6pfx%|$IPv6prefix|g" ../configs/deploy-parameters.cfg > ./deploy-parameters.cfg
-    sed -i -e "s/%LABDOMAIN%/${DOMAIN}/"  ./deploy-parameters.cfg
-    sed -i -e "s/%IPV4ADDRESS%/${IPV4}/"  ./deploy-parameters.cfg
-    sed -i -e "s/%IPV6ADDRESS%/${IPV6}/"  ./deploy-parameters.cfg
-    sed -i -e "s/%ZONEID%/${ZONEID}/"     ./deploy-parameters.cfg
-    sed -i -e "s/%LABTYPE%/${LABTYPE}/"   ./deploy-parameters.cfg
-    sed -i -e "s/%NETWORKS%/${NETWORKS}/" ./deploy-parameters.cfg
-    echo "---> deploy-parameters.cfg file generated"
 
     # set hostname
     hostname $DOMAIN
@@ -212,37 +191,6 @@ LXD_init () {
     lxd init --preseed < ../configs/lxd/lxdpreseed.yaml
     # Show actual LXD configuration
     lxd init --dump
-}
-
-generate_IPv6_ULA () {
-    ## This will generate an IPv6 ULA prefix and save it in $workdir/etc/netplan/IPv6_generated_ULA.txt-DATE_TIME
-
-    # will need to install -ipv6calc- and -ntp- before running this
-    # References:
-    #
-    # RFC 4193 -- Unique Local IPv6 Unicast Addresses
-    #   https://tools.ietf.org/html/rfc4193
-    #
-    apt-get -yq install ntp ipv6calc
-    echo "-- Generating IPv6 ULA prefix to be used in this instance using the following parameters:"
-    time4ULA="$(ntptime | grep "time " | head -n1 | awk '{print $2}')"
-    echo "-- ntptime: $time4ULA"
-    EUI_48="$instanceMACaddr"
-    echo "-- EUI_48: $EUI_48"
-    EUI_64="$(ipv6calc --action prefixmac2ipv6 --in prefix+mac --out ipv6addr :: $EUI_48 | sed 's/^:://')"
-    echo "-- EUI_64: $EUI_64"
-    conq="$(echo "$time4ULA $EUI_64" | tr -d ".: ")"
-    echo "-- Conq: $conq"
-    sha1="$(for x in $(echo "$conq" | sed 's/\(..\)/\1 /g') ; do printf "\x${x}" ; done | sha1sum | awk '{print $1}' | tail -c 11 | sed 's/\(..\)/\1 /g')"
-    IPv6_ULA="$(echo $sha1 | awk '{print "fd" $1 ":" $2 $3 ":" $4 $5 "::/48"}')"
-    echo "IPv6 ULA: $IPv6_ULA"
-    # We will truncate the prefix after the first 4 octets to "pseudo generate" a /32
-    # This is in order to be able to later allocate each group a /48 ("pseudo ULA")
-    # (so will not use $4 and $5 from IPv6_ULA)
-    # Then, the IPv6 prefix to be used across all Lab will be:
-    IPv6prefix="$(echo $sha1 | awk '{print "fd" $1 ":" $2 $3}')"
-    echo "IPv6 Prefix: $IPv6prefix"
-    apt-get -yq remove ntp ipv6calc
 }
 
 gen_net_config () {

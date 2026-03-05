@@ -26,15 +26,11 @@ create_web_content () {
     allow4ns2=''
     allow4ns2EOL=''
 
-    if [ "$allowRouterAccess4Groups" = "NO" ]; then
-        allow4rtr='!-- '
-        allow4rtrEOL='--'
-    fi
-    if [ "$generateClients" = "NO" ]; then
+    if [ "$StudentClients" = "NO" ]; then
         allow4cli='!--'
         allow4cliEOL='--'
     fi
-    if [ $LABTYPE = 1 ]; then
+    if [ "$StudentAuth" = "NO" ]; then
         allow4soa='!-- '
         allow4soaEOL='--'
         allow4ns1='!-- '
@@ -42,39 +38,43 @@ create_web_content () {
         allow4ns2='!-- '
         allow4ns2EOL='--'
     fi
+    if [ "$StudentRouterAccess" = "NO" ]; then
+        allow4rtr='!-- '
+        allow4rtrEOL='--'
+    fi
 
     for grp in $(seq 1 $NETWORKS)
     do
         mkdir -p $contentworkdir/$DOMAIN/grp$grp
 
-        if [ "$generateClients" = "YES" ]; then
+        if [ "$StudentClients" = "YES" ]; then
             IPv4cli=100.100.$grp.2
             user4cli=sysadm
             passwd4cli=$(awk -v dev="grp$grp-cli" -F"," '$1==dev {print $2}' /var/shellinabox/lan-client-password-list.txt | base64)
         fi
-        if [ "$generateServers" = "YES" ]; then
+        if [ "$StudentResolvers" = "YES" ]; then
             IPv4resolv1=100.100.$grp.67
             user4resolv1=sysadm
-            passwd4resolv1=$(awk -v dev="grp$grp-resolv1" -F"," '$1==dev {print $2}' /var/shellinabox/int-server-password-list.txt | base64)
+            passwd4resolv1=$(awk -v dev="grp$grp-resolv1" -F"," '$1==dev {print $2}' /var/shellinabox/res-server-password-list.txt | base64)
             IPv4resolv2=100.100.$grp.68
             user4resolv2=sysadm
-            passwd4resolv2=$(awk -v dev="grp$grp-resolv2" -F"," '$1==dev {print $2}' /var/shellinabox/int-server-password-list.txt | base64)
+            passwd4resolv2=$(awk -v dev="grp$grp-resolv2" -F"," '$1==dev {print $2}' /var/shellinabox/res-server-password-list.txt | base64)
         fi
-        if [ "$generateServers" = "YES" ] && [ $LABTYPE = 2 ]; then
+        if [ "$StudentAuth" = "YES" ]; then
             IPv4soa=100.100.$grp.66
             user4soa=sysadm
-            passwd4soa=$(awk -v dev="grp$grp-soa" -F"," '$1==dev {print $2}' /var/shellinabox/int-server-password-list.txt | base64)
+            passwd4soa=$(awk -v dev="grp$grp-soa" -F"," '$1==dev {print $2}' /var/shellinabox/auth-server-password-list.txt | base64)
             IPv4ns1=100.100.$grp.130
             user4ns1=sysadm
-            passwd4ns1=$(awk -v dev="grp$grp-ns1" -F"," '$1==dev {print $2}' /var/shellinabox/int-server-password-list.txt | base64)
+            passwd4ns1=$(awk -v dev="grp$grp-ns1" -F"," '$1==dev {print $2}' /var/shellinabox/auth-server-password-list.txt | base64)
             IPv4ns2=100.100.$grp.131
             user4ns2=sysadm
-            passwd4ns2=$(awk -v dev="grp$grp-ns2" -F"," '$1==dev {print $2}' /var/shellinabox/int-server-password-list.txt | base64)
+            passwd4ns2=$(awk -v dev="grp$grp-ns2" -F"," '$1==dev {print $2}' /var/shellinabox/auth-server-password-list.txt | base64)
         fi
         IPv4rtr=100.64.1.$grp
         user4rtr=rtradm
         passwd4rtr=$(awk -v dev="grp$grp-rtr" -F"," '$1==dev {print $2}' /var/shellinabox/router-password-list.txt | base64)
-        if [ "$generateRPKIvalidator" = "YES" ]; then
+        if [ "$StudentRPKIvalidator" = "YES" ]; then
             IPv4rpki=100.100.$grp.70
             user4rpki=sysadm
             passwd4rpki=$(awk -v dev="grp$grp-rpki" -F"," '$1==dev {print $2}' /var/shellinabox/int-RPKI-validator-password-list.txt | base64)
@@ -123,7 +123,7 @@ create_web_content () {
             ../configs/www/var/www/html/grp_index.html > $contentworkdir/$DOMAIN/grp$grp/index.html
 
         
-        if [ "$generateRPKIvalidator" = "YES" ]; then
+        if [ "$StudentRPKIvalidator" = "YES" ]; then
             sed -e "s|%group%|$grp|g" \
                 -e "s|%AuthDomain%|$DOMAIN|g" \
                 -e "s|%ip4cli%|$IPv4cli|g" \
@@ -144,7 +144,7 @@ create_web_content () {
                 ../configs/www/var/www/html/grp_index.html > $contentworkdir/$DOMAIN/grp$grp/index.html
         fi
 
-        if [ "$generateGlobalRPKIvalidator" = "YES" ]; then
+        if [ "$GlobalRPKIvalidator" = "YES" ]; then
             sed -e "s|%group%|$grp|g" \
                 -e "s|%AuthDomain%|$DOMAIN|g" \
                 -e "s|%ip4cli%|$IPv4cli|g" \

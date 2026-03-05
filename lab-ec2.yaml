@@ -21,11 +21,12 @@ Parameters:
     MinLength: 1
   LabType:
     Type: String
-    Description: "Which type of lab do you want to run? (1=resolver only, 2=full dns, 3=router)"
+    Description: "Which type of lab do you want to run? (1=resolver only, 2=full dns, 3=router (global rpki), 4=router (group rpki))"
     AllowedValues:
       - 1
       - 2
       - 3
+      - 4
     Default: 2
   LatestUbuntu:
     Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
@@ -326,11 +327,30 @@ Resources:
           # wait for cloudformation stack to finish
           sleep 60
           #
+          # for remaining actions we need to be in the scripts folder
+          cd scripts
+          #
+          # setup DEPLOY VPN parameters
+          DOMAIN=$(perl -e "$_=lc('${DnsName}.${DnsParent}');s/\.$//;print $_;")
+          IPV4=${IPAddress.PublicIp}
+          IPV6=`ip a s dev eth0 scope global | perl -n -e'print $1 if m/inet6\s+(\S+)\/128/'`
+          ZONEID=${labZone}   
+          LABTYPE=${LabType}
+          NETWORKS=${Participants}
+          IPv6prefix="fd89:59e0"
+          cp  .
+          sed -e "s|%IPv6pfx%|$IPv6prefix|g"  \
+              -e "s/%LABDOMAIN%/${DOMAIN}/g"  \
+              -e "s/%IPV4ADDRESS%/${IPV4}/g"  \
+              -e "s/%IPV6ADDRESS%/${IPV6}/g"  \
+              -e "s/%ZONEID%/${ZONEID}/g"     \
+              -e "s/%LABTYPE%/${LABTYPE}/g"   \
+              -e "s/%NETWORKS%/${NETWORKS}/g" \
+              ../configs/deploy-parameters.cfg > ./deploy-parameters.cfg
           #
           # initialize lab server
           #
-          cd scripts
-          ./setup-host.sh ${DnsName}.${DnsParent} ${IPAddress.PublicIp} ${labZone} ${LabType} ${Participants}
+          ./setup-host.sh
           ./setup-containers.sh
           #
           # now deploy the lab

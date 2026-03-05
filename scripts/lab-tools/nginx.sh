@@ -99,13 +99,7 @@ push_nginx_config () {
 recreate_svc_list () {
     # recreate the svc list to be able to access all containers via WEB
     echo "Creating svc list (to be able to access all containers via WEB)"
-    # To list only group clients and servers (lab types 1 & 2), use this:
-    lxc list -c n4 --format csv|grep grp |grep -v rtr |sed -e 's| (eth0)||' -e "s|,| https://shellinabox.$DOMAIN/?host=|" > /var/shellinabox/service-list.txt
-    # To list routers (lab type 3) also, use this (will overwrite previous one):
-    if [ $LABTYPE -gt 2 ]; then
-        echo "List will include routers, as lab type 3 was selected !"
-        lxc list -c n4 --format csv|grep grp |sed -e 's| (eth0)||' |sed -e :a -e 's/"//' -e "s|,|, https://shellinabox.$DOMAIN/?host=|" > /var/shellinabox/service-list.txt
-    fi
+    lxc list -c n4 --format csv|grep grp |sed -e 's| (eth0)||' |sed -e :a -e 's/"//' -e "s|,|, https://shellinabox.$DOMAIN/?host=|" > /var/shellinabox/service-list.txt
     echo " "
 
     # Backup and delete current "/var/lib/shellinabox/.ssh/known_hosts" file (if exist) in order to clean all for new connections

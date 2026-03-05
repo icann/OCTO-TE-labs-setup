@@ -29,39 +29,47 @@ eval set -- "$TEMP"
 . ./lab-tools/nginx.sh
 . ./lab-tools/dnsdist.sh
 . ./lab-tools/routers.sh
-. ./lab-tools/servers.sh
 . ./lab-tools/shellinabox.sh
+. ./lab-tools/studentres.sh
+. ./lab-tools/studentauth.sh
 . ./lab-tools/validators.sh
 . ./lab-tools/web.sh
 . ./lab-tools/webssh.sh
 
-# Setting global variables and default values
-
-echo "---> Default values, environment set up will use them if no option specified:"
-
-# Set default Lab type
-# Lab type:
-# 1 : Practice with 2 DNS Resolvers and 1 Client
-# 2 : Practice with 2 DNS Resolvers, 2 Authoritatives, 1 SOA and 1 Client
-# 3 : Practice with 2 DNS Resolvers, 2 Authoritatives, 1 SOA, 1 Client and Anycast
-LABTYPE=0
-echo "---> Default type of lab is: "$LABTYPE
-
-# Set default number of groups to create
-NETWORKS=5
-echo "---> Default number of groups is: "$NETWORKS
-
-# set default action
-ACTION=NONE
-
-## Load parameters from "deploy-parameters.cfg" file
-# (will write over default values)
+# Load parameters from "deploy-parameters.cfg" file
 . ./deploy-parameters.cfg
 
 # ------------------------------------------------------------------------------------------------------------------
+# Indicate which containers should be created
+#
+# As default, nothing will be installed, thiese values will be changed based on the labtype
+#
+# Indicate if you want -client- container created in each group
+StudentClients=NO
+
+# Indicate if you want resolv1/2 containers created in each group
+StudentResolvers=NO
+
+# Indicate if you want soa,ns1/2 containers created in each group
+StudentAuth=NO
+
+# Indicate if you want -RPKI validator- containers created in each group
+StudentRPKIvalidator=NO
+
+# Indicate if you want groups to be able to access their router (grpX-rtr) by clicking on the router icon
+StudentRouterAccess=NO
+
+# Indicate if you want -RPKI validator- global containers created (normally is this OR previous one)
+GlobalRPKIvalidator=NO
+
+# Indicate if you want border router (iborder-rtr) to be created
+BorderRouter=NO
+
 # ------------------------------------------------------------------------------------------------------------------
 
 main () {
+    # set default action
+    ACTION=NONE
 
     while true; do
         case "$1" in
@@ -80,9 +88,27 @@ main () {
 
     # check for valid LABTYPE
     case "$LABTYPE" in
-        1 ) echo "Will bring up Lab type 1: Practice with 2 DNS Resolvers and 1 Client" ;; 
-        2 ) echo "Will bring up Lab type 2: Practice with 2 DNS Resolvers, 2 Authoritatives, 1 SOA and 1 Client" ;;
-        3 ) echo "Will bring up Lab type 3: Practice with 2 DNS Resolvers, 2 Authoritatives, 1 SOA, 1 Client and Anycast" ;;
+        1 ) StudentClients=YES;
+            StudentResolvers=YES;
+            echo "Will bring up Lab type 1: Practice with 2 DNS Resolvers and 1 Client";;
+        2 ) StudentClients=YES;
+            StudentResolvers=YES;
+            StudentAuth=YES;
+            echo "Will bring up Lab type 2: Practice with 2 DNS Resolvers, 2 Authoritatives, 1 SOA and 1 Client" ;;
+        3 ) StudentClients=YES;
+            StudentResolvers=YES;
+            StudentAuthServers=YES;
+            StudentRouterAccess=YES
+            GlobalRPKIvalidator=YES
+            BorderRouter=YES
+            echo "Will bring up Lab type 3: Practice with 2 DNS Resolvers, 2 Authoritatives, 1 SOA, 1 Client and Anycast, global RPKI validator" ;;
+        4 ) StudentClients=YES;
+            StudentResolvers=YES;
+            StudentAuth=YES;
+            StudentRPKIvalidator=YES
+            StudentRouterAccess=YES
+            BorderRouter=YES
+            echo "Will bring up Lab type 4: Practice with 2 DNS Resolvers, 2 Authoritatives, 1 SOA, 1 Client and Anycast, local RPKI validator" ;;
         * ) echo "Unknown Lab type option "$2""; usage; exit 5;;
     esac
 
@@ -135,22 +161,25 @@ EOF
 
 start_all () {
     echo "---> Performing start_all"
-    if [ "$generateBorderRouter" = "YES" ]; then
+    if [ "$BorderRouter" = "YES" ]; then
         start_border_router
     fi
     start_routers
-    if [ "$generateClients" = "YES" ]; then
+    if [ "$StudentClients" = "YES" ]; then
         start_student_clients
     fi
-    if [ "$generateServers" = "YES" ]; then
+    start_authns
+    start_dnsdist
+    if [ "$StudentResolvers" = "YES" ]; then
         start_student_servers
-        start_authns
-        start_dnsdist
     fi
-    if [ "$generateRPKIvalidator" = "YES" ]; then
+    if [ "$StudentAuth" = "YES" ]; then
+        start_student_servers
+    fi
+    if [ "$StudentRPKIvalidator" = "YES" ]; then
         start_student_RPKI_validator
     fi
-    if [ "$generateGlobalRPKIvalidator" = "YES" ]; then
+    if [ "$GlobalRPKIvalidator" = "YES" ]; then
         start_global_RPKI_validator
     fi
 }
@@ -204,44 +233,36 @@ delete_all () {
 }
 
 deploy () {
-    # Checking maxium number of networks is not exeeded
-    if [ $NETWORKS -gt 64 ]; then
-        echo "Error, you requested $NETWORKS and max. nr of networks (groups) is 64 !"
-        exit 1
-    fi
+    echo "======================================================================="
+    echo "Deploy will use the following parameters (if you want to change them,"
+    echo "please edit the deploy-parameters.cfg file and re-run this script):"
+    echo
+    echo "DOMAIN=$DOMAIN"
+    echo "IPv4ServerAddr=$IPv4ServerAddr"
+    echo "IPv6ServerAddr=$IPv6ServerAddr"
+    echo "ZONEID=$ZONEID"
+    echo "LABTYPE=$LABTYPE"
+    echo "NETWORKS=$NETWORKS"
+    echo "IPv6prefix=$IPv6prefix"
+    echo "VPNpeerName=$VPNpeerName"
+    echo "VPNlistenPort=$VPNlistenPort"
+    echo "VPNprivateKey=$VPNprivateKey"
+    echo "VPNlocalIPv4=$VPNlocalIPv4"
+    echo "VPNpublicKey=$VPNpublicKey"
+    echo "VPNallowedPrefixIPv4=$VPNallowedPrefixIPv4"
+    echo "VPNendPointIPv4=$VPNendPointIPv4"
+    echo
+    echo "Based on the lab type the following containers will be created:"
+    echo "Student Clients: $StudentClients"
+    echo "Student Resolvers: $StudentResolvers"
+    echo "Student Authoritatives: $StudentAuth"
+    echo "Student RPKI validators: $StudentRPKIvalidator"
+    echo "Student Router Access: $StudentRouterAccess"
+    echo "Global RPKI validator: $GlobalRPKIvalidator"
+    echo "Border Router: $BorderRouter"
+    echo "======================================================================="
 
-    echo "======================================================================="
-    echo "======================================================================="
-    echo " "
-    echo "Once more, have you verified the environment you're going to recreate"
-    echo "is going to use the following parameters?"
-    echo " "
-    echo "---> Cloud lab domain set to: "$DOMAIN
-    echo "---> IPv4 public address of the main server is set to: "$IPv4ServerAddr
-    echo "---> IPv6 public address of the main server is set to: "$IPv6ServerAddr
-    echo "---> Will bring up Lab type: "$LABTYPE" with $NETWORKS groups"
-    echo " "
-    echo "---> Group container options:"
-    echo "--->      Want -client- container created in each group (cli): $generateClients"
-    echo "--->      Want -server- containers created in each group (resolv1, resolv2, SOA, ns1 & ns2): $generateServers"
-    echo "--->      Want -RPKI validator- containers created in each group (rpki): $generateRPKIvalidator"
-    echo "--->      Want -RPKI validators- containers created at global level (rpki): $generateGlobalRPKIvalidator"
-    echo "--->      Want border router to be created (iborder-rtr): $generateBorderRouter"
-    echo "--->      Want VPN for border router to be configured (VPN with some ISP): $config_iborder_rtr_VPN"
-    echo " "
-    if [ "$config_iborder_rtr_VPN" = "YES" ]; then
-        echo "---> Border router VPN with ISP parameters:"
-        echo "--->      Name for the VPN peer: $VPNpeerName"
-        echo "--->      Private IP addres and Mask for local VPN interface termination: $VPNlocalIPv4"
-        echo "--->      Public IP address and port of VPN endpoint (the ISP side of the VPN): $VPNendPointIPv4"
-        echo "--->      Private IP prefix that's going to be allowed (the single IP address of ISP side of the VPN): $VPNallowedPrefixIPv4"
-        echo "--->      Private Key you generated and shared with the ISP: $VPNprivateKey"
-        echo " "
-    fi
-
-    echo "======================================================================="
     # Creating temporary deployment directories
-
     workdir=/tmp/dnsdeploy
     mkdir -p $workdir
   
@@ -258,29 +279,31 @@ deploy () {
     echo "---> Recreating environment"
 
     create_networks
-
     create_routers
+    create_authns
+    create_dnsdist
 
-
-    if [ "$generateBorderRouter" = "YES" ]; then
+    if [ "$BorderRouter" = "YES" ]; then
         create_border_router
     fi
 
-    if [ "$generateClients" = "YES" ]; then
+    if [ "$StudentClients" = "YES" ]; then
         create_student_clients
     fi
 
-    if [ "$generateServers" = "YES" ]; then
-        create_student_servers
-        create_authns
-        create_dnsdist
+    if [ "$StudentResolvers" = "YES" ]; then
+        create_student_resolvers
     fi
 
-    if [ "$generateRPKIvalidator" = "YES" ]; then
+    if [ "$StudentAuth" = "YES" ]; then
+        create_student_auth
+    fi
+
+    if [ "$StudentRPKIvalidator" = "YES" ]; then
         create_student_RPKI_validator
     fi
 
-    if [ "$generateGlobalRPKIvalidator" = "YES" ]; then
+    if [ "$GlobalRPKIvalidator" = "YES" ]; then
         create_global_RPKI_validator
     fi
 
@@ -288,34 +311,38 @@ deploy () {
     gen_routers_net_config
     push_routers_net_config
 
-    if [ "$generateBorderRouter" = "YES" ]; then
+    if [ "$BorderRouter" = "YES" ]; then
         start_border_router
         gen_border_router_net_config
         push_border_router_net_config
-        if [ "$config_iborder_rtr_VPN" = "YES" ]; then
-            config_iborder_rtr_VPN_with_ISP
-        fi
+        config_iborder_rtr_VPN_with_ISP
     fi
 
-    if [ "$generateClients" = "YES" ]; then
+    if [ "$StudentClients" = "YES" ]; then
         start_student_clients
         gen_student_clients_net_config
         push_student_clients_net_config
     fi
 
-    if [ "$generateServers" = "YES" ]; then
-        start_student_servers
-        gen_student_servers_net_config
-        push_student_servers_net_config
+    if [ "$StudentResolvers" = "YES" ]; then
+        start_student_resolvers
+        gen_student_resolvers_net_config
+        push_student_resolvers_net_config
     fi
 
-    if [ "$generateRPKIvalidator" = "YES" ]; then
+    if [ "$StudentAuth" = "YES" ]; then
+        start_student_auth
+        gen_student_auth_net_config
+        push_student_auth_net_config
+    fi
+
+    if [ "$StudentRPKIvalidator" = "YES" ]; then
         start_student_RPKI_validator
         gen_student_RPKI_validator_net_config
         push_student_RPKI_validator_net_config
     fi
 
-    if [ "$generateGlobalRPKIvalidator" = "YES" ]; then
+    if [ "$GlobalRPKIvalidator" = "YES" ]; then
         start_global_RPKI_validator
         gen_global_RPKI_validator_net_config
         push_global_RPKI_validator_net_config
@@ -357,16 +384,16 @@ deploy () {
 
     # Done - Report Success
     echo "---> Environment is up !"
-    echo " "
+    echo
     echo "================ Lab setup is ready ! ==================="
-    echo " "
+    echo
     echo "Password files for each group container are in the following files:"
-    echo "/var/shellinabox/router-password-list.txt                    <--- ROUTER container passwords"
-    echo "/var/shellinabox/lan-client-password-list.txt                 <--- CLIENT container passwords (network: lan)"
-    echo "/var/shellinabox/int-server-password-list.txt                <--- SERVER container passwords (network: int)"
-    echo "/var/shellinabox/int-RPKI-validator-password-list.txt        <--- RPKI validator container passwords (network: int)"
-    echo "/home/ubuntu/grouppasswords.txt                         <--- Web Group Passwords"
-    echo " "
+    echo "/var/shellinabox/router-password-list.txt"
+    echo "/var/shellinabox/lan-client-password-list.txt"
+    echo "/var/shellinabox/int-server-password-list.txt"
+    echo "/var/shellinabox/int-RPKI-validator-password-list.txt"
+    echo "/home/ubuntu/grouppasswords.txt"
+    echo
     echo "===================== DEPLOY DONE ======================="  
 }
 
