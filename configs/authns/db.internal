@@ -1,11 +1,11 @@
 $TTL    30
-@       IN      SOA     authns.rpz. te-labs.icann.org. (                                            
+@       IN      SOA     authns.internal. te-labs.icann.org. (
                               1         ; Serial
                              30         ; Refresh
                              30         ; Retry
                              30         ; Expire
                              30 )       ; Negative Cache TTL
-@           NS          authns.rpz.
+@           NS          authns.internal.
 authns      A           100.64.0.54
 
 nxdomain                TXT     "Block me if you can"
