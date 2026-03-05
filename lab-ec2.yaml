@@ -332,20 +332,14 @@ Resources:
           #
           # setup DEPLOY VPN parameters
           DOMAIN=$(perl -e "$_=lc('${DnsName}.${DnsParent}');s/\.$//;print $_;")
-          IPV4=${IPAddress.PublicIp}
-          IPV6=`ip a s dev eth0 scope global | perl -n -e'print $1 if m/inet6\s+(\S+)\/128/'`
-          ZONEID=${labZone}   
-          LABTYPE=${LabType}
-          NETWORKS=${Participants}
-          IPv6prefix="fd89:59e0"
-          cp  .
-          sed -e "s|%IPv6pfx%|$IPv6prefix|g"  \
-              -e "s/%LABDOMAIN%/${DOMAIN}/g"  \
-              -e "s/%IPV4ADDRESS%/${IPV4}/g"  \
-              -e "s/%IPV6ADDRESS%/${IPV6}/g"  \
-              -e "s/%ZONEID%/${ZONEID}/g"     \
-              -e "s/%LABTYPE%/${LABTYPE}/g"   \
-              -e "s/%NETWORKS%/${NETWORKS}/g" \
+          IPv4=${IPAddress.PublicIp}
+          IPv6=`ip a s dev eth0 scope global | perl -n -e'print $1 if m/inet6\s+(\S+)\/128/'`
+          sed -e "s/%LABDOMAIN%/${DOMAIN}/g"  \
+              -e "s/%IPV4ADDRESS%/${IPv4}/g"  \
+              -e "s/%IPV6ADDRESS%/${IPv6}/g"  \
+              -e "s/%ZONEID%/${labZone}/g"  \
+              -e "s/%LABTYPE%/${LabType}/g"   \
+              -e "s/%NETWORKS%/${Participants}/g" \
               ../configs/deploy-parameters.cfg > ./deploy-parameters.cfg
           #
           # initialize lab server
