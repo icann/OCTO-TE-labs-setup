@@ -334,9 +334,9 @@ Resources:
           DOMAIN=$(perl -e "$_=lc('${DnsName}.${DnsParent}');s/\.$//;print $_;")
           IPv4=${IPAddress.PublicIp}
           IPv6=`ip a s dev eth0 scope global | perl -n -e'print $1 if m/inet6\s+(\S+)\/128/'`
-          sed -e "s/%LABDOMAIN%/${DOMAIN}/g"  \
-              -e "s/%IPV4ADDRESS%/${IPv4}/g"  \
-              -e "s/%IPV6ADDRESS%/${IPv6}/g"  \
+          sed -e "s/%LABDOMAIN%/$DOMAIN/g"  \
+              -e "s/%IPV4ADDRESS%/$IPv4/g"  \
+              -e "s/%IPV6ADDRESS%/$IPv6/g"  \
               -e "s/%ZONEID%/${labZone}/g"  \
               -e "s/%LABTYPE%/${LabType}/g"   \
               -e "s/%NETWORKS%/${Participants}/g" \
