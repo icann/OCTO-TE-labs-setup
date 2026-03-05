@@ -191,7 +191,8 @@ stop_all () {
     stop_student_RPKI_validator
     stop_global_RPKI_validator
     stop_student_clients
-    stop_student_servers
+    stop_student_resolvers
+    stop_student_auth
     stop_dnsdist
     stop_authns
     stop_nginx
@@ -202,7 +203,8 @@ stop_all () {
 delete_all () {
     echo "---> Performing delete_all"
     delete_student_clients
-    delete_student_servers
+    delete_student_resolvers
+    delete_student_auth
     delete_dnsdist
     delete_authns
     delete_student_RPKI_validator

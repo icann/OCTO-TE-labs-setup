@@ -64,7 +64,8 @@ gen_student_auth_net_config () {
         # Network 100.100.$grp.64/26 (int)
         net=64
         gate=65
-        nethost=66
+        host=1
+        nethost=$(( $net + $host + 1 ))
         sed -e "s|%GRP%|$grp|g" \
             -e "s|%NET%|$net|g" \
             -e "s|%IP%|$nethost|g" \

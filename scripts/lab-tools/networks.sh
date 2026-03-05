@@ -18,10 +18,10 @@ delete_networks () {
     echo "Deleting all networks..."
     for grp in $(seq 1 $NETWORKS)
     do
-        lxc network delete grp${grp}-lan 2>/dev/null
-        lxc network delete grp${grp}-int 2>/dev/null
-        lxc network delete grp${grp}-dmz 2>/dev/null
-        lxc network delete grp${grp}-extra 2>/dev/null
+        lxc network delete grp${grp}-lan 
+        lxc network delete grp${grp}-int
+        lxc network delete grp${grp}-dmz
+        lxc network delete grp${grp}-extra
     done
     echo "---> all networks deleted"
 }
