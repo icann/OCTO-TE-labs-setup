@@ -39,7 +39,7 @@ jobs:
                 -e"s/%VPNpublicKey%/${ESCAPED_VPNPUBLICKEY}/g" \
                 -e"s/%VPNallowedPrefixIPv4/${ESCAPED_VPNALLOWEDPREFIXIPV4}/g" \
                 -e"s/%VPNendPointIPv4%/${ESCAPED_VPNENDPOINTIPV4}/g" \
-                ../configs/deploy-parameters.yaml
+                configs/deploy-parameters.yaml
     - name: Sync to S3
       uses: jakejarvis/s3-sync-action@master
       with:
