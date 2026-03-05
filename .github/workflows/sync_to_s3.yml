@@ -18,19 +18,28 @@ jobs:
       run: |
         sed -i -e's/%S3BUCKET%/${{ env.AWS_S3_BUCKET }}/g' lab-ec2.yaml
         sed -i -e's/%DNS_PARENT_DEFAULT%/${{ vars.DNS_PARENT_DEFAULT }}/g' lab-ec2.yaml
+
         ESCAPED_SSH_PUBLIC_KEY=$(printf '%s\n' "${{ vars.SSH_PUBLIC_KEY }}" | sed -e 's/[\/&]/\\&/g')
         sed -i -e "s/%SSH_PUBLIC_KEY%/${ESCAPED_SSH_PUBLIC_KEY}/g" lab-ec2.yaml
+
         ESCAPED_KSK_ARN=$(printf '%s\n' "${{ vars.KSK_ARN }}" | sed -e 's/[\/&]/\\&/g')
         sed -i -e"s/%KSK_ARN%/${ESCAPED_KSK_ARN}/g" lab-ec2.yaml
-        sed -i -e"s/%VPNpeerName%/${{ vars.VPNPEERNAME }}/g" lab-ec2.yaml
-        sed -i -e"s/%VPNlistenPort%/${{ vars.VPNLISTENPORT }}/g" lab-ec2.yaml
-        sed -i -e"s/%VPNprivateKey%/${{ vars.VPNPRIVATEKEY }}/g" lab-ec2.yaml
-        sed -i -e"s/%VPNlocalIPv4%/${{ vars.VPNLOCALIPV4 }}/g" lab-ec2.yaml
-        sed -i -e"s/%VPNpublicKey%/${{ vars.VPNPUBLICKEY }}/g" lab-ec2.yaml
-        ESCAPED_ALLOWEDPREFIX=$(printf '%s\n' "${{ vars.VPNALLOWEDPREFIXIPV4 }}" | sed -e 's/[\/&]/\\&/g')
-        sed -i -e"s/%VPNallowedPrefixIPv4/${ESCAPED_ALLOWEDPREFIX}/g" lab-ec2.yaml
-        ESCAPED_ENDPOINTV4=$(printf '%s\n' "${{ vars.VPNENDPOINTIPV4 }}" | sed -e 's/[\/&]/\\&/g')
-        sed -i -e"s/%VPNendPointIPv4%/${ESCAPED_ENDPOINTV4}/g" lab-ec2.yaml
+
+        ESCAPED_VPNPEERNAME=$(printf '%s\n' "${{ vars.VPNPEERNAME }}" | sed -e 's/[\/&]/\\&/g')
+        ESCAPED_VPNLISTENPORT=$(printf '%s\n' "${{ vars.VPNLISTENPORT }}" | sed -e 's/[\/&]/\\&/g')
+        ESCAPED_VPNPRIVATEKEY=$(printf '%s\n' "${{ vars.VPNPRIVATEKEY }}" | sed -e 's/[\/&]/\\&/g')
+        ESCAPED_VPNLOCALIPV4=$(printf '%s\n' "${{ vars.VPNLOCALIPV4 }}" | sed -e 's/[\/&]/\\&/g')
+        ESCAPED_VPNPUBLICKEY=$(printf '%s\n' "${{ vars.VPNPUBLICKEY }}" | sed -e 's/[\/&]/\\&/g')
+        ESCAPED_VPNALLOWEDPREFIXIPV4=$(printf '%s\n' "${{ vars.VPNALLOWEDPREFIXIPV4 }}" | sed -e 's/[\/&]/\\&/g')
+        ESCAPED_VPNENDPOINTIPV4=$(printf '%s\n' "${{ vars.VPNENDPOINTIPV4 }}" | sed -e 's/[\/&]/\\&/g')
+
+        sed -i -e"s/%VPNpeerName%/${ESCAPED_VPNPEERNAME}/g" lab-ec2.yaml
+        sed -i -e"s/%VPNlistenPort%/${ESCAPED_VPNLISTENPORT}/g" lab-ec2.yaml
+        sed -i -e"s/%VPNprivateKey%/${ESCAPED_VPNPRIVATEKEY}/g" lab-ec2.yaml
+        sed -i -e"s/%VPNlocalIPv4%/${ESCAPED_VPNLOCALIPV4}/g" lab-ec2.yaml
+        sed -i -e"s/%VPNpublicKey%/${ESCAPED_VPNPUBLICKEY}/g" lab-ec2.yaml
+        sed -i -e"s/%VPNallowedPrefixIPv4/${ESCAPED_VPNALLOWEDPREFIXIPV4}/g" lab-ec2.yaml
+        sed -i -e"s/%VPNendPointIPv4%/${ESCAPED_VPNENDPOINTIPV4}/g" lab-ec2.yaml
     - name: Sync to S3
       uses: jakejarvis/s3-sync-action@master
       with:
