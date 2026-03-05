@@ -196,12 +196,15 @@ Then, within each group, prefix is splitted into 3 sub-networks:
 # Network setup for different lab types
 
 ## Lab type 1 (Resolver)
+<img src="configs/www/var/www/html/_img/grp_resolver_map.png">
 
 ## Lab type 2 (DNS)
 <img src="configs/www/var/www/html/_img/grp_network_map.png">
 
-## Lab type 3 (Routing)
+## Lab type 3 (Routing, global RPKI validator)
 <img src="configs/www/var/www/html/_img/group_routing_network_globalRPKI_map.png">
+
+## Lab type 4 (Routing, group RPKI validator)
 <img src="configs/www/var/www/html/_img/grp_routing_network_map.png">
 
 # If you fork this repository
@@ -219,8 +222,15 @@ Github Repository Variables:
 - `SSH_PUBLIC_KEY` the ssh key to log into your ec2 instance
 - `KSK_ARN`the AWS ARN of the key to be use for DNSSEC signing
 - `DNS_PARENT_DEFAULT` the default value for the DnsParent parameter
+- `VPNALLOWEDPREFIXIPV4` vpn prefix
+- `VPNENDPOINTIPV4` vpn endpoint ipv4 address
+- `VPNLISTENPORT` vpn port
+- `VPNLOCALIPV4` vpn local ipv4 address
+- `VPNPEERNAME` vpn peer name
+- `VPNPRIVATEKEY` vpn private key
+- `VPNPUBLICKEY` vpn public key
 
-The configuration will be injected in the CF template `lac-ec2.yaml` by the github automation.
+The configuration will be injected in the CF template `lac-ec2.yaml` and the vpn configuration in `configs/deploy-parameters.cfg` by the github automation.
 
 > [!NOTE]
 > The key for DNSSEC signing must be created in Virginia (us-east-1), ECC_NIST_P256, Sign and verify.
@@ -295,11 +305,15 @@ The lab uses LXD container manager. This must be installed before trying to run 
 
 This repository aims to setup a full lab on an AWS EC2 instance. But just copying the 
 `config/`and `scripts/` folders to a Ubuntu Linux machine should allow you to start the
-lab on any other cloud service or on your own machine. Run the following commands
+lab on any other cloud service or on your own machine. 
 
+You must copy the file `configs/deploy-parameters.cfg` to `scripts/deploy-parameters.cfg`.
+Then edit the file and choose appropriate values for all config variables.
+
+Afterwards your a ready to deploy. Run the following commands
 ```
 $ cd scripts
-$ ./setup-host.sh ${DnsName}.${DnsParent} ${PublicIPv4} ${AWS Zone ID} ${LabType} ${Participants}
+$ ./setup-host.sh
 $ ./setup-containers.sh
 $ ./setup-lab.sh --deploy
 ```
