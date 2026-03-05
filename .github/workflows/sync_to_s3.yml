@@ -37,7 +37,7 @@ jobs:
                 -e"s/%VPNprivateKey%/${ESCAPED_VPNPRIVATEKEY}/g" \
                 -e"s/%VPNlocalIPv4%/${ESCAPED_VPNLOCALIPV4}/g" \
                 -e"s/%VPNpublicKey%/${ESCAPED_VPNPUBLICKEY}/g" \
-                -e"s/%VPNallowedPrefixIPv4/${ESCAPED_VPNALLOWEDPREFIXIPV4}/g" \
+                -e"s/%VPNallowedPrefixIPv4%/${ESCAPED_VPNALLOWEDPREFIXIPV4}/g" \
                 -e"s/%VPNendPointIPv4%/${ESCAPED_VPNENDPOINTIPV4}/g" \
                 configs/deploy-parameters.cfg
     - name: Sync to S3
