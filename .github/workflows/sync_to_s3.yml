@@ -27,8 +27,10 @@ jobs:
         sed -i -e"s/%VPNprivateKey%/${{ vars.VPNPRIVATEKEY }}/g" lab-ec2.yaml
         sed -i -e"s/%VPNlocalIPv4%/${{ vars.VPNLOCALIPV4 }}/g" lab-ec2.yaml
         sed -i -e"s/%VPNpublicKey%/${{ vars.VPNPUBLICKEY }}/g" lab-ec2.yaml
-        sed -i -e"s/%VPNallowedPrefixIPv4/${{ vars.VPNALLOWEDPREFIXIPV4 }}/g" lab-ec2.yaml
-        sed -i -e"s/%VPNendPointIPv4%/${{ vars.VPNENDPOINTIPV4 }}/g" lab-ec2.yaml
+        ESCAPED_ALLOWEDPREFIX=$(printf '%s\n' "${{ vars.VPNALLOWEDPREFIXIPV4 }}" | sed -e 's/[\/&]/\\&/g')
+        sed -i -e"s/%VPNallowedPrefixIPv4/${ESCAPED_ALLOWEDPREFIX}/g" lab-ec2.yaml
+        ESCAPED_ENDPOINTV4=$(printf '%s\n' "${{ vars.VPNENDPOINTIPV4 }}" | sed -e 's/[\/&]/\\&/g')
+        sed -i -e"s/%VPNendPointIPv4%/${ESCAPED_ENDPOINTV4}/g" lab-ec2.yaml
     - name: Sync to S3
       uses: jakejarvis/s3-sync-action@master
       with:
