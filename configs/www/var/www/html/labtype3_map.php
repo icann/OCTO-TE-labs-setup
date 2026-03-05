@@ -21,16 +21,11 @@
   </header>
   <hr />
 
-<img src="../_img/group_routing_network_globalRPKI_map.png" width="960" height="540" border="0" usemap="#grp%group%_routing_network_globalRPKI_map" />
+<img src="../_img/labtype3.png" width="960" height="540" border="0" usemap="#network_map" />
 
-<map name="grp%group%_routing_network_globalRPKI_map">
-<!-- #$-:Image map file created by GIMP Image Map plug-in -->
-<!-- #$-:GIMP Image Map plug-in by Maurits Rijk -->
-<!-- #$-:Please do not edit lines starting with "#$" -->
-<!-- #$VERSION:2.3 -->
-<!-- #$AUTHOR:Nicolas Antoniello -->
-<area shape="circle" coords="246,255,16" href="https://webssh.%AuthDomain%/?hostname=%ip4rtr%&username=%username4rtr%&password=%password4rtr%" alt="rtr" target="_blank" rel="noopener noreferrer" />
-<area shape="rect" coords="435,198,462,222" href="https://webssh.%AuthDomain%/?hostname=%ip4cli%&username=%username4cli%&password=%password4cli%" alt="cli" target="_blank" rel="noopener noreferrer" />
+<map name="network_map">
+    <area shape="rect" coords="435,198,462,222" href="https://webssh.%AuthDomain%/?hostname=%ip4cli%&username=%username4cli%&password=%password4cli%" alt="cli" target="_blank" rel="noopener noreferrer" />
+    <area shape="circle" coords="246,255,16" href="https://webssh.%AuthDomain%/?hostname=%ip4rtr%&username=%username4rtr%&password=%password4rtr%" alt="rtr" target="_blank" rel="noopener noreferrer" />
 </map>
 
 </body>

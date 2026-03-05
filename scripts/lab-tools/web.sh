@@ -26,23 +26,6 @@ create_web_content () {
     allow4ns2=''
     allow4ns2EOL=''
 
-    if [ "$StudentClients" = "NO" ]; then
-        allow4cli='!--'
-        allow4cliEOL='--'
-    fi
-    if [ "$StudentAuth" = "NO" ]; then
-        allow4soa='!-- '
-        allow4soaEOL='--'
-        allow4ns1='!-- '
-        allow4ns1EOL='--'
-        allow4ns2='!-- '
-        allow4ns2EOL='--'
-    fi
-    if [ "$StudentRouterAccess" = "NO" ]; then
-        allow4rtr='!-- '
-        allow4rtrEOL='--'
-    fi
-
     for grp in $(seq 1 $NETWORKS)
     do
         mkdir -p $contentworkdir/$DOMAIN/grp$grp
@@ -51,6 +34,10 @@ create_web_content () {
             IPv4cli=100.100.$grp.2
             user4cli=sysadm
             passwd4cli=$(awk -v dev="grp$grp-cli" -F"," '$1==dev {print $2}' /var/shellinabox/lan-client-password-list.txt | base64)
+        else
+            IPv4cli=""
+            user4cli=""
+            passwd4cli=""
         fi
         if [ "$StudentResolvers" = "YES" ]; then
             IPv4resolv1=100.100.$grp.67
@@ -59,6 +46,13 @@ create_web_content () {
             IPv4resolv2=100.100.$grp.68
             user4resolv2=sysadm
             passwd4resolv2=$(awk -v dev="grp$grp-resolv2" -F"," '$1==dev {print $2}' /var/shellinabox/res-server-password-list.txt | base64)
+        else
+            IPv4resolv1=""
+            user4resolv1=""
+            passwd4resolv1=""
+            IPv4resolv2=""
+            user4resolv2=""
+            passwd4resolv2=""
         fi
         if [ "$StudentAuth" = "YES" ]; then
             IPv4soa=100.100.$grp.66
@@ -70,28 +64,49 @@ create_web_content () {
             IPv4ns2=100.100.$grp.131
             user4ns2=sysadm
             passwd4ns2=$(awk -v dev="grp$grp-ns2" -F"," '$1==dev {print $2}' /var/shellinabox/auth-server-password-list.txt | base64)
+        else
+            IPv4soa=""
+            user4soa=""
+            passwd4soa=""
+            IPv4ns1=""
+            user4ns1=""
+            passwd4ns1=""
+            IPv4ns2=""
+            user4ns2=""
+            passwd4ns2=""
         fi
-        IPv4rtr=100.64.1.$grp
-        user4rtr=rtradm
-        passwd4rtr=$(awk -v dev="grp$grp-rtr" -F"," '$1==dev {print $2}' /var/shellinabox/router-password-list.txt | base64)
         if [ "$StudentRPKIvalidator" = "YES" ]; then
             IPv4rpki=100.100.$grp.70
             user4rpki=sysadm
             passwd4rpki=$(awk -v dev="grp$grp-rpki" -F"," '$1==dev {print $2}' /var/shellinabox/int-RPKI-validator-password-list.txt | base64)
+        else   
+            IPv4rpki=""
+            user4rpki=""
+            passwd4rpki=""
         fi
+
+        IPv4rtr=100.64.1.$grp
+        user4rtr=rtradm
+        passwd4rtr=$(awk -v dev="grp$grp-rtr" -F"," '$1==dev {print $2}' /var/shellinabox/router-password-list.txt | base64)
+
+        # NETWORK MAP will be selected by lab type
+        NetworkMap=""
+        case "$LABTYPE" in
+            1 ) NetworkMap="../configs/www/var/www/html/labtype1.php";;
+            2 ) NetworkMap="../configs/www/var/www/html/labtype2.php";;
+            3 ) NetworkMap="../configs/www/var/www/html/labtype3.php";;
+            4 ) NetworkMap="../configs/www/var/www/html/labtype4.php";;
+            * ) echo "Unknown Lab type option "$2""; usage; exit 5;;
+        esac
 
         sed -e "s|%group%|$grp|g" \
             -e "s|%AuthDomain%|$DOMAIN|g" \
             -e "s|%ip4cli%|$IPv4cli|g" \
             -e "s|%username4cli%|$user4cli|g" \
             -e "s|%password4cli%|$passwd4cli|g" \
-            -e "s|%commentCLI%|$allow4cli|g" \
-            -e "s|%commentCLIeol%|$allow4cliEOL|g" \
             -e "s|%ip4soa%|$IPv4soa|g" \
             -e "s|%username4soa%|$user4soa|g" \
             -e "s|%password4soa%|$passwd4soa|g" \
-            -e "s|%commentSOA%|$allow4soa|g" \
-            -e "s|%commentSOAeol%|$allow4soaEOL|g" \
             -e "s|%ip4resolv1%|$IPv4resolv1|g" \
             -e "s|%username4resolv1%|$user4resolv1|g" \
             -e "s|%password4resolv1%|$passwd4resolv1|g" \
@@ -101,67 +116,15 @@ create_web_content () {
             -e "s|%ip4ns1%|$IPv4ns1|g" \
             -e "s|%username4ns1%|$user4ns1|g" \
             -e "s|%password4ns1%|$passwd4ns1|g" \
-            -e "s|%commentNS1%|$allow4ns1|g" \
-            -e "s|%commentNS1eol%|$allow4ns1EOL|g" \
             -e "s|%ip4ns2%|$IPv4ns2|g" \
             -e "s|%username4ns2%|$user4ns2|g" \
             -e "s|%password4ns2%|$passwd4ns2|g" \
-            -e "s|%commentNS2%|$allow4ns2|g" \
-            -e "s|%commentNS2eol%|$allow4ns2EOL|g" \
             -e "s|%ip4rtr%|$IPv4rtr|g" \
             -e "s|%username4rtr%|$user4rtr|g" \
             -e "s|%password4rtr%|$passwd4rtr|g" \
-            -e "s|%commentRTR%|$allow4rtr|g" \
-            -e "s|%commentRTReol%|$allow4rtrEOL|g" \
-            -e "s|%url%|"https://$DOMAIN/grp$grp/grp$grp-network-map.php"|g" \
-            ../configs/www/var/www/html/grp_network_map.php > $contentworkdir/$DOMAIN/grp$grp/grp$grp-network-map.php
-
-        # Create grpX index.html (main grpX page)
-        sed -e "s|%group%|$grp|g" \
-            -e "s|%AuthDomain%|$DOMAIN|g" \
-            -e "s|%url%|"https://$DOMAIN/grp$grp/grp$grp-network-map.php"|g" \
-            ../configs/www/var/www/html/grp_index.html > $contentworkdir/$DOMAIN/grp$grp/index.html
-
+            -e "s|%url%|"https://$DOMAIN/grp$grp/index.php"|g" \
+            $NetworkMap > $contentworkdir/$DOMAIN/grp$grp/index.php
         
-        if [ "$StudentRPKIvalidator" = "YES" ]; then
-            sed -e "s|%group%|$grp|g" \
-                -e "s|%AuthDomain%|$DOMAIN|g" \
-                -e "s|%ip4cli%|$IPv4cli|g" \
-                -e "s|%username4cli%|$user4cli|g" \
-                -e "s|%password4cli%|$passwd4cli|g" \
-                -e "s|%ip4rtr%|$IPv4rtr|g" \
-                -e "s|%username4rtr%|$user4rtr|g" \
-                -e "s|%password4rtr%|$passwd4rtr|g" \
-                -e "s|%ip4rpki%|$IPv4rpki|g" \
-                -e "s|%username4rpki%|$user4rpki|g" \
-                -e "s|%password4rpki%|$passwd4rpki|g" \
-                ../configs/www/var/www/html/grp_routing_network_map.html > $contentworkdir/$DOMAIN/grp$grp/grp$grp-routing-network-map.html
-
-            # Create grpX index.html (main grpX page)
-            sed -e "s|%group%|$grp|g" \
-                -e "s|%AuthDomain%|$DOMAIN|g" \
-                -e "s|%url%|"https://$DOMAIN/grp$grp/grp$grp-routing-network-map.html"|g" \
-                ../configs/www/var/www/html/grp_index.html > $contentworkdir/$DOMAIN/grp$grp/index.html
-        fi
-
-        if [ "$GlobalRPKIvalidator" = "YES" ]; then
-            sed -e "s|%group%|$grp|g" \
-                -e "s|%AuthDomain%|$DOMAIN|g" \
-                -e "s|%ip4cli%|$IPv4cli|g" \
-                -e "s|%username4cli%|$user4cli|g" \
-                -e "s|%password4cli%|$passwd4cli|g" \
-                -e "s|%ip4rtr%|$IPv4rtr|g" \
-                -e "s|%username4rtr%|$user4rtr|g" \
-                -e "s|%password4rtr%|$passwd4rtr|g" \
-                ../configs/www/var/www/html/grp_routing_network_globalRPKI_map.html > $contentworkdir/$DOMAIN/grp$grp/grp$grp-routing-network-globalRPKI-map.html
-
-            # Create grpX index.html (main grpX page)
-            sed -e "s|%group%|$grp|g" \
-                -e "s|%AuthDomain%|$DOMAIN|g" \
-                -e "s|%url%|"https://$DOMAIN/grp$grp/grp$grp-routing-network-globalRPKI-map.html"|g" \
-                ../configs/www/var/www/html/grp_index.html > $contentworkdir/$DOMAIN/grp$grp/index.html
-        fi
-
         echo "-- Web content for group $grp created"
     done
 

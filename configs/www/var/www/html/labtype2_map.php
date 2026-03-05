@@ -24,21 +24,15 @@
   </header>
   <hr />
 
-<img src="../_img/grp_network_map.png" width="960" height="540" border="0" usemap="#grp%group%_network_map" />
+<img src="../_img/labtype2.png" width="960" height="540" border="0" usemap="#network_map" />
 
-<map name="grp%group%_network_map">
-<!-- #$-:Image map file created by GIMP Image Map plug-in -->
-<!-- #$-:GIMP Image Map plug-in by Maurits Rijk -->
-<!-- #$-:Please do not edit lines starting with "#$" -->
-<!-- #$VERSION:2.3 -->
-<!-- #$AUTHOR:Nicolas Antoniello -->
-<%commentCLI%area shape="rect" coords="433,121,464,168" href="https://webssh.%AuthDomain%/?hostname=%ip4cli%&username=%username4cli%&password=%password4cli%" alt="cli" target="_blank" rel="noopener noreferrer" /%commentCLIeol%>
-<%commentSOA%area shape="rect" coords="344,232,374,274" href="https://webssh.%AuthDomain%/?hostname=%ip4soa%&username=%username4soa%&password=%password4soa%" alt="soa" target="_blank" rel="noopener noreferrer" /%commentSOAeol%>
-<area shape="rect" coords="480,233,534,273" href="https://webssh.%AuthDomain%/?hostname=%ip4resolv1%&username=%username4resolv1%&password=%password4resolv1%" alt="resolv1" target="_blank" rel="noopener noreferrer" />
-<area shape="rect" coords="629,231,684,274" href="https://webssh.%AuthDomain%/?hostname=%ip4resolv2%&username=%username4resolv2%&password=%password4resolv2%" alt="resolv2" target="_blank" rel="noopener noreferrer" />
-<%commentNS1%area shape="rect" coords="257,342,285,384" href="https://webssh.%AuthDomain%/?hostname=%ip4ns1%&username=%username4ns1%&password=%password4ns1%" alt="ns1" target="_blank" rel="noopener noreferrer" /%commentNS1eol%>
-<%commentNS2%area shape="rect" coords="435,342,464,385" href="https://webssh.%AuthDomain%/?hostname=%ip4ns2%&username=%username4ns2%&password=%password4ns2%" alt="ns2" target="_blank" rel="noopener noreferrer" /%commentNS2eol%>
-<%commentRTR%area shape="circle" coords="246,195,20" href="https://webssh.%AuthDomain%/?hostname=%ip4rtr%&username=%username4rtr%&password=%password4rtr%" alt="rtr" target="_blank" rel="noopener noreferrer" /%commentRTReol%>
+<map name="network_map">
+    <area shape="rect" coords="433,121,464,168" href="https://webssh.%AuthDomain%/?hostname=%ip4cli%&username=%username4cli%&password=%password4cli%" alt="cli" target="_blank" rel="noopener noreferrer" />
+    <area shape="rect" coords="344,232,374,274" href="https://webssh.%AuthDomain%/?hostname=%ip4soa%&username=%username4soa%&password=%password4soa%" alt="soa" target="_blank" rel="noopener noreferrer" />
+    <area shape="rect" coords="480,233,534,273" href="https://webssh.%AuthDomain%/?hostname=%ip4resolv1%&username=%username4resolv1%&password=%password4resolv1%" alt="resolv1" target="_blank" rel="noopener noreferrer" />
+    <area shape="rect" coords="629,231,684,274" href="https://webssh.%AuthDomain%/?hostname=%ip4resolv2%&username=%username4resolv2%&password=%password4resolv2%" alt="resolv2" target="_blank" rel="noopener noreferrer" />
+    <area shape="rect" coords="257,342,285,384" href="https://webssh.%AuthDomain%/?hostname=%ip4ns1%&username=%username4ns1%&password=%password4ns1%" alt="ns1" target="_blank" rel="noopener noreferrer" />
+    <area shape="rect" coords="435,342,464,385" href="https://webssh.%AuthDomain%/?hostname=%ip4ns2%&username=%username4ns2%&password=%password4ns2%" alt="ns2" target="_blank" rel="noopener noreferrer" />
 </map>
 <hr>
 <h1> Update your DS records! </h1>
