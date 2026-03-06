@@ -26,8 +26,8 @@ create_instructions () {
 
     # install jekyll
     apt -yq install ruby-full build-essential zlib1g-dev
-    export GEM_HOME="$HOME/gems"
-    export PATH="$HOME/gems/bin:$PATH"
+    export GEM_HOME="/root/gems"
+    export PATH="/root/gems/bin:$PATH"
     gem install jekyll bundler
 
     # start new jekyll site
