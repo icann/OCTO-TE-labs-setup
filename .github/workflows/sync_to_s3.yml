@@ -25,6 +25,9 @@ jobs:
         ESCAPED_KSK_ARN=$(printf '%s\n' "${{ vars.KSK_ARN }}" | sed -e 's/[\/&]/\\&/g')
         sed -i -e"s/%KSK_ARN%/${ESCAPED_KSK_ARN}/g" lab-ec2.yaml
 
+        ESCAPED_LAB_INST_URL=$(printf '%s\n' "${{ vars.LAB_INSTRUCTIONS_URL }}" | sed -e 's/[\/&]/\\&/g')
+        sed -i -e"s/%LAB_INSTRUCTIONS_URL%/${ESCAPED_LAB_INST_URL}/g" lab-ec2.yaml
+
         ESCAPED_VPNPEERNAME=$(printf '%s\n' "${{ vars.VPNPEERNAME }}" | sed -e 's/[\/&]/\\&/g')
         ESCAPED_VPNLISTENPORT=$(printf '%s\n' "${{ vars.VPNLISTENPORT }}" | sed -e 's/[\/&]/\\&/g')
         ESCAPED_VPNPRIVATEKEY=$(printf '%s\n' "${{ vars.VPNPRIVATEKEY }}" | sed -e 's/[\/&]/\\&/g')

@@ -57,7 +57,7 @@ The following instructions should help you to setup and take down a lab.
 - Value for DnsParent should not be changed unless you really need to use another domain for the lab.
   Please be aware that the zone must already exist in your AWS account and must be dnssec signed. And
   don't forget the dot at the end.
-- Choose LabType: 1 = resolver, 2 = DNS, 3 = Router
+- Choose LabType: 1 = resolver, 2 = DNS, 3 = Router (global RPKI), 4 = Router (group RPKI)
 - Do **NOT** change the value of LatestUbuntu, it is a magic AWS value
 - Write in your own name as Owner
 - Write in the number of groups you want to set up, between 3 and 64
@@ -65,6 +65,7 @@ The following instructions should help you to setup and take down a lab.
   be filled in with the name of the bucket from where you got the URL for the CloudFormation template.
 - labInstanceType is the type of the AWS EC2 machine this lab should use. Please see section [
   Select Instance Type](#select-instance-type)
+- labInstructions is the URL of the lab instructions to install in each groups web. You can can get the link from github when you click on "Code" and choose "Download zip".
 - Click on "Next"
 - Scroll to the bottom of the page
 - Check the the box "I acknowledge that AWS CloudFormation might create IAM resources with customised names."    
@@ -229,6 +230,7 @@ Github Repository Variables:
 - `VPNPEERNAME` vpn peer name
 - `VPNPRIVATEKEY` vpn private key
 - `VPNPUBLICKEY` vpn public key
+- `LAB_INSTRUCTIONS_URL` URL of the download link for the lab instructions
 
 The configuration will be injected in the CF template `lac-ec2.yaml` and the vpn configuration in `configs/deploy-parameters.cfg` by the github automation.
 

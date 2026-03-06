@@ -1,0 +1,30 @@
+title: DNS Lab Instructions
+baseurl: "/grpX/instructions"
+url: "https://lab_domain"
+
+markdown: kramdown
+
+theme: just-the-docs
+plugins:
+  - jekyll-relative-links
+  - jekyll-gfm-admonitions
+  - jekyll-readme-index
+  - jemoji
+
+search_enabled: false
+
+readme_index:
+  enabled: true
+  remove_originals: false
+  with_frontmatter: true
+
+relative_links:
+  enabled: true
+  collections: true
+
+# Aux links for the upper right navigation
+aux_links:
+  "Lab Instructions on github":
+    - "https://github.com/icann/OCTO-TE-labs/tree/extended"
+aux_links_new_tab: true
+
