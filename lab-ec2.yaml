@@ -355,10 +355,6 @@ Resources:
           #
           ./setup-lab.sh --deploy
           #
-          # setup lab instructions
-          #
-          ./setup-instructions.sh
-          #
           # Finally we are
           #
           echo "DONE"
