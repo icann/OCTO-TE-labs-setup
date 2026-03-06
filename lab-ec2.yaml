@@ -343,6 +343,7 @@ Resources:
               -e "s/%ZONEID%/${labZone}/g"  \
               -e "s/%LABTYPE%/${LabType}/g"   \
               -e "s/%NETWORKS%/${Participants}/g" \
+              -e "s/%INSTRUCTIONS%/${labInstructions}/g" \
               ../configs/deploy-parameters.cfg > ./deploy-parameters.cfg
           #
           # initialize lab server
