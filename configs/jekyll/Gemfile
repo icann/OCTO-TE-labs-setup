@@ -1,8 +1,9 @@
+source "https://rubygems.org"
 gem "jekyll", "~> 4.4.1"
-gem "just-the-docs"
-gem "jekyll-relative-links"
 group :jekyll_plugins do
-  gem "jekyll-gfm-admonitions"
-  gem "jekyll-readme-index"
-  gem "jemoji"
+    gem "jekyll-relative-links"
+    gem "just-the-docs"
+    gem "jekyll-gfm-admonitions"
+    gem "jekyll-readme-index"
+    gem "jemoji"
 end

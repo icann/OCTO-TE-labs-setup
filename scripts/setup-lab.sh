@@ -361,7 +361,8 @@ deploy () {
     push_nginx_config
 
     create_web_content
-
+    create_instructions
+    
     recreate_svc_list
 
     # Clean /root/.shh/known_hosts
