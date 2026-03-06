@@ -4,6 +4,9 @@ create_instructions () {
     ## Create instructions for students and push it to /var/www/$DOMAIN/html/grpX/instructions
     echo "Creating instructions for students and pushing it to /var/www/$DOMAIN/html/grpX/instructions ..."
 
+    # remember working directory
+    OLDPWD="$(pwd)"
+
     # Check if required parameters are set
     if [ -z "$INSTRUCTIONS" ]; then
         echo "No source for instructions is set. Nothing to do!"
@@ -65,5 +68,9 @@ create_instructions () {
         mv _site/* /var/www/${DOMAIN}/html/grp${grp}/instructions
     done
 
+    # back to the old working directory
+    cd $OLDPWD
+
+    # finally we are 
     echo "Lab instructions are now available for all groups."
 }
