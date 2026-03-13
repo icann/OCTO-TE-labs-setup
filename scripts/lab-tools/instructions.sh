@@ -7,13 +7,6 @@ create_instructions () {
     # remember working directory
     OLDPWD="$(pwd)"
 
-    # Check if required parameters are set
-    if [ -z "$INSTRUCTIONS" ]; then
-        echo "No source for instructions is set. Nothing to do!"
-        echo "If you want to use instructions, set the INSTRUCTIONS variable in deploy-parameters.cfg."
-        exit 0;
-    fi
-
     # Cleanup from older runs
     rm -rf instructions source jekyllsite
 

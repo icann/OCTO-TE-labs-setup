@@ -362,7 +362,10 @@ deploy () {
     push_nginx_config
 
     create_web_content
-    create_instructions
+
+    if [ -z "$INSTRUCTIONS" ]; then
+        create_instructions
+    fi
     
     recreate_svc_list
 
