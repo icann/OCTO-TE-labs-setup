@@ -24,7 +24,8 @@ create_authns () {
 
     # configure authoritative DNS
     lxc exec authns -- sh -c 'apt install -qy bind9'
-    lxc exec authns -- sh -c 'rm -rf /etc/bind/named.conf*'
+    lxc exec authns -- sh -c 'rm /etc/bind/named.conf.options'
+    lxc exec authns -- sh -c 'rm /etc/bind/named.conf.local'
     lxc file push ../configs/authns/named.conf.options authns/etc/bind/named.conf.options
     lxc file push ../configs/authns/named.conf.local   authns/etc/bind/named.conf.local
     lxc exec authns -- sh -c 'chown -R bind:bind /etc/bind/*'
