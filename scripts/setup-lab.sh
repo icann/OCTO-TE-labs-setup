@@ -363,7 +363,7 @@ deploy () {
 
     create_web_content
 
-    if [ -z "$INSTRUCTIONS" ]; then
+    if [ -n "$INSTRUCTIONS" ]; then
         create_instructions
     fi
     
