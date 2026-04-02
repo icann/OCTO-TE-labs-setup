@@ -1,6 +1,6 @@
 title: DNS Lab Instructions
-baseurl: "/grpX/instructions"
-url: "https://lab_domain"
+baseurl: "/grp%GRP%/instructions"
+url: "https://%DOMAIN%"
 
 markdown: kramdown
 

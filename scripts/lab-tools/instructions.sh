@@ -41,15 +41,15 @@ create_instructions () {
         # install dependencies
         bundle install
 
-        # replace lab_domain and X 
-        sed -i -e "s/X/${grp}/g" -e "s/lab_domain/${DOMAIN}/g" _config.yml
+        # substitute in group number and domain 
+        sed -i -e "s/%GRP%/${grp}/g" -e "s/%DOMAIN%/${DOMAIN}/g" _config.yml
 
         # get content
         cp -a ../source/. ./
 
-        # replace lab_domain and X
+        # substitute in group number and domain
         find . -type f -name '*.md' -print0 | while IFS= read -r -d '' file; do
-            sed -i -e "s/X/${grp}/g" -e "s/lab_domain/${DOMAIN}/g" "$file"
+            sed -i -e "s/%GRP%/${grp}/g" -e "s/%DOMAIN%/${DOMAIN}/g" "$file"
         done
 
         # build the site
