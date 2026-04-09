@@ -68,6 +68,7 @@
 
         <text style="fill: rgb(0, 0, 128); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: end;" x="470" y="80" >100.100.%GRP%.0/26</text>
         <text style="fill: rgb(0, 0, 128); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: end;" x="470" y="88" >%IPv6pfx%:%GRP%:0::/64</text>
+        <text style="fill: rgb(0, 0, 128); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: end;" x="470" y="102" >LAN</text>
 
         <!-- INTERNAL -->
 
@@ -98,6 +99,7 @@
 
         <text style="fill: rgb(192, 0, 128); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: end;" x="470" y="142" >100.100.%GRP%.64/26</text>
         <text style="fill: rgb(192, 0, 128); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: end;" x="470" y="150" >%IPv6pfx%:%GRP%:64::/64</text>
+        <text style="fill: rgb(192, 0, 128); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: end;" x="470" y="164" >Internal</text>
 
         <!-- DMZ -->
 
@@ -121,6 +123,7 @@
 
         <text style="fill: rgb(0, 100, 0); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: end;" x="470" y="217" >100.100.%GRP%.128/26</text>
         <text style="fill: rgb(0, 100, 0); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: end;" x="470" y="225" >%IPv6pfx%:%GRP%:128::/64</text>
+        <text style="fill: rgb(0, 100, 0); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: end;" x="470" y="239" >DMZ</text>
 
         <!-- network done -->
     </svg>    
