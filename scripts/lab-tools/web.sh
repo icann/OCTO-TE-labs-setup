@@ -101,6 +101,7 @@ create_web_content () {
 
         sed -e "s|%group%|$grp|g" \
             -e "s|%AuthDomain%|$DOMAIN|g" \
+            -e "s|%IPv6pfx%|$IPv6prefix|g" \
             -e "s|%ip4cli%|$IPv4cli|g" \
             -e "s|%username4cli%|$user4cli|g" \
             -e "s|%password4cli%|$passwd4cli|g" \
@@ -122,7 +123,7 @@ create_web_content () {
             -e "s|%ip4rtr%|$IPv4rtr|g" \
             -e "s|%username4rtr%|$user4rtr|g" \
             -e "s|%password4rtr%|$passwd4rtr|g" \
-            -e "s|%url%|"https://$DOMAIN/grp$grp/index.php"|g" \
+            -e "s|%url%|"https://$DOMAIN/grp$grp/"|g" \
             $NetworkMap > $contentworkdir/$DOMAIN/grp$grp/index.php
         
         echo "-- Web content for group $grp created"
