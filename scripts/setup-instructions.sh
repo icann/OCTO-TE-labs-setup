@@ -12,7 +12,10 @@ if [ -z "$INSTRUCTIONS" ]; then
     exit 0;
 fi
 
-# Create a directory for the setup instructions
+# Cleanup from older runs
+rm -rf instructions source jekyllsite
+
+# Get the instructions
 apt -yq install unzip
 mkdir -p instructions
 mkdir -p source
@@ -21,7 +24,6 @@ curl -L -o instructions.zip "$INSTRUCTIONS"
 unzip instructions.zip
 mv */* ../source/
 cd ..
-#rm -rf instructions
 
 # install jekyll
 apt -yq install ruby-full build-essential zlib1g-dev

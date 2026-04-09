@@ -267,6 +267,7 @@ deploy () {
 
     # Creating temporary deployment directories
     workdir=/tmp/dnsdeploy
+    rm -rf $workdir # cleanup previous deployment if exists
     mkdir -p $workdir
   
     nginxworkdir=$workdir/nginx
