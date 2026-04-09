@@ -137,7 +137,7 @@ create_web_content () {
     cp -vr ../configs/www/var/www/html/_img/ /var/www/$DOMAIN/html/
 
     # Copy content generated for each group to /var/www/$DOMAIN/html/
-    cp -vr $contentworkdir/$DOMAIN/. /var/www/$DOMAIN/html/
+    cp -vr $contentworkdir/$DOMAIN/* /var/www/$DOMAIN/html/
 
     # Create index.html (main site page)
     sed -e "s|%AuthDomain%|$DOMAIN|g" \
