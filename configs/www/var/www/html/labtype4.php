@@ -9,8 +9,6 @@
 </head>
 <body>
     <h1>grp%group% network</h1>
-    <p>This is the network topology for your group (X=%group%)</p>
-    <p>Lab: %AuthDomain%</p>
     <p><a href="instructions" target="_blank" rel="noopener noreferrer">Lab instructions</a></p>
     <hr />
 
