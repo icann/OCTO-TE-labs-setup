@@ -89,17 +89,12 @@ create_web_content () {
         user4rtr=rtradm
         passwd4rtr=$(awk -v dev="grp$grp-rtr" -F"," '$1==dev {print $2}' /var/shellinabox/router-password-list.txt | base64)
 
-        # NETWORK MAP will be selected by lab type
-        NetworkMap=""
-        case "$LABTYPE" in
-            1 ) NetworkMap="../configs/www/var/www/html/labtype1.php";;
-            2 ) NetworkMap="../configs/www/var/www/html/labtype2.php";;
-            3 ) NetworkMap="../configs/www/var/www/html/labtype3.php";;
-            4 ) NetworkMap="../configs/www/var/www/html/labtype4.php";;
-            * ) echo "Unknown Lab type option "$2""; usage; exit 5;;
-        esac
+        # copy web pages template to content workdir and replace variables with values
+        cp ../configs/www/var/www/html/* $contentworkdir/$DOMAIN/grp$grp/
 
-        sed -e "s|%group%|$grp|g" \
+        sed -i \
+            -e "s/%LABTYPE%/$LABTYPE/g" \
+            -e "s|%group%|$grp|g" \
             -e "s|%GRP%|$grp|g" \
             -e "s|%AuthDomain%|$DOMAIN|g" \
             -e "s|%IPv6pfx%|$IPv6prefix|g" \
@@ -125,7 +120,7 @@ create_web_content () {
             -e "s|%username4rtr%|$user4rtr|g" \
             -e "s|%password4rtr%|$passwd4rtr|g" \
             -e "s|%url%|"https://$DOMAIN/grp$grp/"|g" \
-            $NetworkMap > $contentworkdir/$DOMAIN/grp$grp/index.php
+            $contentworkdir/$DOMAIN/grp$grp/*
         
         echo "-- Web content for group $grp created"
     done
