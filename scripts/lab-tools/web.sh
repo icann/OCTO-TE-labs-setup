@@ -100,6 +100,7 @@ create_web_content () {
         esac
 
         sed -e "s|%group%|$grp|g" \
+            -e "s|%GRP%|$grp|g" \
             -e "s|%AuthDomain%|$DOMAIN|g" \
             -e "s|%IPv6pfx%|$IPv6prefix|g" \
             -e "s|%ip4cli%|$IPv4cli|g" \
