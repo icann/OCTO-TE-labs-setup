@@ -197,16 +197,16 @@ Then, within each group, prefix is splitted into 3 sub-networks:
 # Network setup for different lab types
 
 ## Lab type 1 (Resolver)
-<img src="configs/www/var/www/html/_img/grp_resolver_map.png">
+<img src="configs/www/var/www/html/_img/topology1.svg">
 
 ## Lab type 2 (DNS)
-<img src="configs/www/var/www/html/_img/grp_network_map.png">
+<img src="configs/www/var/www/html/_img/topology2.svg">
 
 ## Lab type 3 (Routing, global RPKI validator)
-<img src="configs/www/var/www/html/_img/group_routing_network_globalRPKI_map.png">
+<img src="configs/www/var/www/html/_img/topology3.svg">
 
 ## Lab type 4 (Routing, group RPKI validator)
-<img src="configs/www/var/www/html/_img/grp_routing_network_map.png">
+<img src="configs/www/var/www/html/_img/topology4.svg">
 
 # If you fork this repository
 
