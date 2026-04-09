@@ -32,6 +32,14 @@
             </symbol>
         </defs>
 
+        <!--
+        !!!!!!!!!!!!!!!!  ATTENTION !!!!!!!!!!!!!!!!
+        
+        Any changes to these diagram needs to be 
+        reflected in the lab instructions as well
+        
+        -->
+        
         <!-- net-bb -->
 
         <path style="fill: none; stroke: rgb(255, 0,   0); stroke-width: 3px;" d="M  50  38 L 470  38"/>
