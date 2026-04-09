@@ -51,7 +51,7 @@ do
 
     # substitute in group number and domain 
     find . -type f -name '*.md' -print0 | while IFS= read -r -d '' file; do
-        sed -i -e "s/%GRP%/${grp}/g" -e "s/%DOMAIN%/${DOMAIN}/g" -e "s/%IPv6pfx%/${$IPv6prefix}/g" "$file"
+        sed -i -e "s/%GRP%/${grp}/g" -e "s/%DOMAIN%/${DOMAIN}/g" -e "s/%IPv6pfx%/${IPv6prefix}/g" "$file"
     done
 
     # build the site
