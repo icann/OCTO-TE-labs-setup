@@ -11,7 +11,7 @@
     <h1>grp%group% network</h1>
     <p><a href="instructions" target="_blank" rel="noopener noreferrer">Lab instructions</a></p>
     <hr />
-    <img src="topology%LABTYPE%.svg" alt="Network topology diagram" style="width:100%; height:auto;" />
+    <?php echo file_get_contents(__DIR__ . '/topology%LABTYPE%.svg'); ?>
     <hr />
 
     <?php if (%LABTYPE% == 2): ?>

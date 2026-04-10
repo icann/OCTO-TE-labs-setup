@@ -90,7 +90,8 @@ create_web_content () {
         passwd4rtr=$(awk -v dev="grp$grp-rtr" -F"," '$1==dev {print $2}' /var/shellinabox/router-password-list.txt | base64)
 
         # copy web pages template to content workdir and replace variables with values
-        cp ../configs/www/var/www/html/* $contentworkdir/$DOMAIN/grp$grp/
+        cp ../configs/www/var/www/html/index.php $contentworkdir/$DOMAIN/grp$grp/
+        cp ../configs/www/var/www/html/topology* $contentworkdir/$DOMAIN/grp$grp/
 
         sed -i \
             -e "s/%LABTYPE%/$LABTYPE/g" \
@@ -129,8 +130,6 @@ create_web_content () {
     ls -larth $contentworkdir/$DOMAIN/
     echo " "
     echo "Pushing all web content to /var/www/$DOMAIN/html/..."
-    mkdir -p /var/www/$DOMAIN/html/_img
-    cp -vr ../configs/www/var/www/html/_img/ /var/www/$DOMAIN/html/
 
     # Copy content generated for each group to /var/www/$DOMAIN/html/
     cp -vr $contentworkdir/$DOMAIN/* /var/www/$DOMAIN/html/
