@@ -44,7 +44,7 @@
     <use href="#server" x="300" y="10" width="24" height="24" fill="#ff0000"/>
     <text style="fill: rgb(255, 0, 0); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: middle;" x="310" y="32" >.71 | ::71</text>
 
-    <text style="fill: rgb(255, 0, 0); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: end;" x="470" y="25" >100.100.0.0/22</text>
+    <text style="fill: rgb(255, 0, 0); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: end;" x="470" y="25" >100.64.0.0/22</text>
     <text style="fill: rgb(255, 0, 0); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: end;" x="470" y="33" >%IPv6pfx%:0::/48</text>
 
     <text style="fill: rgb(255, 0, 0); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: end;" x="95" y="80" >.1.%GRP% | 1::%GRP%</text>
