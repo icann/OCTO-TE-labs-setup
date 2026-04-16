@@ -188,14 +188,21 @@ setup_DHCP_server () {
   # Stop dnsmasq if running
   systemctl is-active --quiet dnsmasq && systemctl stop dnsmasq
 
+  #
+  # DO NOT DISABLE SYSTEMD-RESOLVED
+  # 
+  # It is much saver to use the AWS resolver than to rely on 
+  # Quad9 connectivity.
+  # 
+
   # Disable systemd-resolved, as it obfuscates DNS resolution further
-  systemctl disable systemd-resolved
-  systemctl is-active --quiet systemd-resolved && systemctl stop systemd-resolved
+  # systemctl disable systemd-resolved
+  # systemctl is-active --quiet systemd-resolved && systemctl stop systemd-resolved
 
   # Remove /etc/resolv.conf otherwise is symlink to ../run/systemd/resolve/stub-resolv.conf
-  rm /etc/resolv.conf
-  echo 'nameserver 9.9.9.9' > /etc/resolv.conf
-  echo 'options timeout:30 attempts:5' >> /etc/resolv.conf
+  # rm /etc/resolv.conf
+  # echo 'nameserver 9.9.9.9' > /etc/resolv.conf
+  # echo 'options timeout:30 attempts:5' >> /etc/resolv.conf
   
   # Configure dnsmasq
   # By default it listens on all the loopback interfaces.
