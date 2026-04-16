@@ -326,11 +326,24 @@ Resources:
           # wait for cloudformation stack to finish
           sleep 60
           #
+          # for remaining actions we need to be in the scripts folder
+          cd scripts
+          #
+          # setup DEPLOY parameters
+          DOMAIN=$(perl -e '$_=lc("${DnsName}.${DnsParent}");s/\.$//;print $_;')
+          IPv4=${IPAddress.PublicIp}
+          until IPv6=$(ip a s scope global | perl -n -e'print $1 if m/inet6\s+(\S+)\/128/'); [ -n "$IPv6" ]; do echo "Waiting..."; sleep 1; done;
+          sed -e "s/%LABDOMAIN%/$DOMAIN/g"  \
+              -e "s/%IPV4ADDRESS%/$IPv4/g"  \
+              -e "s/%IPV6ADDRESS%/$IPv6/g"  \
+              -e "s/%ZONEID%/${labZone}/g"  \
+              -e "s/%LABTYPE%/${LabType}/g"   \
+              -e "s/%NETWORKS%/${Participants}/g" \
+              ../configs/deploy-parameters.cfg > ./deploy-parameters.cfg
           #
           # initialize lab server
           #
-          cd scripts
-          ./setup-host.sh ${DnsName}.${DnsParent} ${IPAddress.PublicIp} ${labZone} ${LabType} ${Participants}
+          ./setup-host.sh
           ./setup-containers.sh
           #
           # now deploy the lab
