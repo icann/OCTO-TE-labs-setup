@@ -103,8 +103,10 @@ cat <<EOF > /tmp/db.grp$GRP
                           86400         ; Retry
                         2419200         ; Expire
                              30 )       ; Negative Cache TTL
+@           MX          0 .
 @           NS          ${DOMAIN}.
 @           TXT         "DNS IS FUN"
+@           TXT         "v=spf1 -all"
 ns1         A           100.100.${GRP}.130
 ns1         AAAA        fd89:59e0:${GRP}:128::130
 ns2         A           100.100.${GRP}.131
@@ -156,7 +158,7 @@ lxc exec grp$GRP-soa -- sh -c 'chown -R bind:bind /var/lib/bind'
 cat <<EOF > /tmp/named.conf.local.secondary
 zone "grp${GRP}.${DOMAIN}" {
     type secondary;
-    file "/etc/bind/zones/db.grp${GRP}.secondary";
+    file "/var/lib/bind/zones/db.grp${GRP}.secondary";
     masters { 
         100.100.${GRP}.66; 
         fd89:59e0:${GRP}:64::66;
