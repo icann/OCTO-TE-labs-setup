@@ -143,6 +143,9 @@ create_web_content () {
     done
     echo "</html>" >> /var/www/$DOMAIN/html/index.html
 
+    # Create protocol.php (for protocol reference)
+    cp ../configs/www/var/www/html/protocol.php /var/www/$DOMAIN/html/protocol.php
+    
     # DONE
     echo "Content of /var/www/$DOMAIN/html/ is now:"
     tree -a /var/www/$DOMAIN/html/
