@@ -53,6 +53,8 @@ create_instructions () {
             sed -i \
                 -e "s/%GRP%/${grp}/g" \
                 -e "s/%DOMAIN%/${DOMAIN}/g" \
+                -e "s/%IPv4%/${IPv4ServerAddr}/g" \
+                -e "s/%IPv6%/${IPv6ServerAddr}/g" \
                 -e "s/%IPv6pfx%/${IPv6prefix}/g" "$file"
         done
 
