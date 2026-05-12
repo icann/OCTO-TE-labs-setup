@@ -27,21 +27,20 @@ gen_nginx_config () {
         echo '    try_files $uri $uri/ =404;' >> $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
         echo '    auth_basic "Restricted Content";' >> $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
         echo '    auth_basic_user_file /etc/nginx/htpasswd/htpasswd_grp'$grp';' >> $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
-        cat ../configs/nginx/etc/nginx/sites-available/php.conf >> $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
         echo '  }' >> $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
         echo '' >> $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
     done
 
-    # nginx configuration for LAB_DOMAIN virtual-host --> [/etc/nginx/sites-enabled/LAB_DOMAIN.te-labs.training]
+    # nginx configuration for LAB_DOMAIN virtual-host --> [/etc/nginx/sites-enabled/domain]
     sed -e "s|%AuthDomain%|$DOMAIN|g" \
         -e "/#grpX_Locations/r $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt" \
-        ../configs/nginx/etc/nginx/sites-available/LAB_DOMAIN.te-labs.training > $nginxworkdir/etc/nginx/sites-available/$DOMAIN
-    # nginx configuration for WEBSSH virtual-host --> [/etc/nginx/sites-enabled/webssh.LAB_DOMAIN.te-labs.training]
+        ../configs/nginx/etc/nginx/sites-available/domain > $nginxworkdir/etc/nginx/sites-available/$DOMAIN
+    # nginx configuration for WEBSSH virtual-host --> [/etc/nginx/sites-enabled/webssh.domain]
     sed -e "s|%AuthDomain%|$DOMAIN|g" \
-    ../configs/nginx/etc/nginx/sites-available/webssh.LAB_DOMAIN.te-labs.training > $nginxworkdir/etc/nginx/sites-available/webssh.$DOMAIN
-    # nginx configuration for SHELLINABOX virtual-host --> [/etc/nginx/sites-enabled/shellinabox.LAB_DOMAIN.te-labs.training]
+    ../configs/nginx/etc/nginx/sites-available/webssh.domain > $nginxworkdir/etc/nginx/sites-available/webssh.$DOMAIN
+    # nginx configuration for SHELLINABOX virtual-host --> [/etc/nginx/sites-enabled/shellinabox.domain]
     sed -e "s|%AuthDomain%|$DOMAIN|g" \
-    ../configs/nginx/etc/nginx/sites-available/shellinabox.LAB_DOMAIN.te-labs.training > $nginxworkdir/etc/nginx/sites-available/shellinabox.$DOMAIN
+    ../configs/nginx/etc/nginx/sites-available/shellinabox.domain > $nginxworkdir/etc/nginx/sites-available/shellinabox.$DOMAIN
     echo "nginx configuration (/etc/nginx/nginx.conf) for domain $DOMAIN generated"
 
     echo "---> nginx configuration generated"
