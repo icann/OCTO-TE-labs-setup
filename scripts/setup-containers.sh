@@ -63,6 +63,10 @@ lxc exec hostX -- sh -c "sed -i -e's/KbdInteractiveAuthentication no/KbdInteract
 lxc exec hostX -- sh -c 'useradd sysadm -c "Adm" -d /home/sysadm -m -G sudo -s /bin/bash'
 lxc exec hostX -- sh -c 'echo "sysadm:icannws" | chpasswd'
 lxc exec hostX -- sh -c 'echo "sysadm ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/sysadm'
+# fix rsyslog
+lxc exec hostX -- sh -c 'echo "/run/systemd/journal/dev-log rw," > /etc/apparmor.d/local/usr.sbin.rsyslogd'
+lxc exec hostX -- sh -c 'apparmor_parser -r /etc/apparmor.d/usr.sbin.rsyslogd'
+lxc exec hostX -- sh -c 'systemctl reload apparmor'
 # done setting up base image
 lxc stop hostX
 
