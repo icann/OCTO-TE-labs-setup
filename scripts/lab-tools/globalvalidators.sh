@@ -65,7 +65,7 @@ push_global_RPKI_validator_net_config () {
         lxc file push $workdir/bb-lxc.yaml.rpki$serv rpki$serv/etc/netplan/bb-lxc.yaml
         echo "-- setting host name to rpki$serv.$DOMAIN"
         lxc exec rpki$serv -- sh -c "echo rpki$serv.$DOMAIN >/etc/hostname"
-        lxc exec rpki$serv -- "hostname rpki$serv.$DOMAIN"
+        lxc exec rpki$serv -- sh -c "hostname rpki$serv.$DOMAIN"
         lxc exec rpki$serv -- sh -c "echo 127.0.0.222 rpki$serv.$DOMAIN >>/etc/hosts"
         echo "-- Stopping and starting rpki$serv"
         lxc stop rpki$serv
