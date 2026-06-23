@@ -120,7 +120,7 @@ config_iborder_rtr_VPN_with_ISP () {
     # Install VPN packages & set up interface for VPN
     lxc exec iborder-rtr -- bash -ilc "
         apt-get -yq update
-        apt-get -yq install wireguard wireguard-tools wireguard-dkms
+        apt-get -yq install wireguard wireguard-tools
         ip link add wg0 type wireguard
         ip addr add $VPNlocalIPv4 dev wg0
         ip link set wg0 up
