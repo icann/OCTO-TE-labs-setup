@@ -35,12 +35,12 @@ start_routers () {
     echo "Starting all routers..."
     for grp in $(seq 1 $NETWORKS)
     do
-        echo -n "  starting grp$grp-rtr"
+        echo "  starting grp$grp-rtr"
         lxc start grp${grp}-rtr
     done
     for grp in $(seq 1 $NETWORKS)
     do
-        echo -n "  waiting for grp$grp-rtr"
+        echo "  waiting for grp$grp-rtr"
         lxc exec grp${grp}-rtr -- cloud-init status --wait
     done
     echo
@@ -83,6 +83,12 @@ push_routers_net_config () {
     echo "Pushing all routers configs..."
     for grp in $(seq 1 $NETWORKS)
     do
+        # ----
+        # These lines are added because of lxc timing errors
+        echo "$grp"
+        lxc ls grp${grp}-rtr
+        sleep 1
+        #----
         lxc file push $workdir/frr.conf.$grp grp$grp-rtr/etc/frr/frr.conf
         lxc exec grp$grp-rtr -- sh -c 'chown frr:frr /etc/frr/frr.conf'
         lxc exec grp$grp-rtr -- sh -c 'service frr restart'
