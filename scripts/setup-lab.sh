@@ -288,6 +288,7 @@ deploy () {
     create_networks
     create_routers
     create_authns
+    create_nat64
     create_dnsdist
 
     if [ "$BorderRouter" = "YES" ]; then

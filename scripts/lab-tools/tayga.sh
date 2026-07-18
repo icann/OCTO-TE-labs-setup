@@ -30,12 +30,12 @@ EOF
 }
 
 stop_nat64() {
-    echo "Create NAT64"
+    echo "Stop NAT64"
     sudo systemctl stop tayga
     sudo tayga --config /etc/tayga.conf --rmmod
     sudo ip link del nat64
     sudo ip route del 192.0.2.0/24 dev nat64
     sudo ip -6 route del 64:ff9b::/96 dev nat64
     #
-    echo "Done - Create NAT64"
+    echo "Done - Stop NAT64"
 }
