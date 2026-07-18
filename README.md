@@ -43,39 +43,63 @@ The following instructions should help you to setup and take down a lab.
 ## Step-by-step guide
 
 - Log into AWS
-- Goto S3 and find the bucket to which the whole repository is uploaded to
+- Goto S3 and find the bucket to which the whole repository is uploaded
+  to (usually \<repo name\> or \<repo-name\>-\<branch\>)
 - Copy the URL of the lab-ec2.yaml file 
 - Goto CloudFormation
+- Change to desired region 
 - Click on "Create stack"
 - Choose "with new resources (standard)"
-- Paste in the URL from above
+### Step 1
+- Amazon S3 URL: Paste in the URL from above
 - Click on "Next"
+### Step 2
 - Enter Stack name - Please follow the convention    
   LAB-\<DATE\>-\<LOCATION\>, e.g. LAB-20250101-STOCKHOLM
-- Enter DnsName - needs to be a valid domain name, usually we use location (city or country) name.<br>
+- DnsName: enter a valid domain name 
+  (suggestion: use IATA 3-Letter Airport Code)<br/>
   **NO DASHES**, only a-z0-9.
-- Value for DnsParent should not be changed unless you really need to use another domain for the lab.
-  Please be aware that the zone must already exist in your AWS account and must be dnssec signed. And
-  don't forget the dot at the end.
+- DnsParent: Keep default unless you really need to use another domain for the lab.<br>
+  Please be aware that the zone must already exist in your AWS account and must be dnssec signed. And don't forget the dot at the end.
 - Choose LabType: 1 = resolver, 2 = DNS, 3 = Router (global RPKI), 4 = Router (group RPKI)
-- Do **NOT** change the value of LatestUbuntu, it is a magic AWS value
-- Write in your own name as Owner
-- Write in the number of groups you want to set up, between 3 and 64
-- S3Bucket is the name of the S3 bucket from where all install files will be fetched. It should already 
-  be filled in with the name of the bucket from where you got the URL for the CloudFormation template.
-- labInstanceType is the type of the AWS EC2 machine this lab should use. Please see section [
+- LatestUbuntu: Do **NOT** change
+- Owner: write in your own name
+- Participants: Write in the number of groups you want to set up, between 3 and 64
+- S3Bucket: name of the S3 bucket from where all install files will be fetched. Keep default!<br>
+It should already be filled in with the name of the bucket from where you got the URL for the CloudFormation template.
+- labInstanceType: is the type of the AWS EC2 machine this lab should use. Please see section [
   Select Instance Type](#select-instance-type)
-- labInstructions is the URL of the lab instructions to install in each groups web. You can can get the link from github when you click on "Code" and choose "Download zip".
+  and double check [Available AWS Instances](https://docs.aws.amazon.com/ec2/latest/instancetypes/ec2-instance-regions.html)
+- labInstructions: URL of the lab instructions to install in each
+  groups web. You can can get the link from github when you click 
+  on "Code" and choose "Download zip".
 - Click on "Next"
+### Step 3
 - Scroll to the bottom of the page
-- Check the the box "I acknowledge that AWS CloudFormation might create IAM resources with customised names."    
+- Check the the box "I acknowledge that AWS CloudFormation might 
+  create IAM resources with customised names."    
   This is needed for the ec2 instance to access s3 and route53
 - Click on "Next"
+### Step 4
 - Scroll to the bottom of the page
 - Click on "Submit"
+### Status Review
 - After around 5 minutes the stack creation should show "CREATE_COMPLETE"
-- Wait approx. 30 minutes for all lab setup scripts to finish too.
-- **DONE**
+- Wait between 30 minutes and 2 hours (depending on number of groups) 
+  for all lab setup scripts to finish too.
+### Validation
+- log into the server see section [Lab access](#lab-access)
+- `cat grouppasswords.txt` gives you the list of all grouos with passwords 
+- `tail -f /var/log/cloud-init-output.log` you can follow all the install scripts. The last output should be 
+``` 
++ echo '===================== DEPLOY DONE ======================='
+===================== DEPLOY DONE =======================
++ echo =========================================================
+=========================================================
++ exit
++ echo DONE
+DONE
+ ```
 
 ### Select Instance Type
 
