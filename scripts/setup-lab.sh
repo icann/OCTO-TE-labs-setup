@@ -33,6 +33,7 @@ eval set -- "$TEMP"
 . ./lab-tools/shellinabox.sh
 . ./lab-tools/studentauth.sh
 . ./lab-tools/studentres.sh
+. ./lab-tools/tayga.sh
 . ./lab-tools/validators.sh
 . ./lab-tools/web.sh
 . ./lab-tools/webssh.sh
@@ -170,6 +171,7 @@ start_all () {
         start_student_clients
     fi
     start_authns
+    start_nat64
     start_dnsdist
     if [ "$StudentResolvers" = "YES" ]; then
         start_student_servers
@@ -195,6 +197,7 @@ stop_all () {
     stop_student_resolvers
     stop_student_auth
     stop_dnsdist
+    stop_nat64
     stop_authns
     stop_nginx
     stop_webssh
