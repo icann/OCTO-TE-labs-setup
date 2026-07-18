@@ -8,6 +8,8 @@ Parameters:
   DnsName:
     Type: String
     Description: "DNS name for the lab. NO DASHES - only a-z0-9!!!"
+    MinLength: 3
+    MaxLength: 32
   Owner:
     Type: String
     Description: "Who is responsible for this lab?"
