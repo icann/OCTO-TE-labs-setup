@@ -534,26 +534,6 @@ Resources:
           - - !Ref DnsName
             - !Ref DnsParent
 
-  webssh:
-    DependsOn:
-      - dnsA
-      - dnsAAAA
-    Type: AWS::Route53::RecordSet
-    Properties:    
-      HostedZoneId: !Ref labZone
-      Name: !Join
-      - '.'
-      - - 'webssh'
-        - !Ref DnsName
-        - !Ref DnsParent
-      Type: CNAME
-      TTL: '300'
-      ResourceRecords: 
-        - !Join
-          - '.'
-          - - !Ref DnsName
-            - !Ref DnsParent
-
   labLambdaGetDsRole:
     Type: AWS::IAM::Role
     Properties:
