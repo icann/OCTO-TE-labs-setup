@@ -37,14 +37,17 @@ gen_nginx_config () {
         echo '' >> $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
     done
 
+    # nginx configuration for default virtual-host --> [/etc/nginx/sites-enabled/default]
+    cp ../configs/nginx/etc/nginx/sites-available/default $nginxworkdir/etc/nginx/sites-available/default
+    
     # nginx configuration for LAB_DOMAIN virtual-host --> [/etc/nginx/sites-enabled/domain]
     sed -e "s|%AuthDomain%|$DOMAIN|g" \
         -e "/#grpX_Locations/r $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt" \
         ../configs/nginx/etc/nginx/sites-available/domain > $nginxworkdir/etc/nginx/sites-available/$DOMAIN
+
     # nginx configuration for SHELLINABOX virtual-host --> [/etc/nginx/sites-enabled/shellinabox.domain]
     sed -e "s|%AuthDomain%|$DOMAIN|g" \
     ../configs/nginx/etc/nginx/sites-available/shellinabox.domain > $nginxworkdir/etc/nginx/sites-available/shellinabox.$DOMAIN
-    echo "nginx configuration (/etc/nginx/nginx.conf) for domain $DOMAIN generated"
 
     echo "---> nginx configuration generated"
 }
