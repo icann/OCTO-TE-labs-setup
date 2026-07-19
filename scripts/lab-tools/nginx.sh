@@ -11,6 +11,9 @@ gen_nginx_config () {
     sed -e "s|%AuthDomain%|$DOMAIN|g" \
         ../configs/nginx/etc/nginx/nginx.conf > $nginxworkdir/etc/nginx/nginx.conf
 
+    # htpasswd file for webssh
+    htpasswd -bc $nginxworkdir/etc/nginx/htpasswd/webssh labuser $webuserpasswd
+
     touch $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
     grp=1
     for grp in $(seq 1 $NETWORKS)
@@ -21,6 +24,9 @@ gen_nginx_config () {
         # Create the file for storing grpX username and password
         htpasswd -bc $nginxworkdir/etc/nginx/htpasswd/htpasswd_grp$grp grp$grp $passwd4grp
         htpasswd -b $nginxworkdir/etc/nginx/htpasswd/htpasswd_grp$grp labuser $webuserpasswd
+
+        # Adding group password to webssh
+        htpasswd -b $nginxworkdir/etc/nginx/htpasswd/webssh grp$grp $passwd4grp
 
         # Add grpX nginx "location" statement to a temporary file (grpX_locations.txt)
         echo '  location /grp'$grp' {' >> $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
@@ -35,9 +41,6 @@ gen_nginx_config () {
     sed -e "s|%AuthDomain%|$DOMAIN|g" \
         -e "/#grpX_Locations/r $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt" \
         ../configs/nginx/etc/nginx/sites-available/domain > $nginxworkdir/etc/nginx/sites-available/$DOMAIN
-    # nginx configuration for WEBSSH virtual-host --> [/etc/nginx/sites-enabled/webssh.domain]
-    sed -e "s|%AuthDomain%|$DOMAIN|g" \
-    ../configs/nginx/etc/nginx/sites-available/webssh.domain > $nginxworkdir/etc/nginx/sites-available/webssh.$DOMAIN
     # nginx configuration for SHELLINABOX virtual-host --> [/etc/nginx/sites-enabled/shellinabox.domain]
     sed -e "s|%AuthDomain%|$DOMAIN|g" \
     ../configs/nginx/etc/nginx/sites-available/shellinabox.domain > $nginxworkdir/etc/nginx/sites-available/shellinabox.$DOMAIN
@@ -53,7 +56,6 @@ push_nginx_config () {
     cp -r $nginxworkdir/etc/nginx/htpasswd/. /etc/nginx/htpasswd
     cp ../configs/letsencrypt/etc/letsencrypt/options-ssl-nginx.conf /etc/letsencrypt/options-ssl-nginx.conf
     cp $nginxworkdir/etc/nginx/sites-available/$DOMAIN /etc/nginx/sites-available/$DOMAIN
-    cp $nginxworkdir/etc/nginx/sites-available/webssh.$DOMAIN /etc/nginx/sites-available/webssh.$DOMAIN
     cp $nginxworkdir/etc/nginx/sites-available/shellinabox.$DOMAIN /etc/nginx/sites-available/shellinabox.$DOMAIN
     echo "Content of /etc/nginx/sites-available/ is now:"
     ls -larth /etc/nginx/sites-available/
@@ -73,7 +75,6 @@ push_nginx_config () {
     # Create symlinks for new virtual-hosts
     echo "Creating symlinks for new virtual-hosts..."
     ln -sf /etc/nginx/sites-available/$DOMAIN /etc/nginx/sites-enabled/
-    ln -sf /etc/nginx/sites-available/webssh.$DOMAIN /etc/nginx/sites-enabled/
     ln -sf /etc/nginx/sites-available/shellinabox.$DOMAIN /etc/nginx/sites-enabled/
     echo "Symlinks for new virtual-hosts:"
     ls -larth /etc/nginx/sites-enabled/
@@ -85,7 +86,6 @@ push_nginx_config () {
     # Create directories for all web content (if non existent)
     echo "Creating directories for all web content (if non existent)..."
     mkdir -p /var/www/$DOMAIN/html
-    mkdir -p /var/www/webssh.$DOMAIN/html
     mkdir -p /var/www/shellinabox.$DOMAIN/html
     echo "The followign directories were created under /var/www/:"
     tree -a /var/www/
