@@ -55,6 +55,7 @@ push_nginx_config () {
     cp $nginxworkdir/etc/nginx/nginx.conf /etc/nginx/nginx.conf
     cp -r $nginxworkdir/etc/nginx/htpasswd/. /etc/nginx/htpasswd
     cp ../configs/letsencrypt/etc/letsencrypt/options-ssl-nginx.conf /etc/letsencrypt/options-ssl-nginx.conf
+    cp $nginxworkdir/etc/nginx/sites-available/default /etc/nginx/sites-available/default
     cp $nginxworkdir/etc/nginx/sites-available/$DOMAIN /etc/nginx/sites-available/$DOMAIN
     cp $nginxworkdir/etc/nginx/sites-available/shellinabox.$DOMAIN /etc/nginx/sites-available/shellinabox.$DOMAIN
     echo "Content of /etc/nginx/sites-available/ is now:"
@@ -74,6 +75,7 @@ push_nginx_config () {
 
     # Create symlinks for new virtual-hosts
     echo "Creating symlinks for new virtual-hosts..."
+    ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
     ln -sf /etc/nginx/sites-available/$DOMAIN /etc/nginx/sites-enabled/
     ln -sf /etc/nginx/sites-available/shellinabox.$DOMAIN /etc/nginx/sites-enabled/
     echo "Symlinks for new virtual-hosts:"
@@ -85,6 +87,7 @@ push_nginx_config () {
 
     # Create directories for all web content (if non existent)
     echo "Creating directories for all web content (if non existent)..."
+    mkdir -p /var/www/default/html
     mkdir -p /var/www/$DOMAIN/html
     mkdir -p /var/www/shellinabox.$DOMAIN/html
     echo "The followign directories were created under /var/www/:"
