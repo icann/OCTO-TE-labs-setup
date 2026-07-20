@@ -514,6 +514,34 @@ Resources:
       ResourceRecords: 
         - !GetAtt labInstanceIpv6.Ipv6Address
 
+  dnsIPv4only:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'ipv4only'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: A
+      TTL: '300'
+      ResourceRecords:
+        - !GetAtt IPAddress.PublicIp
+
+  dnsIPv6only:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Join
+      - '.'
+      - - 'ipv6only'
+        - !Ref DnsName
+        - !Ref DnsParent
+      Type: AAAA
+      TTL: '300'
+      ResourceRecords:
+        - !GetAtt labInstanceIpv6.Ipv6Address
+
   shellinabox:
     DependsOn:
       - dnsA
