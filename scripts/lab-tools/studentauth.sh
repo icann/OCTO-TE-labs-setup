@@ -8,9 +8,6 @@ create_student_auth () {
         lxc copy hostX grp${grp}-soa
         lxc copy hostX grp${grp}-ns1
         lxc copy hostX grp${grp}-ns2
-        lxc config device add grp${grp}-soa eth0 nic name=eth0 nictype=bridged parent=grp${grp}-int
-        lxc config device add grp${grp}-ns1 eth0 nic name=eth0 nictype=bridged parent=grp${grp}-dmz
-        lxc config device add grp${grp}-ns2 eth0 nic name=eth0 nictype=bridged parent=grp${grp}-dmz
     done
     echo "---> all student authoritative servers created"
 }
@@ -100,6 +97,12 @@ push_student_auth_net_config () {
     echo "Pushing all student authoritative servers net conf..."
     for grp in $(seq 1 $NETWORKS)
     do
+        # Adding network device to servers containers
+        lxc config device add grp${grp}-soa eth0 nic name=eth0 nictype=bridged parent=grp${grp}-int
+        lxc config device add grp${grp}-ns1 eth0 nic name=eth0 nictype=bridged parent=grp${grp}-dmz
+        lxc config device add grp${grp}-ns2 eth0 nic name=eth0 nictype=bridged parent=grp${grp}-dmz
+
+        # Pushing resolv.conf and netplan config to servers containers
         lxc file push $workdir/resolv.conf.$grp grp$grp-soa/etc/resolv.conf
         lxc file push $workdir/resolv.conf.$grp grp$grp-ns1/etc/resolv.conf
         lxc file push $workdir/resolv.conf.$grp grp$grp-ns2/etc/resolv.conf
