@@ -7,8 +7,6 @@ create_student_resolvers () {
         echo "Creating resolvers for grp$grp"
         lxc copy hostX grp${grp}-resolv1
         lxc copy hostX grp${grp}-resolv2
-        lxc config device add grp${grp}-resolv1 eth0 nic name=eth0 nictype=bridged parent=grp${grp}-int
-        lxc config device add grp${grp}-resolv2 eth0 nic name=eth0 nictype=bridged parent=grp${grp}-int
     done
     echo "---> all student resolvers created"
 }
@@ -88,6 +86,10 @@ push_student_resolvers_net_config () {
     echo "Pushing all student resolvers net conf..."
     for grp in $(seq 1 $NETWORKS)
     do
+        # Adding network device to resolvers containers
+        lxc config device add grp${grp}-resolv1 eth0 nic name=eth0 nictype=bridged parent=grp${grp}-int
+        lxc config device add grp${grp}-resolv2 eth0 nic name=eth0 nictype=bridged parent=grp${grp}-int
+        # Pushing network config to resolvers containers
         lxc file push $workdir/resolv.conf.$grp grp$grp-resolv1/etc/resolv.conf
         lxc file push $workdir/resolv.conf.$grp grp$grp-resolv2/etc/resolv.conf
         lxc file push $workdir/10-lxc.yaml.$grp-64-2 grp$grp-resolv1/etc/netplan/10-lxc.yaml

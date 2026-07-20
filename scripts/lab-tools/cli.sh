@@ -8,7 +8,6 @@ create_student_clients () {
     do
         echo "grp$grp-cli"
         lxc copy hostX grp${grp}-cli
-        lxc config device add grp${grp}-cli eth0 nic name=eth0 nictype=bridged parent=grp${grp}-lan
     done
     echo "---> all student clients created"
 }
@@ -78,6 +77,10 @@ push_student_clients_net_config () {
     echo "Pushing all student clients net conf..."
     for grp in $(seq 1 $NETWORKS)
     do
+        # Adding eth0 to client container
+        lxc config device add grp${grp}-cli eth0 nic name=eth0 nictype=bridged parent=grp${grp}-lan
+
+        # Pushing netplan config to client container
         lxc file push $workdir/10-lxc.yaml.$grp-0-1 grp$grp-cli/etc/netplan/10-lxc.yaml
         lxc exec grp$grp-cli -- sh -c 'chmod 600 /etc/netplan/10-lxc.yaml'
         lxc exec grp$grp-cli -- sh -c "echo cli.grp$grp.$DOMAIN >/etc/hostname"
