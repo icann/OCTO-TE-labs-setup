@@ -31,6 +31,21 @@ create_dnsdist () {
     sed -e "s|%DOMAIN%|$DOMAIN|g" \
         -e "s|%IPv6pfx%|$IPv6prefix|g" \
         ../configs/dnsdist/dnsdist.conf > $workdir/dnsdist.conf
+    for grp in $(seq 1 $NETWORKS)
+    do
+    cat >> $workdir/dnsdist.conf <<EOF
+-- grp${grp}
+newServer({address="${IPv6pfx}:${grp}:128::130", pool="grp${grp}", healthCheckMode='lazy', checkInterval=30}):setUp()
+newServer({address="${IPv6pfx}:${grp}:128::131", pool="grp${grp}", healthCheckMode='lazy', checkInterval=30}):setUp()
+newServer({address="100.100.${grp}.130", pool="grp${grp}", healthCheckMode='lazy', checkInterval=30}):setUp()
+newServer({address="100.100.${grp}.131", pool="grp${grp}", healthCheckMode='lazy', checkInterval=30}):setUp()
+addAction(QNameSuffixRule{"grp${grp}.${DOMAIN}"}, PoolAction("grp${grp}"))
+EOF
+    done
+    cat >> $workdir/dnsdist.conf <<EOF
+-- default
+addAction(AllRule(), PoolAction("authns"))
+EOF
     lxc file push $workdir/dnsdist.conf dnsdist/etc/dnsdist/dnsdist.conf
     # dnsdist is a memory hog
     lxc config set dnsdist limits.memory 8GB
