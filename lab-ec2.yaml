@@ -545,7 +545,7 @@ Resources:
   ec2A:
     Type: AWS::Route53::RecordSet
     Properties:
-      HostedZoneId: !Ref DnsParent
+      HostedZoneName: !Ref DnsParent
       Name: !Sub "ec2-${DnsName}.${DnsParent}"
       Type: A
       TTL: '300'
@@ -555,7 +555,7 @@ Resources:
   ec2AAAA:
     Type: AWS::Route53::RecordSet
     Properties:    
-      HostedZoneId: !Ref DnsParent
+      HostedZoneName: !Ref DnsParent
       Name: !Sub "ec2-${DnsName}.${DnsParent}"
       Type: AAAA
       TTL: '300'
