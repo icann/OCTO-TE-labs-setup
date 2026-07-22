@@ -35,14 +35,16 @@ create_dnsdist () {
     do
     cat >> $workdir/dnsdist.conf <<EOF
 -- grp${grp}
-newServer({address="${IPv6pfx}:${grp}:128::130", pool="grp${grp}", healthCheckMode='lazy', checkInterval=30}):setUp()
-newServer({address="${IPv6pfx}:${grp}:128::131", pool="grp${grp}", healthCheckMode='lazy', checkInterval=30}):setUp()
+newServer({address="${IPv6prefix}:${grp}:128::130", pool="grp${grp}", healthCheckMode='lazy', checkInterval=30}):setUp()
+newServer({address="${IPv6prefix}:${grp}:128::131", pool="grp${grp}", healthCheckMode='lazy', checkInterval=30}):setUp()
 newServer({address="100.100.${grp}.130", pool="grp${grp}", healthCheckMode='lazy', checkInterval=30}):setUp()
 newServer({address="100.100.${grp}.131", pool="grp${grp}", healthCheckMode='lazy', checkInterval=30}):setUp()
-addAction(QNameSuffixRule{"grp${grp}.${DOMAIN}"}, PoolAction("grp${grp}"))
+addAction(AndRule({QNameRule("grp${grp}.${DOMAIN}"), QTypeRule(DNSQType.DS)}), PoolAction("authns"))
+addAction(QNameSuffixRule("grp${grp}.${DOMAIN}"), PoolAction("grp${grp}"))
 EOF
     done
     cat >> $workdir/dnsdist.conf <<EOF
+
 -- default
 addAction(AllRule(), PoolAction("authns"))
 EOF
