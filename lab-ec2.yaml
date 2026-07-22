@@ -542,6 +542,26 @@ Resources:
       ResourceRecords:
         - !GetAtt labInstanceIpv6.Ipv6Address
 
+  ec2A:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref labZone
+      Name: !Sub "ec2-${DnsName}.${DnsParent}"
+      Type: A
+      TTL: '300'
+      ResourceRecords:
+        - !GetAtt IPAddress.PublicIp
+
+  ec2AAAA:
+    Type: AWS::Route53::RecordSet
+    Properties:    
+      HostedZoneId: !Ref labZone
+      Name: !Sub "ec2-${DnsName}.${DnsParent}"
+      Type: AAAA
+      TTL: '300'
+      ResourceRecords: 
+        - !GetAtt labInstanceIpv6.Ipv6Address
+
   shellinabox:
     DependsOn:
       - dnsA
