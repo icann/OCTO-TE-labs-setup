@@ -24,13 +24,27 @@ create_authns () {
 
     # configure authoritative DNS
     lxc exec authns -- sh -c 'apt install -qy bind9'
-    lxc file push ../configs/authns/named.conf authns/etc/bind/named.conf
+    sed -e "s/%DOMAIN%/${DOMAIN}/g" \
+        -e "s/%IPv4%/${IPv4ServerAddr}/g" \
+        -e "s/%IPv6%/${IPv6ServerAddr}/g" \
+        -e "s/%IPv6pfx%/${IPv6prefix}/g" \
+        ../configs/authns/named.conf > $workdir/named.conf
+    lxc file push $workdir/named.conf authns/etc/bind/named.conf
     lxc exec authns -- sh -c 'chown -R bind:bind /etc/bind/*'
     lxc exec authns -- sh -c 'mkdir -p /var/lib/bind/zones'
     lxc file push ../configs/authns/db.rpz                 authns/var/lib/bind/zones/
     lxc file push ../configs/authns/db.internal            authns/var/lib/bind/zones/
     lxc file push ../configs/authns/db.evilnsip.internal   authns/var/lib/bind/zones/
     lxc file push ../configs/authns/db.badnsname.internal  authns/var/lib/bind/zones/
+    sed -e "s/%DOMAIN%/${DOMAIN}/g" \
+        -e "s/%IPv4%/${IPv4ServerAddr}/g" \
+        -e "s/%IPv6%/${IPv6ServerAddr}/g" \
+        -e "s/%IPv6pfx%/${IPv6prefix}/g" \
+        ../configs/authns/db.domain > $workdir/db.domain
+    for $GRP in $(seq 1 $NETWORKS) do
+        echo "grp$GRP NS $DOMAIN." >> $workdir/db.domain
+    done
+    lxc file push $workdir/db.domain  authns/var/lib/bind/zones/db.$DOMAIN
     lxc exec authns -- sh -c 'chown -R bind:bind /var/lib/bind'
 
     # restart server to apply all config changes 
