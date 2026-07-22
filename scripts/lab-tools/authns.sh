@@ -41,7 +41,8 @@ create_authns () {
         -e "s/%IPv6%/${IPv6ServerAddr}/g" \
         -e "s/%IPv6pfx%/${IPv6prefix}/g" \
         ../configs/authns/db.domain > $workdir/db.domain
-    for $GRP in $(seq 1 $NETWORKS) do
+    for GRP in $(seq 1 $NETWORKS) 
+    do
         echo "grp$GRP NS $DOMAIN." >> $workdir/db.domain
     done
     lxc file push $workdir/db.domain  authns/var/lib/bind/zones/db.$DOMAIN
