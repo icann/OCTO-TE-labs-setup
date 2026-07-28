@@ -42,22 +42,22 @@ for ((GRP=start; GRP<=end; GRP++)); do
     lxc exec grp$GRP-resolv1 -- sh -c 'echo "nameserver 9.9.9.9"|sudo tee /etc/resolv.conf'
 
     cat <<EOF >/tmp/named.conf.options.resolv1
-    options {
+options {
     directory "/var/cache/bind";
     dnssec-validation no;
     listen-on port 53 { localhost; 100.100.0.0/16; };
     listen-on-v6 port 53 { localhost; fd89:59e0::/32; };
     allow-query { any; };
     recursion yes;
-    };
+};
 EOF
 
     cat <<EOF >/tmp/named.conf.local.resolv1
-    zone "internal." {
-        type forward;
-        forwarders { 100.64.0.54; };
-        forward only;  // only forward, no fallback to root hints
-    };
+zone "internal." {
+    type forward;
+    forwarders { 100.64.0.54; };
+    forward only;  // only forward, no fallback to root hints
+};
 EOF
 
     lxc exec grp$GRP-resolv1 -- sh -c 'apt install -qy bind9'
@@ -71,26 +71,26 @@ EOF
     # resolv2 - unbound
     #
     cat <<EOF > /tmp/unbound.conf
-    server:
-            interface: 0.0.0.0
-            interface: ::0
+server:
+        interface: 0.0.0.0
+        interface: ::0
 
-            access-control: 0.0.0.0/0 allow
-            access-control: ::/0 allow
+        access-control: 0.0.0.0/0 allow
+        access-control: ::/0 allow
 
-            port: 53
+        port: 53
 
-            do-udp: yes
-            do-tcp: yes
-            do-ip4: yes
-            do-ip6: yes
+        do-udp: yes
+        do-tcp: yes
+        do-ip4: yes
+        do-ip6: yes
 
-    remote-control:
-        control-enable: yes
+remote-control:
+    control-enable: yes
 
-    stub-zone:
-        name: "internal."
-        stub-addr: 100.64.0.54
+stub-zone:
+    name: "internal."
+    stub-addr: 100.64.0.54
 EOF
 
     lxc exec grp$GRP-resolv2 -- sh -c 'apt install -qy unbound'
@@ -104,53 +104,53 @@ EOF
     # soa - bind9
     #
     cat <<EOF > /tmp/db.grp$GRP
-    ; grp${GRP}
+; grp${GRP}
 
-    \$TTL    30
-    @       IN      SOA     ${DOMAIN}. te-labs.icann.org. (
-                                1         ; Serial
-                            604800         ; Refresh
-                            86400         ; Retry
-                            2419200         ; Expire
-                                30 )       ; Negative Cache TTL
-    @           MX          0 .
-    @           NS          ${DOMAIN}.
-    @           TXT         "DNS IS FUN"
-    @           TXT         "v=spf1 -all"
-    ns1         A           100.100.${GRP}.130
-    ns1         AAAA        fd89:59e0:${GRP}:128::130
-    ns2         A           100.100.${GRP}.131
-    ns2         AAAA        fd89:59e0:${GRP}:128::131
+\$TTL    30
+@       IN      SOA     ${DOMAIN}. te-labs.icann.org. (
+                            1         ; Serial
+                        604800         ; Refresh
+                        86400         ; Retry
+                        2419200         ; Expire
+                            30 )       ; Negative Cache TTL
+@           MX          0 .
+@           NS          ${DOMAIN}.
+@           TXT         "DNS IS FUN"
+@           TXT         "v=spf1 -all"
+ns1         A           100.100.${GRP}.130
+ns1         AAAA        fd89:59e0:${GRP}:128::130
+ns2         A           100.100.${GRP}.131
+ns2         AAAA        fd89:59e0:${GRP}:128::131
 EOF
 
     cat <<EOF > /tmp/named.conf.local.primary
-    zone "grp${GRP}.${DOMAIN}." {
-        type primary;
-        file "/var/lib/bind/zones/db.grp${GRP}";
-        allow-transfer { any; };
-        also-notify {
-            100.100.${GRP}.130; 
-            100.100.${GRP}.131; 
-            fd89:59e0:${GRP}:128::130; 
-            fd89:59e0:${GRP}:128::131; 
-        };
-    }; 
+zone "grp${GRP}.${DOMAIN}." {
+    type primary;
+    file "/var/lib/bind/zones/db.grp${GRP}";
+    allow-transfer { any; };
+    also-notify {
+        100.100.${GRP}.130; 
+        100.100.${GRP}.131; 
+        fd89:59e0:${GRP}:128::130; 
+        fd89:59e0:${GRP}:128::131; 
+    };
+}; 
 EOF
 
     cat <<EOF > /tmp/named.conf.options.primary
-    options {
-        directory "/var/cache/bind";
-        server-id "hidden primary";
-        version "grp${GRP}";
-        hostname "grp${GRP}-soa";
-        dnssec-validation no;
-        listen-on port 53 { localhost; 100.100.0.0/16; };
-        listen-on-v6 port 53 { localhost; fd89:59e0::/32; };
-        allow-query { any; };
-        allow-transfer { any; };
-        also-notify { any; };
-        recursion yes;
-    };
+options {
+    directory "/var/cache/bind";
+    server-id "hidden primary";
+    version "grp${GRP}";
+    hostname "grp${GRP}-soa";
+    dnssec-validation no;
+    listen-on port 53 { localhost; 100.100.0.0/16; };
+    listen-on-v6 port 53 { localhost; fd89:59e0::/32; };
+    allow-query { any; };
+    allow-transfer { any; };
+    also-notify { any; };
+    recursion yes;
+};
 EOF
 
     lxc exec grp$GRP-soa -- sh -c 'apt install -qy bind9'
@@ -166,29 +166,29 @@ EOF
     # ns1 - bind9 secondary
     #
     cat <<EOF > /tmp/named.conf.local.secondary
-    zone "grp${GRP}.${DOMAIN}" {
-        type secondary;
-        file "/var/lib/bind/zones/db.grp${GRP}.secondary";
-        masters { 
-            100.100.${GRP}.66; 
-            fd89:59e0:${GRP}:64::66;
-        };
+zone "grp${GRP}.${DOMAIN}" {
+    type secondary;
+    file "/var/lib/bind/zones/db.grp${GRP}.secondary";
+    masters { 
+        100.100.${GRP}.66; 
+        fd89:59e0:${GRP}:64::66;
     };
+};
 EOF
 
     cat <<EOF > /tmp/named.conf.options.secondary
-    options {
-        directory "/var/cache/bind";
-        server-id "${GRP} Secondary server_id";
-        version "grp${GRP}";
-        hostname "${GRP} Secondary host_name";
-        dnssec-validation no;
-        listen-on port 53 { localhost; 100.100.0.0/16; };
-        listen-on-v6 port 53 { localhost; fd89:59e0::/32; };
-        allow-query { any; };
-        recursion yes;
-        cookie-secret "71ff147d946b942ed66e608b64dc54c9";
-    };
+options {
+    directory "/var/cache/bind";
+    server-id "${GRP} Secondary server_id";
+    version "grp${GRP}";
+    hostname "${GRP} Secondary host_name";
+    dnssec-validation no;
+    listen-on port 53 { localhost; 100.100.0.0/16; };
+    listen-on-v6 port 53 { localhost; fd89:59e0::/32; };
+    allow-query { any; };
+    recursion yes;
+    cookie-secret "71ff147d946b942ed66e608b64dc54c9";
+};
 EOF
 
     lxc exec grp$GRP-ns1 -- sh -c 'apt install -qy bind9'
@@ -204,28 +204,28 @@ EOF
     # ns2 - nsd secondary
     #
     cat <<EOF > /tmp/nsd.conf
-    server:
-        log-only-syslog: yes
-        zonesdir: "/var/lib/nsd"
-        nsid: "ascii_grp${GRP} NSD nsid"
-        hide-version: no
-        hide-identity: no
-        cookie-secret: "71ff147d946b942ed66e608b64dc54c9"
-        answer-cookie: yes
+server:
+    log-only-syslog: yes
+    zonesdir: "/var/lib/nsd"
+    nsid: "ascii_grp${GRP} NSD nsid"
+    hide-version: no
+    hide-identity: no
+    cookie-secret: "71ff147d946b942ed66e608b64dc54c9"
+    answer-cookie: yes
 
-    pattern:
-        name: "fromprimary"
-        allow-notify: 100.100.${GRP}.66 NOKEY
-        allow-notify: fd89:59e0:${GRP}:64::66 NOKEY
-        allow-notify: fd89:59e0:${GRP}::2 NOKEY
-        request-xfr: AXFR 100.100.${GRP}.66 NOKEY
-        request-xfr: AXFR fd89:59e0:${GRP}:64::66 NOKEY
-        request-xfr: AXFR fd89:59e0:${GRP}::2 NOKEY
+pattern:
+    name: "fromprimary"
+    allow-notify: 100.100.${GRP}.66 NOKEY
+    allow-notify: fd89:59e0:${GRP}:64::66 NOKEY
+    allow-notify: fd89:59e0:${GRP}::2 NOKEY
+    request-xfr: AXFR 100.100.${GRP}.66 NOKEY
+    request-xfr: AXFR fd89:59e0:${GRP}:64::66 NOKEY
+    request-xfr: AXFR fd89:59e0:${GRP}::2 NOKEY
 
-    zone:
-        name: "grp${GRP}.${DOMAIN}."
-        zonefile: "db.grp${GRP}.secondary"
-        include-pattern: "fromprimary"
+zone:
+    name: "grp${GRP}.${DOMAIN}."
+    zonefile: "db.grp${GRP}.secondary"
+    include-pattern: "fromprimary"
 EOF
 
     lxc exec grp$GRP-ns2 -- sh -c 'apt install -qy nsd'
