@@ -16,13 +16,13 @@ delete_student_auth () {
     echo "Deleting all student authoritative servers..."
     lxc list -c n --format csv \
         | grep -E '^grp[0-9]+-soa$' \
-        | xargs -r -n1 lxc delete --force    
+        | xargs -rt -n1 lxc delete --force    
     lxc list -c n --format csv \
         | grep -E '^grp[0-9]+-ns1$' \
-        | xargs -r -n1 lxc delete --force    
+        | xargs -rt -n1 lxc delete --force    
     lxc list -c n --format csv \
         | grep -E '^grp[0-9]+-ns2$' \
-        | xargs -r -n1 lxc delete --force    
+        | xargs -rt -n1 lxc delete --force    
     echo "---> all student authoritative servers deleted"
 }
 
@@ -45,13 +45,15 @@ start_student_auth () {
 
 stop_student_auth () {
     echo "Stoping all student authoritative servers..."
-    for grp in $(seq 1 $NETWORKS)
-    do
-        lxc stop -f grp${grp}-soa >/dev/null 2>&1
-        lxc stop -f grp${grp}-ns1 >/dev/null 2>&1
-        lxc stop -f grp${grp}-ns2 >/dev/null 2>&1
-        echo "group $grp student authoritative servers stopped"
-    done
+    lxc list -c n --format csv \
+        | grep -E '^grp[0-9]+-soa$' \
+        | xargs -rt -n1 lxc stop    
+    lxc list -c n --format csv \
+        | grep -E '^grp[0-9]+-ns1$' \
+        | xargs -rt -n1 lxc stop    
+    lxc list -c n --format csv \
+        | grep -E '^grp[0-9]+-ns2$' \
+        | xargs -rt -n1 lxc stop    
     echo "---> all student authoritative servers stopped"
 }
 

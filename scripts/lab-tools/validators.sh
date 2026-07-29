@@ -17,7 +17,7 @@ delete_student_RPKI_validator () {
     echo "Deleting all student RPKI validators..."
     lxc list -c n --format csv \
         | grep -E '^grp[0-9]+-rpki$' \
-        | xargs -r -n1 lxc delete --force    
+        | xargs -rt -n1 lxc delete --force    
     echo "---> all student RPKI validators deleted"
 }
 
@@ -34,11 +34,9 @@ start_student_RPKI_validator () {
 
 stop_student_RPKI_validator () {
     echo "Stoping all student RPKI validators..."
-    for grp in $(seq 1 $NETWORKS)
-    do
-        lxc stop -f grp${grp}-rpki >/dev/null 2>&1
-        echo "group $grp student RPKI validator stopped"
-    done
+    lxc list -c n --format csv \
+        | grep -E '^grp[0-9]+-rpki$' \
+        | xargs -rt -n1 lxc stop
     echo "---> all student RPKI validators stopped"
 }
 

@@ -16,7 +16,7 @@ delete_student_clients () {
     echo "Deleting all student clients..."
     lxc list -c n --format csv \
         | grep -E '^grp[0-9]+-cli$' \
-        | xargs -r -n1 lxc delete --force    
+        | xargs -rt -n1 lxc delete --force    
     echo "---> all student clients deleted"
 }
 
@@ -35,11 +35,9 @@ start_student_clients () {
 
 stop_student_clients () {
     echo "Stopping all student clients..."
-    for grp in $(seq 1 $NETWORKS)
-    do
-        lxc stop -f grp${grp}-cli >/dev/null 2>&1
-        echo "group $grp student clinet stopped"
-    done
+    lxc list -c n --format csv \
+        | grep -E '^grp[0-9]+-cli$' \
+        | xargs -rt -n1 lxc stop    
     echo "---> all student clients stopped"
 }
 

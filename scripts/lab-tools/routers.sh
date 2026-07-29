@@ -21,7 +21,7 @@ delete_routers () {
     echo "Deleting all routers..."
     lxc list -c n --format csv \
         | grep -E '^grp[0-9]+-rtr$' \
-        | xargs -r -n1 lxc delete --force    
+        | xargs -rt -n1 lxc delete --force    
     echo "---> all routers deleted"
 }
 
@@ -43,12 +43,9 @@ start_routers () {
 
 stop_routers () {
     echo "Stopping all routers..."
-    for grp in $(seq 1 $NETWORKS)
-    do
-        lxc stop -f grp${grp}-rtr >/dev/null 2>&1
-        echo -n " grp$grp-rtr"
-    done
-    echo " "
+    lxc list -c n --format csv \
+        | grep -E '^grp[0-9]+-rtr$' \
+        | xargs -rt -n1 lxc stop    
     echo "---> all routers stopped"
 }
 

@@ -15,10 +15,10 @@ delete_student_resolvers () {
     echo "Deleting all student resolvers..."
     lxc list -c n --format csv \
         | grep -E '^grp[0-9]+-resolv1$' \
-        | xargs -r -n1 lxc delete --force    
+        | xargs -rt -n1 lxc delete --force    
     lxc list -c n --format csv \
         | grep -E '^grp[0-9]+-resolv2$' \
-        | xargs -r -n1 lxc delete --force    
+        | xargs -rt -n1 lxc delete --force    
     echo "---> all student resolvers deleted"
 }
 
@@ -39,12 +39,12 @@ start_student_resolvers () {
 
 stop_student_resolvers () {
     echo "Stoping all student resolvers..."
-    for grp in $(seq 1 $NETWORKS)
-    do
-        lxc stop -f grp${grp}-resolv1 >/dev/null 2>&1
-        lxc stop -f grp${grp}-resolv2 >/dev/null 2>&1
-        echo "group $grp student resolvers stopped"
-    done
+    lxc list -c n --format csv \
+        | grep -E '^grp[0-9]+-resolv1$' \
+        | xargs -rt -n1 lxc stop
+    lxc list -c n --format csv \
+        | grep -E '^grp[0-9]+-resolv2$' \
+        | xargs -rt -n1 lxc stop
     echo "---> all student resolvers stopped"
 }
 
