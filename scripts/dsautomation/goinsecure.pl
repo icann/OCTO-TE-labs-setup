@@ -3,49 +3,41 @@
 use strict;
 use warnings;
 
+if (@ARGV != 1) {
+    die "Usage: $0 <domain>\n";
+}
+
+my $zone       = $ARGV[0];
+
 my @delfiles = glob('/tmp/*.DEL');
 foreach my $file (@delfiles) {
-    print STDERR "Working on $file\n";
+    print STDERR "GOINSECURE: Working on $file\n";
 
     open(my $fh_in, "<", $file) or die "Can't open $file: $!";
     my $line = readline($fh_in);
-    print STDERR "Found domain: $line\n";
+    print STDERR "GOINSECURE: Found domain: $line\n";
     close($fh_in);
     rename $file, $file.".done";     # we worked through the file, remove it from queue
 
-    # get name name and value of the first ds record
-    my $action = "DELETE";
-    my $name = $line;
-    $name =~ s/\R//;
-       
-    # AWS requires to set in the current data to delete it.
-    my $DSdata = `aws route53 list-resource-record-sets --hosted-zone-id Z02099872PWMNFHNH52LL --query "ResourceRecordSets[?Name == 'grp1.cologne.te-labs.training.']" | jq '.[] | select(.Type == "DS")'`;
+    # create a temporary file for nsupdate commands
+    my ($fh_tmp, $tmpname) = tempfile();
 
-    # if no DS records were found jump to next file
-    if (!defined $DSdata || $DSdata  eq '') {
-        print STDERR "No DS records found for $name\n";
-        next;
+    # write nsupdate commands to the temporary file
+    print $fh_tmp "server $dns_server\n";
+    print $fh_tmp "zone $zone\n";
+    print $fh_tmp "update delete $name DS\n";
+    print $fh_tmp "send\n";
+    close($fh_tmp);
+
+    # run nsupdate with the temporary file
+    my $cmd = "nsupdate -k $tsig_key $tmpname";
+    print STDERR "GOINSECURE: Running: $cmd\n";
+    my $rc = system($cmd);
+
+    if ($rc != 0) {
+        die "GOINSECURE: nsupdate failed for $name, rc=$rc";
     }
 
-    # write aws data
-    open(my $fh_out, ">", $file.".TMP") or die "Can't open $file.TMP: $!";
-    print $fh_out <<EOF;
-{ 
-    "Comment": "$action DS records for $name",
-    "Changes": [
-        {
-            "Action": "$action",
-            "ResourceRecordSet": 
-EOF
-    print $fh_out $DSdata;
-    print $fh_out <<EOF;
-        }
-    ]
-}
-EOF
-    close($fh_out);
-    rename $file.".TMP", $file.".AWS";
-
     # done with this file
-    print STDERR "DONE file $file\n";
+    print STDERR "GOINSECURE: DONE file $file\n";
 }
