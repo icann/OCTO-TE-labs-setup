@@ -76,9 +76,6 @@ gen_student_resolvers_net_config () {
 }
 
 push_student_resolvers_net_config () {
-    echo "Creating password list file for student resolvers..."
-    touch /var/shellinabox/res-server-password-list.txt
-
     echo "Pushing all student resolvers net conf..."
     for grp in $(seq 1 $NETWORKS)
     do

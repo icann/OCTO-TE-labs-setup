@@ -12,4 +12,3 @@ $TTL    30
 @           TXT         "v=spf1 -all"
 ipv4only    A           %IPv4%
 ipv6only    AAAA        %IPv6%
-shellinabox CNAME       %DOMAIN%.

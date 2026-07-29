@@ -562,26 +562,6 @@ Resources:
       ResourceRecords: 
         - !GetAtt labInstanceIpv6.Ipv6Address
 
-  shellinabox:
-    DependsOn:
-      - dnsA
-      - dnsAAAA
-    Type: AWS::Route53::RecordSet
-    Properties:    
-      HostedZoneId: !Ref labZone
-      Name: !Join
-      - '.'
-      - - 'shellinabox'
-        - !Ref DnsName
-        - !Ref DnsParent
-      Type: CNAME
-      TTL: '300'
-      ResourceRecords: 
-        - !Join
-          - '.'
-          - - !Ref DnsName
-            - !Ref DnsParent
-
   labLambdaGetDsRole:
     Type: AWS::IAM::Role
     Properties:

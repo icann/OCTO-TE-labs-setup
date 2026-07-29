@@ -66,10 +66,6 @@ gen_student_clients_net_config () {
 }
 
 push_student_clients_net_config () {
-    # Creating "lan-client-password-list" file to store client passwords
-    # "lan-client-password-list" file will be stored in /var/shellinabox/lan-client-password-list.txt
-    touch /var/shellinabox/lan-client-password-list.txt
-
     echo "Pushing all student clients net conf..."
     for grp in $(seq 1 $NETWORKS)
     do

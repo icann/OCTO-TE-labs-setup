@@ -108,14 +108,6 @@ init_lab_VM () {
     snap install core
     snap refresh core
 
-    ## Install Shellinabox (to be able to access consoles from Internet using a browser)
-    apt-get -yq install shellinabox
-    systemctl stop shellinabox
-    cp ../configs/shellinabox/etc/default/shellinabox /etc/default/shellinabox
-    cp ../configs/shellinabox/usr/local/bin/dns-shell.pl /usr/local/bin/dns-shell.pl
-    chmod +x /usr/local/bin/dns-shell.pl
-    mkdir /var/shellinabox/
-
     ## Install Webssh (to be able to access consoles from Internet using a browser)
     apt-get -yq install python3-pip
     pip3 install pyopenssl --break-system-packages

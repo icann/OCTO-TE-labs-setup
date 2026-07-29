@@ -31,7 +31,6 @@ eval set -- "$TEMP"
 . ./lab-tools/nginx.sh
 . ./lab-tools/passwords.sh
 . ./lab-tools/routers.sh
-. ./lab-tools/shellinabox.sh
 . ./lab-tools/studentauth.sh
 . ./lab-tools/studentres.sh
 . ./lab-tools/tayga.sh
@@ -373,15 +372,12 @@ deploy () {
         create_instructions
     fi
     
-    recreate_svc_list
-
     # Clean /root/.shh/known_hosts
     rm -f /root/.ssh/known_hosts
     touch /root/.ssh/known_hosts
 
     start_nginx
     start_webssh
-    restart_shellinabox
 
     configure_cron
   

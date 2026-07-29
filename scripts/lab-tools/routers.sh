@@ -25,10 +25,6 @@ delete_routers () {
         echo "-- deleting grp$grp-rtr"
     done
     echo "---> all routers deleted"
-
-    # Deleting "router-password-list" file that stores router passwords
-    rm /var/shellinabox/router-password-list.txt
-    echo "/var/shellinabox/router-password-list.txt file that stores router passwords deleted!"
 }
 
 start_routers () {
@@ -76,10 +72,6 @@ gen_routers_net_config () {
 }
 
 push_routers_net_config () {
-    # Creating "router-password-list" file to store router passwords
-    # "router-password-list" file will be stored in /var/shellinabox/router-password-list.txt
-    touch /var/shellinabox/router-password-list.txt
-
     echo "Pushing all routers configs..."
     for grp in $(seq 1 $NETWORKS)
     do

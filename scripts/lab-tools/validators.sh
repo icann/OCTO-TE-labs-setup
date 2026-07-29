@@ -65,10 +65,6 @@ gen_student_RPKI_validator_net_config () {
 }
 
 push_student_RPKI_validator_net_config () {
-    # Creating "*-server-password-list" files to store servers passwords
-    # "*-server-password-list" files will be stored in /var/shellinabox/*-server-password-list.txt
-    touch /var/shellinabox/int-RPKI-validator-password-list.txt
-
     echo "Pushing all student RPKI validators net conf..."
     for grp in $(seq 1 $NETWORKS)
     do

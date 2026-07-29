@@ -45,10 +45,6 @@ gen_nginx_config () {
         -e "/#grpX_Locations/r $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt" \
         ../configs/nginx/etc/nginx/sites-available/domain > $nginxworkdir/etc/nginx/sites-available/$DOMAIN
 
-    # nginx configuration for SHELLINABOX virtual-host --> [/etc/nginx/sites-enabled/shellinabox.domain]
-    sed -e "s|%AuthDomain%|$DOMAIN|g" \
-    ../configs/nginx/etc/nginx/sites-available/shellinabox.domain > $nginxworkdir/etc/nginx/sites-available/shellinabox.$DOMAIN
-
     echo "---> nginx configuration generated"
 }
 
@@ -60,7 +56,6 @@ push_nginx_config () {
     cp ../configs/letsencrypt/etc/letsencrypt/options-ssl-nginx.conf /etc/letsencrypt/options-ssl-nginx.conf
     cp $nginxworkdir/etc/nginx/sites-available/default /etc/nginx/sites-available/default
     cp $nginxworkdir/etc/nginx/sites-available/$DOMAIN /etc/nginx/sites-available/$DOMAIN
-    cp $nginxworkdir/etc/nginx/sites-available/shellinabox.$DOMAIN /etc/nginx/sites-available/shellinabox.$DOMAIN
     echo "Content of /etc/nginx/sites-available/ is now:"
     ls -larth /etc/nginx/sites-available/
     echo " "
@@ -80,7 +75,6 @@ push_nginx_config () {
     echo "Creating symlinks for new virtual-hosts..."
     ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
     ln -sf /etc/nginx/sites-available/$DOMAIN /etc/nginx/sites-enabled/
-    ln -sf /etc/nginx/sites-available/shellinabox.$DOMAIN /etc/nginx/sites-enabled/
     echo "Symlinks for new virtual-hosts:"
     ls -larth /etc/nginx/sites-enabled/
     echo " "
@@ -92,27 +86,12 @@ push_nginx_config () {
     echo "Creating directories for all web content (if non existent)..."
     mkdir -p /var/www/default/html
     mkdir -p /var/www/$DOMAIN/html
-    mkdir -p /var/www/shellinabox.$DOMAIN/html
     echo "The followign directories were created under /var/www/:"
     tree -a /var/www/
     echo " "
 
     echo "---> nginx configuration pushed"
     echo " "
-}
-
-recreate_svc_list () {
-    # recreate the svc list to be able to access all containers via WEB
-    echo "Creating svc list (to be able to access all containers via WEB)"
-    lxc list -c n4 --format csv|grep grp |sed -e 's| (eth0)||' |sed -e :a -e 's/"//' -e "s|,|, https://shellinabox.$DOMAIN/?host=|" > /var/shellinabox/service-list.txt
-    echo " "
-
-    # Backup and delete current "/var/lib/shellinabox/.ssh/known_hosts" file (if exist) in order to clean all for new connections
-    echo "Backup and delete current --/var/lib/shellinabox/.ssh/known_hosts-- file in order to clean all for new connections"
-    [ -f /var/lib/shellinabox/.ssh/known_hosts ] && mv /var/lib/shellinabox/.ssh/known_hosts /var/lib/shellinabox/.ssh/known_hosts.bkp-"$(date +\%F_\%H-\%M-\%S)"
-    echo " "
-  
-    echo "---> Svc list created"
 }
 
 stop_nginx () {

@@ -89,9 +89,6 @@ gen_student_auth_net_config () {
 }
 
 push_student_auth_net_config () {
-    echo "Creating password list file for student authoritative servers..."
-    touch /var/shellinabox/auth-server-password-list.txt
-
     echo "Pushing all student authoritative servers net conf..."
     for grp in $(seq 1 $NETWORKS)
     do
