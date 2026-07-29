@@ -94,11 +94,9 @@ push_routers_net_config () {
         lxc exec grp$grp-rtr -- sh -c 'service frr restart'
 
         # Generating random password for user "rtradm"
-        password=$(openssl rand -base64 14)
+        password=$(get_grp_password $grp)
         # Pushing password to router container
         lxc exec grp$grp-rtr -- sh -c "echo rtradm:$password | /usr/sbin/chpasswd"
-        # Appending router password to "router-password-list" file
-        echo grp$grp-rtr,$password >> /var/shellinabox/router-password-list.txt
         echo "-- Generated rtradm grp$grp-rtr password is: $password"
 
         echo "-- grp$grp-rtr done"

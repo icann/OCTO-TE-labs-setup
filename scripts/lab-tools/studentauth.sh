@@ -20,8 +20,6 @@ delete_student_auth () {
         lxc delete grp${grp}-ns1 2>/dev/null
         lxc delete grp${grp}-ns2 2>/dev/null
     done
-    echo "Deleting student authoritative servers password list"
-    rm /var/shellinabox/auth-server-password-list.txt
     echo "---> all student authoritative servers deleted"
 }
 
@@ -127,17 +125,14 @@ push_student_auth_net_config () {
         echo "Servers net conf push for group $grp done"
 
         # Generating random password for user "sysadm"
-        password=$(openssl rand -base64 14)
+        password=$(get_grp_password $grp)
     
         # Pushing password to server containers and appending client password to "auth-server-password-list" file
         lxc exec grp$grp-soa -- sh -c "echo sysadm:$password | /usr/sbin/chpasswd"
-        echo grp$grp-soa,$password >> /var/shellinabox/auth-server-password-list.txt
         echo "Generated sysadm grp$grp-soa password is: $password"
         lxc exec grp$grp-ns1 -- sh -c "echo sysadm:$password | /usr/sbin/chpasswd"
-        echo grp$grp-ns1,$password >> /var/shellinabox/auth-server-password-list.txt
         echo "Generated sysadm grp$grp-ns1 password is: $password"
         lxc exec grp$grp-ns2 -- sh -c "echo sysadm:$password | /usr/sbin/chpasswd"
-        echo grp$grp-ns2,$password >> /var/shellinabox/auth-server-password-list.txt
         echo "Generated sysadm grp$grp-ns2 password is: $password"
     done
     echo "---> all student authoritative servers net conf pushed"

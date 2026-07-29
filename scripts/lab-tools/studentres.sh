@@ -19,10 +19,6 @@ delete_student_resolvers () {
         lxc delete grp${grp}-resolv2 2>/dev/null
     done
     echo "---> all student resolvers deleted"
-
-    echo "Deleting student resolvers password list"
-    rm /var/shellinabox/res-server-password-list.txt
-    echo "---> all student resolvers deleted"
 }
 
 start_student_resolvers () {
@@ -107,16 +103,13 @@ push_student_resolvers_net_config () {
         echo "resolvers net conf push for group $grp done"
 
         # Generating random password for user "sysadm"
-        password=$(openssl rand -base64 14)
+        password=$(get_grp_password $grp)
     
         # Pushing password to server containers and appending client password to "res-server-password-list" file
         lxc exec grp$grp-resolv1 -- sh -c "echo sysadm:$password | /usr/sbin/chpasswd"
-        echo grp$grp-resolv1,$password >> /var/shellinabox/res-server-password-list.txt
-        echo "Generted sysadm grp$grp-resolv1 password is: $password"
-    
+        echo "Generated sysadm grp$grp-resolv1 password is: $password"
         lxc exec grp$grp-resolv2 -- sh -c "echo sysadm:$password | /usr/sbin/chpasswd"
-        echo grp$grp-resolv2,$password >> /var/shellinabox/res-server-password-list.txt
-        echo "Generted sysadm grp$grp-resolv2 password is: $password"
+        echo "Generated sysadm grp$grp-resolv2 password is: $password"
     done
     echo "---> all student resolvers net conf pushed"
 }

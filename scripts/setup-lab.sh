@@ -29,6 +29,7 @@ eval set -- "$TEMP"
 . ./lab-tools/letsencrypt.sh
 . ./lab-tools/networks.sh
 . ./lab-tools/nginx.sh
+. ./lab-tools/passwords.sh
 . ./lab-tools/routers.sh
 . ./lab-tools/shellinabox.sh
 . ./lab-tools/studentauth.sh
@@ -277,7 +278,6 @@ deploy () {
     mkdir -p $nginxworkdir
     mkdir -p $nginxworkdir/etc/nginx/sites-available
     mkdir -p $nginxworkdir/etc/nginx/htpasswd
-    webuserpasswd=$(openssl rand -base64 14)
 
     contentworkdir=$workdir/www
     mkdir -p $contentworkdir/$DOMAIN
@@ -285,6 +285,7 @@ deploy () {
     echo " "
     echo "---> Recreating environment"
 
+    create_passwords
     create_networks
     create_routers
     create_authns
@@ -388,11 +389,6 @@ deploy () {
     if [ -d $workdir ]; then
         rm -rf $workdir
     fi
-
-    # Make group passwords easily acceissible to user ubuntu
-    echo "labuser    $webuserpasswd" > /home/ubuntu/grouppasswords.txt
-    sed -E 's/(grp[0-9]+)-rtr,/\1    /'  /var/shellinabox/router-password-list.txt >> /home/ubuntu/grouppasswords.txt
-    chown ubuntu:ubuntu /home/ubuntu/grouppasswords.txt
 
     # Done - Report Success
     echo "---> Environment is up !"

@@ -20,10 +20,6 @@ delete_student_RPKI_validator () {
         lxc delete grp${grp}-rpki 2>/dev/null
     done
     echo "---> all student RPKI validators deleted"
-
-    # Deleting "*-RPKI-validator-password-list" files that stores RPKI validators passwords
-    rm /var/shellinabox/int-RPKI-validator-password-list.txt
-    echo "/var/shellinabox/*-RPKI-validator-password-list.txt files that stores RPKI validators passwords deleted!"
 }
 
 start_student_RPKI_validator () {
@@ -85,13 +81,13 @@ push_student_RPKI_validator_net_config () {
         echo "RPKI validator net conf push for group $grp done"
 
         # Generating random password for user "sysadm"
-        password=$(openssl rand -base64 14)
+        password=$(get_grp_password $grp)
     
         # Pushing password to RPKI validator containers and appending password to "int-RPKI-validator-password-list" file
         lxc exec grp$grp-rpki -- sh -c "echo sysadm:$password | /usr/sbin/chpasswd"
-        echo grp$grp-rpki,$password >> /var/shellinabox/int-RPKI-validator-password-list.txt
         echo "Generated sysadm grp$grp-rpki password is: $password"
     done
+    echo "---> all student RPKI validators net conf pushed"
 }
 
 push_student_RPKI_validator_files () {

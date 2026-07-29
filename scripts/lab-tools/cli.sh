@@ -19,10 +19,6 @@ delete_student_clients () {
         lxc delete grp${grp}-cli 2>/dev/null
     done
     echo "---> all student clients deleted"
-
-    # Deleting "lan-client-password-list" file that stores client passwords
-    rm /var/shellinabox/lan-client-password-list.txt
-    echo "/var/shellinabox/lan-client-password-list.txt file that stores celint passwords deleted!"
 }
 
 start_student_clients () {
@@ -98,11 +94,10 @@ push_student_clients_net_config () {
         echo "Clients net conf push for group $grp done"
 
         # Generating random password for user "sysadm"
-        password=$(openssl rand -base64 14)
+        password=$(get_grp_password $grp)
         # Pushing password to client container
         lxc exec grp$grp-cli -- sh -c "echo sysadm:$password | /usr/sbin/chpasswd"
-        # Appending client password to "lan-client-password-list" file
-        echo grp$grp-cli,$password >> /var/shellinabox/lan-client-password-list.txt
         echo "Generated sysadm grp$grp-cli password is: $password"
     done
+    echo "---> all student clients net conf pushed"
 }

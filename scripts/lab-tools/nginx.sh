@@ -12,18 +12,18 @@ gen_nginx_config () {
         ../configs/nginx/etc/nginx/nginx.conf > $nginxworkdir/etc/nginx/nginx.conf
 
     # htpasswd file for webssh
-    htpasswd -bc $nginxworkdir/etc/nginx/htpasswd/webssh labuser $webuserpasswd
+    htpasswd -bc $nginxworkdir/etc/nginx/htpasswd/webssh labuser $(get_labuser_password)
 
     touch $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
     grp=1
     for grp in $(seq 1 $NETWORKS)
     do
         # Read grpX password from "routers" password file (grpX-rtr)
-        passwd4grp=$(awk -v dev="grp$grp-rtr" -F"," '$1==dev {print $2}' /var/shellinabox/router-password-list.txt)
+        passwd4grp=$(get_grp_password $grp)
 
         # Create the file for storing grpX username and password
         htpasswd -bc $nginxworkdir/etc/nginx/htpasswd/htpasswd_grp$grp grp$grp $passwd4grp
-        htpasswd -b $nginxworkdir/etc/nginx/htpasswd/htpasswd_grp$grp labuser $webuserpasswd
+        htpasswd -b $nginxworkdir/etc/nginx/htpasswd/htpasswd_grp$grp labuser $(get_labuser_password)
 
         # Adding group password to webssh
         htpasswd -b $nginxworkdir/etc/nginx/htpasswd/webssh grp$grp $passwd4grp

@@ -29,11 +29,12 @@ create_web_content () {
     for grp in $(seq 1 $NETWORKS)
     do
         mkdir -p $contentworkdir/$DOMAIN/grp$grp
-
+        password=$(get_grp_password $grp | base64)
+        
         if [ "$StudentClients" = "YES" ]; then
             IPv4cli=100.100.$grp.2
             user4cli=sysadm
-            passwd4cli=$(awk -v dev="grp$grp-cli" -F"," '$1==dev {print $2}' /var/shellinabox/lan-client-password-list.txt | base64)
+            passwd4cli=$password
         else
             IPv4cli=""
             user4cli=""
@@ -42,10 +43,10 @@ create_web_content () {
         if [ "$StudentResolvers" = "YES" ]; then
             IPv4resolv1=100.100.$grp.67
             user4resolv1=sysadm
-            passwd4resolv1=$(awk -v dev="grp$grp-resolv1" -F"," '$1==dev {print $2}' /var/shellinabox/res-server-password-list.txt | base64)
+            passwd4resolv1=$password
             IPv4resolv2=100.100.$grp.68
             user4resolv2=sysadm
-            passwd4resolv2=$(awk -v dev="grp$grp-resolv2" -F"," '$1==dev {print $2}' /var/shellinabox/res-server-password-list.txt | base64)
+            passwd4resolv2=$password
         else
             IPv4resolv1=""
             user4resolv1=""
@@ -57,13 +58,13 @@ create_web_content () {
         if [ "$StudentAuth" = "YES" ]; then
             IPv4soa=100.100.$grp.66
             user4soa=sysadm
-            passwd4soa=$(awk -v dev="grp$grp-soa" -F"," '$1==dev {print $2}' /var/shellinabox/auth-server-password-list.txt | base64)
+            passwd4soa=$password
             IPv4ns1=100.100.$grp.130
             user4ns1=sysadm
-            passwd4ns1=$(awk -v dev="grp$grp-ns1" -F"," '$1==dev {print $2}' /var/shellinabox/auth-server-password-list.txt | base64)
+            passwd4ns1=$password
             IPv4ns2=100.100.$grp.131
             user4ns2=sysadm
-            passwd4ns2=$(awk -v dev="grp$grp-ns2" -F"," '$1==dev {print $2}' /var/shellinabox/auth-server-password-list.txt | base64)
+            passwd4ns2=$password
         else
             IPv4soa=""
             user4soa=""
@@ -78,7 +79,7 @@ create_web_content () {
         if [ "$StudentRPKIvalidator" = "YES" ]; then
             IPv4rpki=100.100.$grp.70
             user4rpki=sysadm
-            passwd4rpki=$(awk -v dev="grp$grp-rpki" -F"," '$1==dev {print $2}' /var/shellinabox/int-RPKI-validator-password-list.txt | base64)
+            passwd4rpki=$password
         else   
             IPv4rpki=""
             user4rpki=""
@@ -87,7 +88,7 @@ create_web_content () {
 
         IPv4rtr=100.64.1.$grp
         user4rtr=rtradm
-        passwd4rtr=$(awk -v dev="grp$grp-rtr" -F"," '$1==dev {print $2}' /var/shellinabox/router-password-list.txt | base64)
+        passwd4rtr=$password
 
         # copy web pages template to content workdir and replace variables with values
         cp ../configs/www/var/www/html/index.php $contentworkdir/$DOMAIN/grp$grp/
