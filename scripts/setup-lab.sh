@@ -395,12 +395,8 @@ deploy () {
     echo
     echo "================ Lab setup is ready ! ==================="
     echo
-    echo "Password files for each group container are in the following files:"
-    echo "/var/shellinabox/router-password-list.txt"
-    echo "/var/shellinabox/lan-client-password-list.txt"
-    echo "/var/shellinabox/int-server-password-list.txt"
-    echo "/var/shellinabox/int-RPKI-validator-password-list.txt"
-    echo "/home/ubuntu/grouppasswords.txt"
+    echo "Passwords for each group are in the following file:"
+    echo $PASSWORD_FILE
     echo
     echo "===================== DEPLOY DONE ======================="  
 }
