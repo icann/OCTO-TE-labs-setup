@@ -14,12 +14,15 @@ create_student_auth () {
 
 delete_student_auth () {
     echo "Deleting all student authoritative servers..."
-    for grp in $(seq 1 $NETWORKS)
-    do
-        lxc delete grp${grp}-soa 2>/dev/null
-        lxc delete grp${grp}-ns1 2>/dev/null
-        lxc delete grp${grp}-ns2 2>/dev/null
-    done
+    lxc list -c n --format csv \
+        | grep -E '^grp[0-9]+-soa$' \
+        | xargs -r -n1 lxc delete --force    
+    lxc list -c n --format csv \
+        | grep -E '^grp[0-9]+-ns1$' \
+        | xargs -r -n1 lxc delete --force    
+    lxc list -c n --format csv \
+        | grep -E '^grp[0-9]+-ns2$' \
+        | xargs -r -n1 lxc delete --force    
     echo "---> all student authoritative servers deleted"
 }
 

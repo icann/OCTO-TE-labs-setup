@@ -14,10 +14,9 @@ create_student_clients () {
 
 delete_student_clients () {
     echo "Deleting all student clients..."
-    for grp in $(seq 1 $NETWORKS)
-    do
-        lxc delete grp${grp}-cli 2>/dev/null
-    done
+    lxc list -c n --format csv \
+        | grep -E '^grp[0-9]+-cli$' \
+        | xargs -r -n1 lxc delete --force    
     echo "---> all student clients deleted"
 }
 

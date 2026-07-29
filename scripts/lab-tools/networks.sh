@@ -16,12 +16,17 @@ create_networks () {
 
 delete_networks () {
     echo "Deleting all networks..."
-    for grp in $(seq 1 $NETWORKS)
-    do
-        lxc network delete grp${grp}-lan 
-        lxc network delete grp${grp}-int
-        lxc network delete grp${grp}-dmz
-        lxc network delete grp${grp}-extra
-    done
+    lxc list -c n --format csv \
+        | grep -E '^grp[0-9]+-lan$' \
+        | xargs -r -n1 lxc network delete --force    
+    lxc list -c n --format csv \
+        | grep -E '^grp[0-9]+-int$' \
+        | xargs -r -n1 lxc network delete --force    
+    lxc list -c n --format csv \
+        | grep -E '^grp[0-9]+-dmz$' \
+        | xargs -r -n1 lxc network delete --force    
+    lxc list -c n --format csv \
+        | grep -E '^grp[0-9]+-extra$' \
+        | xargs -r -n1 lxc network delete --force    
     echo "---> all networks deleted"
 }

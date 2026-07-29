@@ -19,11 +19,9 @@ create_routers () {
 
 delete_routers () {
     echo "Deleting all routers..."
-    for grp in $(seq 1 $NETWORKS)
-    do
-        lxc delete grp${grp}-rtr 2>/dev/null
-        echo "-- deleting grp$grp-rtr"
-    done
+    lxc list -c n --format csv \
+        | grep -E '^grp[0-9]+-rtr$' \
+        | xargs -r -n1 lxc delete --force    
     echo "---> all routers deleted"
 }
 

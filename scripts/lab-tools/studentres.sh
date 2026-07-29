@@ -13,11 +13,12 @@ create_student_resolvers () {
 
 delete_student_resolvers () {
     echo "Deleting all student resolvers..."
-    for grp in $(seq 1 $NETWORKS)
-    do
-        lxc delete grp${grp}-resolv1 2>/dev/null
-        lxc delete grp${grp}-resolv2 2>/dev/null
-    done
+    lxc list -c n --format csv \
+        | grep -E '^grp[0-9]+-resolv1$' \
+        | xargs -r -n1 lxc delete --force    
+    lxc list -c n --format csv \
+        | grep -E '^grp[0-9]+-resolv2$' \
+        | xargs -r -n1 lxc delete --force    
     echo "---> all student resolvers deleted"
 }
 
