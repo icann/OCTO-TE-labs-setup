@@ -84,6 +84,8 @@ push_ds() {
     local tmpdir dnskey_file ksk_dnskey_file ds_file ds_values_file change_file change_id
     local parent_fqdn domain_fqdn
 
+    apt install -yq bind9-utils jq
+
     parent_fqdn="${PARENT%.}."
     domain_fqdn="${DOMAIN%.}."
 
@@ -114,7 +116,7 @@ push_ds() {
     ds_values_file="$tmpdir/ds-values.txt"
     change_file="$tmpdir/change-batch.json"
 
-    dig @100.6.0.54 +noall +answer "$domain_fqdn" DNSKEY > "$dnskey_file"
+    dig @100.64.0.54 +noall +answer "$domain_fqdn" DNSKEY > "$dnskey_file"
 
     if [[ ! -s "$dnskey_file" ]]; then
         echo "No DNSKEY answers returned for $domain_fqdn" >&2
