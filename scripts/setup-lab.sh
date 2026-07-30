@@ -246,7 +246,6 @@ deploy () {
     echo "DOMAIN=$DOMAIN"
     echo "IPv4ServerAddr=$IPv4ServerAddr"
     echo "IPv6ServerAddr=$IPv6ServerAddr"
-    echo "ZONEID=$ZONEID"
     echo "LABTYPE=$LABTYPE"
     echo "NETWORKS=$NETWORKS"
     echo "IPv6prefix=$IPv6prefix"
@@ -387,8 +386,11 @@ deploy () {
     fi
 
     # Push DS to parent
-    push_ds || { echo "PUSH DS failed" >&2 }
-    
+    push_ds || { 
+        echo "PUSH DS failed" >&2 
+        exit 1
+    }
+
     # Done - Report Success
     echo "---> Environment is up !"
     echo

@@ -248,13 +248,11 @@ Resources:
         Statement:
           - Effect: Allow
             Action:
+              - "route53:ListHostedZonesByName"
               - "route53:ChangeResourceRecordSets"
               - "route53:ListResourceRecordSets"
-            Resource:
-              - !Join
-                - ''
-                - - "arn:aws:route53:::hostedzone/"
-                  - !Ref DnsParent
+              - "route53:GetChange"
+            Resource: '*'
       Roles:
         - !Ref labInstanceRole
 
@@ -376,11 +374,7 @@ Resources:
           Action:
           - sts:AssumeRole
       Path: "/"
-      Policies:
-      - PolicyName: !Join
-        - '-'
-        - - !Ref 'AWS::StackName'
-          - 'lambdaPolicy'
+      Policies: !Sub '${AWS::StackName}-lambdaPolicy'
         PolicyDocument:
           Version: '2012-10-17'
           Statement:

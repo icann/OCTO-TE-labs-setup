@@ -24,6 +24,7 @@ create_authns () {
 
     # configure authoritative DNS
     lxc exec authns -- sh -c 'apt install -qy bind9'
+    lxc file push ../configs/authns/nsupdate.key authns/etc/bind/nsupdate.key
     sed -e "s/%DOMAIN%/${DOMAIN}/g" \
         -e "s/%IPv4%/${IPv4ServerAddr}/g" \
         -e "s/%IPv6%/${IPv6ServerAddr}/g" \
@@ -113,7 +114,7 @@ push_ds() {
     ds_values_file="$tmpdir/ds-values.txt"
     change_file="$tmpdir/change-batch.json"
 
-    dig +dnssec +multi +noall +answer "$domain_fqdn" DNSKEY > "$dnskey_file"
+    dig @100.6.0.54 +noall +answer "$domain_fqdn" DNSKEY > "$dnskey_file"
 
     if [[ ! -s "$dnskey_file" ]]; then
         echo "No DNSKEY answers returned for $domain_fqdn" >&2
@@ -132,7 +133,7 @@ push_ds() {
         return 1
     fi
 
-    dnssec-dsfromkey -2 "$ksk_dnskey_file" > "$ds_file"
+    dnssec-dsfromkey -2 -f "$ksk_dnskey_file" "$DOMAIN"> "$ds_file"
 
     if [[ ! -s "$ds_file" ]]; then
         echo "Failed to compute DS records from KSK DNSKEY records" >&2
