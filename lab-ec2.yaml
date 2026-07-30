@@ -360,10 +360,7 @@ Resources:
   labLambdaGetIntstanceIpv6Role:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Join
-      - '-'
-      - - !Ref 'AWS::StackName'
-        - 'labLambdaGetIntstanceIpv6Role'
+      RoleName: !Sub '${AWS::StackName}-labLambdaGetIntstanceIpv6Role'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
