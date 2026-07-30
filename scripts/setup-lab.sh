@@ -386,6 +386,9 @@ deploy () {
         rm -rf $workdir
     fi
 
+    # Push DS to parent
+    push_ds || { echo "PUSH DS failed" >&2 }
+    
     # Done - Report Success
     echo "---> Environment is up !"
     echo
