@@ -374,7 +374,8 @@ Resources:
           Action:
           - sts:AssumeRole
       Path: "/"
-      Policies: !Sub '${AWS::StackName}-lambdaPolicy'
+      Policies: 
+      - PolicyName: !Sub '${AWS::StackName}-lambdaPolicy'
         PolicyDocument:
           Version: '2012-10-17'
           Statement:
