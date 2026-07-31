@@ -8,7 +8,7 @@ $TTL    30
 @           A           %IPv4%
 @           AAAA        %IPv6%
 @           MX          0 .
-@           NS          %DOMAIN%.
+@           NS          ns.%DOMAIN%.
 @           TXT         "v=spf1 -all"
 ipv4only    A           %IPv4%
 ipv6only    AAAA        %IPv6%
