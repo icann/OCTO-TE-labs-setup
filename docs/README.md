@@ -10,7 +10,7 @@
 
 The **OCTO-TE Labs Architecture & Engineering Handbook** is the primary engineering reference for the OCTO-TE Labs platform.
 
-It documents the platform architecture, engineering principles, technical decisions, implementation model, and accumulated engineering knowledge.
+It documents the platform architecture, engineering principles, technical decisions, implementation model, future design, and accumulated engineering knowledge.
 
 The Handbook evolves together with the platform and serves as the authoritative technical reference for engineers, maintainers, instructors, and contributors.
 
@@ -37,7 +37,8 @@ The Handbook follows a defined set of engineering principles:
 - Engineering decisions are documented.
 - Architecture remains independent from implementation.
 - Documentation is based on verified behavior whenever possible.
-- A document is created only when enough stable content exists to justify it.
+- Documents normally exist only when enough stable content is available.
+- Draft placeholders may be created when their purpose and planned scope are clear.
 
 Detailed engineering principles are documented in:
 
@@ -55,14 +56,19 @@ The documentation is organized into six complementary sections.
 
 Describes the platform and its architectural model.
 
-Current contents include:
+Current and planned subjects include:
 
 - Architecture Map
 - Platform Overview
+- Deployment Flow
+- Orchestration Architecture
+- Network Topology
+- DNS Capabilities
+- Routing Capabilities
+- Platform Services
+- Current Implementation
 - Engineering Principles
 - Knowledge Base
-
-Additional architecture documents are created as the implementation is analyzed and verified.
 
 ---
 
@@ -70,17 +76,17 @@ Additional architecture documents are created as the implementation is analyzed 
 
 Contains stable technical reference information.
 
-Potential subjects include:
+Subjects include:
 
-- laboratory profiles;
-- naming conventions;
-- network addressing;
-- AWS resources;
-- ports;
-- acronyms;
-- software stack.
-
-Reference documents are created only when verified information is available.
+- Laboratory profiles and types
+- Container naming
+- Network addressing
+- DNS naming
+- AWS resources and services
+- Ports and protocols
+- Acronyms
+- Container platform
+- Software stack
 
 ---
 
@@ -88,12 +94,13 @@ Reference documents are created only when verified information is available.
 
 Documents proposed future architectural evolution.
 
-Potential subjects include:
+Subjects include:
 
-- Architecture Candidates;
-- future capabilities;
-- future orchestration;
-- future modularization.
+- Architecture Candidates
+- Future capabilities
+- Future orchestration
+- Future modularity
+- Future routing architecture
 
 Design documents describe proposals rather than the current implementation.
 
@@ -105,9 +112,11 @@ Tracks engineering work and project evolution.
 
 Current contents include:
 
-- Engineering Log;
-- Engineering Backlog;
-- Engineering Roadmap.
+- Engineering Log
+- Engineering Backlog
+- Engineering Roadmap
+- Engineering Ideas
+- Immediate Engineering Tasks
 
 ---
 
@@ -123,7 +132,7 @@ Every significant architectural decision should be documented as an ADR.
 
 Contains architecture and engineering diagrams referenced by the Handbook.
 
-Diagrams are created when they provide meaningful support for verified documentation.
+Diagrams complement the written documentation and do not replace it.
 
 ---
 
@@ -173,12 +182,19 @@ Every Handbook document uses one of the following states:
 
 | Status | Description |
 |---|---|
-| Draft | Initial version under development |
+| Draft | Initial version or placeholder under development |
 | In Review | Under technical review |
 | Approved | Accepted as the current reference |
 | Deprecated | Preserved for historical reasons |
 
-A planned document that has not yet been created does not have a document status.
+A placeholder document may use the `Draft` status when:
+
+- its purpose is clear;
+- its planned scope is documented;
+- the engineering work expected to complete it is identified;
+- the document is not left empty.
+
+A placeholder may later be renamed, merged, replaced, or removed if engineering evidence shows that a different structure is more appropriate.
 
 ---
 
@@ -199,8 +215,44 @@ A planned document that has not yet been created does not have a document status
 |---|---|
 | Architecture Map | In Review |
 | Platform Overview | In Review |
+| Deployment Flow | Draft |
+| Orchestration Architecture | Draft |
+| Network Topology | Draft |
+| DNS Capabilities | Draft |
+| Routing Capabilities | Draft |
+| Platform Services | Draft |
+| Current Implementation | Draft |
 | Engineering Principles | In Review |
 | Knowledge Base | In Review |
+
+---
+
+## Reference
+
+| Document | Status |
+|---|---|
+| Acronyms | Draft |
+| AWS Resources | Draft |
+| AWS Services | Draft |
+| Container Naming | Draft |
+| DNS Naming | Draft |
+| Laboratory Profiles and Types | Draft |
+| Container Platform Reference | Draft |
+| Network Addressing | Draft |
+| Ports and Protocols | Draft |
+| Software Stack | Draft |
+
+---
+
+## Design
+
+| Document | Status |
+|---|---|
+| Architecture Candidates | In Review |
+| Future Capabilities | Draft |
+| Future Modularity | Draft |
+| Future Orchestrator | Draft |
+| Future Routing Architecture | Draft |
 
 ---
 
@@ -211,6 +263,8 @@ A planned document that has not yet been created does not have a document status
 | Engineering Log | In Review |
 | Engineering Backlog | In Review |
 | Engineering Roadmap | In Review |
+| Engineering Ideas | Draft |
+| Immediate Engineering Tasks | Draft |
 
 ---
 
@@ -222,46 +276,12 @@ A planned document that has not yet been created does not have a document status
 
 ---
 
-# Planned Documentation
-
-The following documents are expected to be created as evidence becomes available during the corresponding engineering work.
-
-## Architecture
-
-- Deployment Flow
-- Orchestrator
-- Network Topology
-- DNS Capabilities
-- Routing Capabilities
-- Platform Services
-- Current Implementation
-
-## Reference
-
-- Laboratory profiles
-- Container naming
-- Network addressing
-- DNS naming
-- AWS resources and services
-- Ports
-- Acronyms
-- Container platform
-- Software stack
-
-## Design
-
-- Future routing model
-- Future orchestration model
-- Future capabilities
-- Future modularity
-
 ## Diagrams
 
-- Deployment flow
-- Network topology
-- Additional architecture and capability diagrams as required
-
-Planned documents are not created until sufficient stable and verified content exists.
+| Document | Status |
+|---|---|
+| Deployment Flow Diagram | Draft |
+| Network Topology Diagram | Draft |
 
 ---
 
@@ -289,7 +309,7 @@ Planned documents are not created until sufficient stable and verified content e
 
 Current objective:
 
-Analyze and document the complete lifecycle of the platform, beginning with deployment and continuing through participant access.
+Analyze and document the complete lifecycle of the platform, beginning with infrastructure deployment and continuing through participant access.
 
 ---
 
@@ -302,6 +322,7 @@ The Handbook intentionally separates:
 - engineering knowledge;
 - engineering decisions;
 - future design;
+- reference information;
 - development activity.
 
 This separation allows each artifact to evolve independently while maintaining a coherent engineering model.
