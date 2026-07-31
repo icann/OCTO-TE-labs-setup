@@ -2,12 +2,15 @@
 
 use strict;
 use warnings;
+use File::Temp qw(tempfile);
 
 if (@ARGV != 1) {
     die "Usage: $0 <domain>\n";
 }
 
 my $zone       = $ARGV[0];
+my $dns_server = '100.64.0.54';
+my $tsig_key   = 'hmac-sha256:nsupdate.key:86TjST9U6vQz07LCzet/EZ4cVoL5A4CsX92uJIQbWsQ=';
 
 my @delfiles = glob('/tmp/*.DEL');
 foreach my $file (@delfiles) {
@@ -25,17 +28,17 @@ foreach my $file (@delfiles) {
     # write nsupdate commands to the temporary file
     print $fh_tmp "server $dns_server\n";
     print $fh_tmp "zone $zone\n";
-    print $fh_tmp "update delete $name DS\n";
+    print $fh_tmp "update delete $line DS\n";
     print $fh_tmp "send\n";
     close($fh_tmp);
 
     # run nsupdate with the temporary file
-    my $cmd = "nsupdate -k $tsig_key $tmpname";
-    print STDERR "GOINSECURE: Running: $cmd\n";
+    my $cmd = "nsupdate -y $tsig_key $tmpname";
     my $rc = system($cmd);
-
     if ($rc != 0) {
-        die "GOINSECURE: nsupdate failed for $name, rc=$rc";
+        die "GOINSECURE: nsupdate failed for $line, rc=$rc";
+    } else {
+        print STDERR "GOINSECURE: DS for $line removed from zone $zone\n";
     }
 
     # done with this file

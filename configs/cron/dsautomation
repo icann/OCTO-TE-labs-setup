@@ -2,10 +2,7 @@
 *   * * * *   root   /root/scripts/dsautomation/dsupdate.pl %DOMAIN% 2>&1 | logger
 
 # converting CDS record files to AWS format
-*   * * * *   root   /root/scripts/dsautomation/cdsupdate.pl %DOMAIN% 2>&1 | logger
-
-# Scanning for CDS records for all deployed groups
-*/2 * * * *   root   /root/scripts/dsautomation/getcds.pl %DOMAIN% %NETWORKS% 2>&1 | logger
+*   * * * *   root   /root/scripts/dsautomation/cdsupdate.pl %DOMAIN% %NETWORKS% 2>&1 | logger
 
 # going insecure
 *   * * * *   root   /root/scripts/dsautomation/goinsecure.pl %DOMAIN% 2>&1 | logger

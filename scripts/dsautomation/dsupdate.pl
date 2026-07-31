@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use File::Temp qw(tempfile);
 
 if (@ARGV != 1) {
     die "Usage: $0 <domain>\n";
@@ -9,8 +10,7 @@ if (@ARGV != 1) {
 
 my $zone       = $ARGV[0];
 my $dns_server = '100.64.0.54';
-my $ttl        = 30;
-my $tsig_key   = '/etc/bind/nsupdate.key';
+my $tsig_key   = 'hmac-sha256:nsupdate.key:86TjST9U6vQz07LCzet/EZ4cVoL5A4CsX92uJIQbWsQ=';
 
 my @dsfiles = glob('/tmp/*.DS');
 foreach my $file (@dsfiles) {
@@ -21,7 +21,7 @@ foreach my $file (@dsfiles) {
     open(my $fh_in, "<", $file) or die "Can't open $file: $!";
     while (my $line = readline($fh_in)) {
         if ($line =~ m/^\s*(\S+\s+\d*\s*IN\s+DS\s+\d+\s+\d+\s+\d+[0-9A-Za-z ]+)\s*$/) {
-            print STDERR "DSUPDATE: DS record found.\n";
+            print STDERR "DSUPDATE: DS record found. $line\n";
             push @ds, $1;
         }
     }
@@ -49,19 +49,19 @@ foreach my $file (@dsfiles) {
     for my $rr (@ds) {
         $rr =~ m/^\S+\s+\d*\s*IN\s+DS\s+(\d+\s+\d+\s+\d+[0-9A-Za-z ]+)$/ or next;
         my $value = $1;
-        print $fh_tmp "update add $name $ttl DS $value\n";
+        print $fh_tmp "update add $name 30 DS $value\n";
     }
 
     print $fh_tmp "send\n";
     close($fh_tmp);
 
     # run nsupdate with the temporary file
-    my $cmd = "nsupdate -k $tsig_key $tmpname";
-    print STDERR "DSUPDATE: Running: $cmd\n";
+    my $cmd = "nsupdate -y $tsig_key $tmpname";
     my $rc = system($cmd);
-
     if ($rc != 0) {
         die "DSUPDATE: nsupdate failed for $name, rc=$rc";
+    } else {
+        print STDERR "DSUPDATE: DS RR set for $name updated in zone $zone\n";
     }
 
     print STDERR "DSUPDATE: DONE file $file\n";
