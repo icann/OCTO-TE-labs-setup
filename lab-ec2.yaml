@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'ICANN OCTO-TE EC2 Lab stack'
+Description: 'ICANN OCTO-TE EC2 Lab stack (nico)'
 Parameters:
   DnsParent:
     Type: String
