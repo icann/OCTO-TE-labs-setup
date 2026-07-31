@@ -10,7 +10,7 @@ if (@ARGV != 1) {
 
 my $zone       = $ARGV[0];
 my $dns_server = '100.64.0.54';
-my $tsig_key   = 'hmac-sha256:nsupdate.key:86TjST9U6vQz07LCzet/EZ4cVoL5A4CsX92uJIQbWsQ=";
+my $tsig_key   = 'hmac-sha256:nsupdate.key:86TjST9U6vQz07LCzet/EZ4cVoL5A4CsX92uJIQbWsQ=';
 
 my @dsfiles = glob('/tmp/*.DS');
 foreach my $file (@dsfiles) {
@@ -56,7 +56,7 @@ foreach my $file (@dsfiles) {
     close($fh_tmp);
 
     # run nsupdate with the temporary file
-    my $cmd = "nsupdate -k $tsig_key $tmpname";
+    my $cmd = "nsupdate -y $tsig_key $tmpname";
     my $rc = system($cmd);
     if ($rc != 0) {
         die "DSUPDATE: nsupdate failed for $name, rc=$rc";

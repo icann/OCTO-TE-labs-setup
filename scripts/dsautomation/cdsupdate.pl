@@ -16,7 +16,7 @@ my $tsig_key   = 'hmac-sha256:nsupdate.key:86TjST9U6vQz07LCzet/EZ4cVoL5A4CsX92uJ
 
 for(my $grp=1; $grp<=$NETWORKS; $grp++) {
     my @cds = ();
-    my $digraw = `dig @100.64.0.53 grp$grp.$DOMAIN. cds +noall +answer`;
+    my $digraw = `dig \@100.64.0.53 grp$grp.$DOMAIN. cds +noall +answer`;
     foreach my $line (split /\n/, $digraw) {
         if ($line =~ m/^\s*(\S+\s+\d+\s+IN\s+CDS\s+\d+\s+\d+\s+\d+[0-9A-Za-z ]+)\s*$/) {
             print STDERR "GETCDS: CDS record found for grp$grp.$DOMAIN.\n";
@@ -54,7 +54,7 @@ for(my $grp=1; $grp<=$NETWORKS; $grp++) {
     close($fh_tmp);
 
     # run nsupdate with the temporary file
-    my $cmd = "nsupdate -k $tsig_key $tmpname";
+    my $cmd = "nsupdate -y $tsig_key $tmpname";
     my $rc = system($cmd);
     if ($rc != 0) {
         die "CDSUPDATE: nsupdate failed for grp$grp.$DOMAIN., rc=$rc";
