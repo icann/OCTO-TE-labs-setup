@@ -8,21 +8,21 @@
 
 # Purpose
 
-The Session Log records the engineering progress of the OCTO-TE Labs project.
+The Engineering Log records the chronological engineering progress of the OCTO-TE Labs project.
 
-Unlike the Knowledge Base, which preserves long-term engineering knowledge, the Session Log records the chronological evolution of the project.
+Unlike the Knowledge Base, which preserves long-term engineering knowledge, the Engineering Log records how the project evolves over time.
 
-Each session summarizes:
+Each entry summarizes:
 
-- objectives
-- work completed
-- engineering decisions
-- created or modified artifacts
-- next planned activities
+- objectives;
+- work completed;
+- engineering decisions;
+- created or modified artifacts;
+- next planned activities.
 
 ---
 
-# Session S-0001
+# Entry S-0001
 
 **Date**
 
@@ -52,12 +52,12 @@ docs/
 
 including:
 
-- architecture/
-- development/
-- decisions/
-- diagrams/
-- design/
-- reference/
+- architecture/;
+- development/;
+- decisions/;
+- diagrams/;
+- design/;
+- reference/.
 
 ---
 
@@ -89,12 +89,12 @@ Release
 
 Defined the handbook organization into the following sections:
 
-- Architecture
-- Reference
-- Design
-- Development
-- Decisions
-- Diagrams
+- Architecture;
+- Reference;
+- Design;
+- Development;
+- Decisions;
+- Diagrams.
 
 ---
 
@@ -108,10 +108,10 @@ Established the engineering principles governing the platform.
 
 Defined the conceptual architecture based on:
 
-- Training Domains
-- Capabilities
-- Platform Services
-- Platform Infrastructure
+- Training Domains;
+- Capabilities;
+- Platform Services;
+- Platform Infrastructure.
 
 ---
 
@@ -136,7 +136,7 @@ Defined:
 
 ## Engineering Decisions
 
-The following engineering decisions were established during this session.
+The following engineering decisions were established during this entry:
 
 - Architecture drives implementation.
 - Capabilities drive architecture.
@@ -150,12 +150,12 @@ The following engineering decisions were established during this session.
 
 ## Architecture Candidates Identified
 
-The following ideas were recorded for future evaluation.
+The following ideas were recorded for future evaluation:
 
-- AC-0001 — Capability-Based Lab Composition
-- AC-0002 — Capability Taxonomy
-- AC-0003 — Training Profiles
-- AC-0004 — ADR Classification
+- AC-0001 — Capability-Based Lab Composition;
+- AC-0002 — Capability Taxonomy;
+- AC-0003 — Training Profiles;
+- AC-0004 — ADR Classification.
 
 No candidate was approved during Sprint 0.
 
@@ -163,20 +163,26 @@ No candidate was approved during Sprint 0.
 
 ## Documents Created or Updated
 
+### Handbook Root
+
+- README.md;
+- CHANGELOG.md.
+
 ### Architecture
 
-- README.md
-- ENGINEERING-PRINCIPLES.md
-- 00-architecture-map.md
-- KNOWLEDGE-BASE.md
+- ENGINEERING-PRINCIPLES.md;
+- 00-architecture-map.md;
+- 01-overview.md;
+- KNOWLEDGE-BASE.md.
 
 ### Decisions
 
-- ADR-0001
+- ADR-0001 — Architecture-Driven Engineering.
 
 ### Development
 
-- session-log.md
+- engineering-log.md;
+- engineering-backlog.md.
 
 ---
 
@@ -202,10 +208,10 @@ Analyze the complete deployment lifecycle from CloudFormation to participant acc
 
 ---
 
-# Session Index
+# Engineering Log Index
 
-| Session | Sprint | Status |
-|---------|--------|--------|
+| Entry | Sprint | Status |
+|---|---|---|
 | S-0001 | Sprint 0 | Completed |
 
 ---

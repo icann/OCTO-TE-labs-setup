@@ -1,6 +1,6 @@
 # Engineering Principles
 
-**Status:** In Progress
+**Status:** In Review
 
 **Last Updated:** 2026-07-31
 
@@ -37,7 +37,7 @@ Each domain is composed of one or more capabilities.
 
 Examples:
 
-DNS
+## DNS
 
 - Recursive DNS
 - Authoritative DNS
@@ -45,7 +45,7 @@ DNS
 - Universal Acceptance
 - DNS Monitoring
 
-Routing
+## Routing
 
 - BGP
 - Anycast
@@ -80,7 +80,7 @@ The engineering workflow is:
 
 ---
 
-# Principle 5 — Architecture is Independent from the Current Implementation
+# Principle 5 — Architecture Is Independent from the Current Implementation
 
 The architecture describes the intended structure of the platform.
 
@@ -96,9 +96,9 @@ This separation allows the platform to evolve without losing architectural consi
 
 Architecture documentation should be supported by one of the following:
 
-- verified implementation
-- approved architectural decisions
-- documented engineering design
+- verified implementation;
+- approved architectural decisions;
+- documented engineering design.
 
 Assumptions should never be documented as facts.
 
@@ -108,7 +108,7 @@ Whenever uncertainty exists, it should be explicitly stated.
 
 # Principle 7 — Every Document Has a Single Responsibility
 
-Each document in the handbook should have a clearly defined purpose.
+Each document in the Handbook should have a clearly defined purpose.
 
 Information should not be duplicated across multiple documents.
 
@@ -116,17 +116,17 @@ Instead, documents should reference each other whenever appropriate.
 
 ---
 
-# Principle 8 — Engineering Knowledge is a Project Asset
+# Principle 8 — Engineering Knowledge Is a Project Asset
 
 Knowledge accumulated during the evolution of the platform is considered an engineering asset.
 
 The Knowledge Base should continuously capture:
 
-- architectural discoveries
-- implementation details worth preserving
-- engineering rationale
-- important observations
-- lessons learned
+- architectural discoveries;
+- implementation details worth preserving;
+- engineering rationale;
+- important observations;
+- lessons learned.
 
 This allows future contributors to understand not only how the platform works, but also why it was designed that way.
 
@@ -146,7 +146,7 @@ Scalability of the architecture is considered more important than optimization o
 
 The Architecture & Engineering Handbook is written in English.
 
-Training materials, lab instructions, and participant-facing documentation may be produced in multiple languages according to the target audience.
+Training materials, laboratory instructions, and participant-facing documentation may be produced in multiple languages according to the target audience.
 
 ---
 
@@ -199,10 +199,10 @@ Documents are promoted to **Approved** only after technical review.
 
 ## Engineering Identifiers
 
-The handbook uses stable identifiers to facilitate traceability.
+The Handbook uses stable identifiers to facilitate traceability.
 
 | Prefix | Purpose |
-|---------|----------|
+|---|---|
 | ADR | Architecture Decision Record |
 | KB | Knowledge Base Entry |
 | EPIC | Engineering Epic |
@@ -221,12 +221,12 @@ Identifiers are never reused.
 
 Whenever possible, engineering artifacts should reference related artifacts.
 
-Examples:
+Examples include:
 
-- ADRs
-- Knowledge Base entries
-- Tasks
-- Architecture documents
+- ADRs;
+- Knowledge Base entries;
+- Tasks;
+- Architecture documents.
 
 The objective is to build a connected engineering knowledge system instead of isolated documents.
 
@@ -234,6 +234,16 @@ The objective is to build a connected engineering knowledge system instead of is
 
 ## Document Creation
 
-A new document should only be created when there is enough stable content to justify its existence.
+A new document should normally be created only when there is enough stable content to justify its existence.
 
-The handbook should remain compact and well organized.
+A placeholder document may be created in advance when its future purpose and planned scope are already clear.
+
+Placeholder documents must:
+
+- use the `Draft` status;
+- describe their intended purpose;
+- define their planned scope;
+- identify the engineering work during which they are expected to be completed;
+- never remain completely empty.
+
+The Handbook should remain compact and well organized.

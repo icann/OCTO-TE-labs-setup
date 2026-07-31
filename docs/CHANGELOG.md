@@ -28,7 +28,7 @@ It documents changes to the handbook itself rather than changes to the platform 
 - Platform Overview.
 - Knowledge Base.
 - ADR-0001.
-- Engineering Session Log.
+- Engineering Log.
 - Engineering Backlog.
 - Documentation structure.
 - Engineering workflow.

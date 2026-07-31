@@ -14,7 +14,7 @@ Unlike architecture documents, which describe how the platform is designed, or d
 
 It answers questions such as:
 
-- What have we learned about the platform?
+- What has been learned about the platform?
 - Why does a component behave in a particular way?
 - Which implementation details are important to preserve?
 - Which architectural ideas are currently under evaluation?
@@ -25,44 +25,42 @@ The Knowledge Base is intended to become the institutional engineering memory of
 
 # Scope
 
-The Knowledge Base records information that should remain useful independently of individual development sessions.
+The Knowledge Base records information that should remain useful independently of individual engineering sessions.
 
 Typical entries include:
 
-- Architectural discoveries
-- Implementation discoveries
-- Historical context
-- Engineering observations
-- Long-term lessons learned
-- Architecture candidates
+- architectural discoveries;
+- implementation discoveries;
+- historical context;
+- engineering observations;
+- long-term lessons learned;
+- architecture candidates.
 
-It is **not** intended to replace:
+It does **not** replace:
 
-- Architecture documents
-- Architecture Decision Records (ADRs)
-- Development backlog
-- Session log
+- architecture documents;
+- Architecture Decision Records;
+- the Engineering Backlog;
+- the Engineering Log.
 
-Each of those documents has a different purpose.
+Each of those artifacts has a separate purpose.
 
 ---
 
 # Knowledge Categories
 
-Knowledge is organized into the following categories.
-
----
+Knowledge Base entries use one of the following categories.
 
 ## Architecture Knowledge
 
-Knowledge that improves the understanding of the conceptual architecture of the platform.
+Knowledge that improves understanding of the conceptual architecture of the platform.
 
-Examples:
+Examples include:
 
-- Architectural models
-- Relationships between major components
-- Capability organization
-- Platform boundaries
+- architectural models;
+- relationships between major components;
+- capability organization;
+- platform boundaries.
 
 ---
 
@@ -70,53 +68,57 @@ Examples:
 
 Knowledge that helps explain how the current implementation works.
 
-Examples:
+Examples include:
 
-- Initialization order
-- Dependencies between scripts
-- Container lifecycle
-- Network initialization
-- Configuration generation
+- initialization order;
+- dependencies between scripts;
+- container lifecycle;
+- network initialization;
+- configuration generation.
 
-Implementation knowledge should describe behavior rather than reproduce code.
+Implementation knowledge should describe behavior rather than reproduce source code.
 
 ---
 
 ## Historical Knowledge
 
-Knowledge explaining how or why the platform evolved.
+Knowledge that explains how or why the platform evolved.
 
-Examples:
+Examples include:
 
-- Original design decisions
-- Migration history
-- Compatibility constraints
-- Previous implementation approaches
+- original design decisions;
+- migration history;
+- compatibility constraints;
+- previous implementation approaches.
 
-Historical context should only be recorded when it helps future maintainers understand the current platform.
+Historical context should be recorded when it helps future maintainers understand the current platform.
 
 ---
 
-## Engineering Observations
+## Engineering Observation
 
 Technical observations discovered during analysis.
 
-Examples:
+Examples include:
 
-- Hidden dependencies
-- Design patterns
-- Operational constraints
-- Opportunities for simplification
+- hidden dependencies;
+- recurring design patterns;
+- operational constraints;
+- opportunities for simplification.
 
-Observations do not imply architectural decisions.
+An observation does not, by itself, constitute an architectural decision.
 
 ---
 
 # Architecture Candidates
 
-Architecture Candidates are ideas that appear promising but have not yet been approved.
+Architecture Candidates are ideas that appear promising but have not been approved as architectural decisions.
 
-Candidates are evaluated during future architecture reviews.
+Candidates remain open until they are either:
+
+- approved through an Architecture Decision Record;
+- deferred for later consideration;
+- rejected after review.
 
 ---
 
@@ -128,22 +130,27 @@ Candidate
 
 **Summary**
 
-Instead of defining laboratories using predefined laboratory types, future versions of the platform could compose laboratories from a selected set of capabilities.
+Future versions of the platform could compose laboratories from a selected set of capabilities instead of relying exclusively on predefined laboratory types.
 
-Examples:
+Examples of selectable capabilities include:
 
-- Recursive DNS
-- Authoritative DNS
-- DNSSEC
-- BGP
-- Anycast
-- RPKI
+- Recursive DNS;
+- Authoritative DNS;
+- DNSSEC;
+- BGP;
+- Anycast;
+- RPKI.
 
-This approach could significantly simplify orchestration while increasing flexibility.
+This approach could increase flexibility and simplify the future orchestration model.
 
 **Planned Review**
 
 EPIC-003
+
+**Related**
+
+- `docs/architecture/00-architecture-map.md`
+- `docs/development/engineering-backlog.md`
 
 ---
 
@@ -155,20 +162,24 @@ Candidate
 
 **Summary**
 
-Capabilities could eventually be classified into categories.
+Capabilities could eventually be classified into categories such as:
 
-Example taxonomy:
+- Core Capabilities;
+- Security Capabilities;
+- Operational Capabilities;
+- Deployment Capabilities.
 
-- Core Capabilities
-- Security Capabilities
-- Operational Capabilities
-- Deployment Capabilities
-
-This taxonomy could improve documentation and future orchestration.
+A capability taxonomy could improve documentation, discovery, composition, and future orchestration.
 
 **Planned Review**
 
 EPIC-003
+
+**Related**
+
+- AC-0001
+- `docs/architecture/00-architecture-map.md`
+- `docs/development/engineering-backlog.md`
 
 ---
 
@@ -180,43 +191,98 @@ Candidate
 
 **Summary**
 
-Training Profiles could become the mechanism used by instructors to compose laboratories from capabilities.
+Training Profiles could provide an instructor-facing mechanism for composing laboratories from capabilities.
 
-Instead of selecting a laboratory type, instructors would select a Training Profile.
+Instead of selecting an implementation-specific laboratory type, an instructor could select a profile such as:
 
-Training Profiles would internally activate the required capabilities.
+- Recursive DNS Fundamentals;
+- Authoritative DNS Operations;
+- Secure Routing Fundamentals;
+- Anycast Deployment;
+- Advanced DNSSEC.
+
+Each profile would activate the capabilities required for that training experience.
 
 **Planned Review**
 
 EPIC-003
 
+**Related**
+
+- AC-0001
+- AC-0002
+- `docs/development/engineering-backlog.md`
+
 ---
 
-# Knowledge Entry Template
+## AC-0004 — ADR Classification
 
-Every new Knowledge Base entry should follow the structure below.
+**Status**
+
+Candidate
+
+**Summary**
+
+If the number of Architecture Decision Records grows substantially, ADRs could be classified into categories such as:
+
+- Foundational ADRs;
+- Platform ADRs;
+- Deployment ADRs;
+- Capability ADRs.
+
+This classification should only be introduced when the number and diversity of ADRs justify the additional organizational structure.
+
+**Planned Review**
+
+EPIC-003
+
+**Related**
+
+- ADR-0001
+- `docs/decisions/README.md`
+- `docs/development/engineering-backlog.md`
+
+---
+
+# Knowledge Entry Format
+
+Every new Knowledge Base entry should use a stable identifier and follow this structure:
 
 ```text
-KB-XXXX
+## KB-XXXX — Short Title
 
-Date:
+**Date**
 
-Category:
+YYYY-MM-DD
 
-Summary:
+**Category**
 
-Related:
+Architecture Knowledge | Implementation Knowledge |
+Historical Knowledge | Engineering Observation
 
-Notes:
+**Summary**
+
+Concise description of the knowledge being preserved.
+
+**Related**
+
+- Related ADRs
+- Related Architecture Candidates
+- Related tasks
+- Related documents
+
+**Notes**
+
+Optional additional context.
 ```
 
-The objective is to keep entries concise, searchable, and easy to reference.
+Identifiers are sequential and must never be reused.
 
 ---
 
 # Engineering Knowledge
 
-## KB-0001
+## KB-0001 — Capability-Driven Architecture
 
 **Date**
 
@@ -228,17 +294,17 @@ Architecture Knowledge
 
 **Summary**
 
-The platform architecture is organized around training domains and capabilities rather than implementation technologies.
+The OCTO-TE Labs architecture is organized around training domains and capabilities rather than implementation technologies.
 
 **Related**
 
-ADR-0001
-
-00-architecture-map.md
+- ADR-0001
+- `docs/architecture/00-architecture-map.md`
+- AC-0001
 
 ---
 
-## KB-0002
+## KB-0002 — Architecture and Implementation Separation
 
 **Date**
 
@@ -252,17 +318,17 @@ Architecture Knowledge
 
 Architecture documentation intentionally remains independent from the current implementation.
 
-Implementation is expected to evolve while preserving the architectural model.
+The implementation may evolve while preserving the conceptual architectural model.
 
 **Related**
 
-ADR-0001
-
-ENGINEERING-PRINCIPLES.md
+- ADR-0001
+- `docs/architecture/ENGINEERING-PRINCIPLES.md`
+- `docs/architecture/00-architecture-map.md`
 
 ---
 
-## KB-0003
+## KB-0003 — Lifecycle-Oriented Analysis
 
 **Date**
 
@@ -274,19 +340,19 @@ Engineering Observation
 
 **Summary**
 
-The most effective way to understand the platform is by following its lifecycle rather than reading individual scripts in isolation.
+The most effective way to understand the platform is to follow its complete lifecycle rather than reading individual scripts in isolation.
 
-This principle guides the analysis performed throughout EPIC-001.
+This principle guides the work performed during EPIC-001.
 
 **Related**
 
-02-deployment-flow.md
-
-EPIC-001
+- EPIC-001
+- TASK-0010
+- `docs/development/engineering-backlog.md`
 
 ---
 
-## KB-0004
+## KB-0004 — Handbook as an Engineering Asset
 
 **Date**
 
@@ -294,19 +360,19 @@ EPIC-001
 
 **Category**
 
-Engineering Knowledge
+Architecture Knowledge
 
 **Summary**
 
-The Architecture & Engineering Handbook is considered part of the platform itself.
+The Architecture & Engineering Handbook is considered part of the platform and evolves together with its architecture and implementation.
 
-Documentation evolves together with the platform and is maintained as an engineering asset.
+Documentation is maintained as a long-term engineering asset.
 
 **Related**
 
-ENGINEERING-PRINCIPLES.md
-
-README.md
+- ADR-0001
+- `docs/README.md`
+- `docs/architecture/ENGINEERING-PRINCIPLES.md`
 
 ---
 
@@ -316,20 +382,23 @@ Whenever possible, Knowledge Base entries should reference related engineering a
 
 Examples include:
 
-- ADRs
-- Architecture documents
-- Development tasks
-- Architecture Candidates
+- Architecture Decision Records;
+- Architecture Candidates;
+- engineering tasks;
+- architecture documents;
+- reference documents.
 
-Cross references help transform the handbook into an interconnected engineering knowledge system.
+Cross-references help transform the Handbook into an interconnected engineering knowledge system rather than a set of isolated documents.
 
 ---
 
 # Maintenance Policy
 
-Knowledge is expected to accumulate over the lifetime of the project.
+Knowledge is expected to accumulate throughout the lifetime of the project.
 
 Existing entries should normally be refined rather than removed.
+
+If an entry becomes obsolete, it should be marked appropriately and retain enough context to explain why it is no longer applicable.
 
 Engineering knowledge is considered a long-term project asset.
 

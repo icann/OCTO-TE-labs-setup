@@ -12,7 +12,7 @@ The Engineering Backlog is the master list of engineering work planned for the O
 
 It records the work required to understand, maintain, improve, and evolve the platform.
 
-Unlike the Session Log, which records completed work, the backlog describes future work.
+Unlike the Engineering Log, which records completed work, the backlog describes current and future engineering work.
 
 ---
 
@@ -21,19 +21,19 @@ Unlike the Session Log, which records completed work, the backlog describes futu
 Every backlog item belongs to one of the following categories.
 
 | Type | Description |
-|------|-------------|
+|---|---|
 | Architecture | Architectural analysis and design work |
 | Documentation | Documentation and handbook work |
 | Feature | New functionality |
 | Improvement | Improvements to existing functionality |
-| Technical Debt | Refactoring and maintainability |
+| Technical Debt | Refactoring and maintainability work |
 | Bug | Defect correction |
 
 ---
 
 # Status Values
 
-Each work item should use one of the following status values.
+Each work item should use one of the following status values:
 
 - Planned
 - In Progress
@@ -47,7 +47,7 @@ Each work item should use one of the following status values.
 
 **Status**
 
-Planned
+In Progress
 
 **Objective**
 
@@ -55,7 +55,7 @@ Develop a complete understanding of the existing platform before modifying its i
 
 ---
 
-## TASK-0010
+## TASK-0010 — Analyze the Deployment Lifecycle
 
 **Type**
 
@@ -67,15 +67,15 @@ Planned
 
 **Description**
 
-Analyze the complete deployment lifecycle.
+Analyze the complete deployment lifecycle, beginning with `lab-ec2.yaml` and continuing through participant access.
 
 ---
 
-## TASK-0011
+## TASK-0011 — Document the Deployment Lifecycle
 
 **Type**
 
-Architecture
+Documentation
 
 **Status**
 
@@ -83,11 +83,15 @@ Planned
 
 **Description**
 
-Document the deployment lifecycle.
+Document the verified deployment lifecycle in the Architecture & Engineering Handbook.
+
+**Expected Artifact**
+
+`docs/architecture/02-deployment-flow.md`
 
 ---
 
-## TASK-0012
+## TASK-0012 — Analyze the Orchestration Model
 
 **Type**
 
@@ -99,15 +103,15 @@ Planned
 
 **Description**
 
-Analyze the orchestration model implemented by `setup-lab.sh`.
+Analyze the orchestration model implemented by `setup-lab.sh` and its supporting modules.
 
 ---
 
-## TASK-0013
+## TASK-0013 — Document the Orchestration Architecture
 
 **Type**
 
-Architecture
+Documentation
 
 **Status**
 
@@ -115,11 +119,15 @@ Planned
 
 **Description**
 
-Document the orchestration architecture.
+Document the verified orchestration architecture.
+
+**Expected Artifact**
+
+`docs/architecture/03-orchestrator.md`
 
 ---
 
-## TASK-0014
+## TASK-0014 — Build the Dependency Graph
 
 **Type**
 
@@ -131,15 +139,15 @@ Planned
 
 **Description**
 
-Build the dependency graph of the current platform.
+Identify and document dependencies among deployment scripts, orchestration modules, services, and infrastructure components.
 
 ---
 
-## TASK-0015
+## TASK-0015 — Document the Current Network Topology
 
 **Type**
 
-Architecture
+Documentation
 
 **Status**
 
@@ -147,13 +155,17 @@ Planned
 
 **Description**
 
-Document the current network topology.
+Document the verified network topology of the current platform.
+
+**Expected Artifact**
+
+`docs/architecture/04-network-topology.md`
 
 ---
 
 ## Completion Criteria
 
-EPIC-001 is completed when the complete lifecycle of the platform can be understood without reading the implementation.
+EPIC-001 is completed when the current platform lifecycle and architecture can be understood through the Handbook without requiring the reader to inspect the implementation directly.
 
 ---
 
@@ -198,6 +210,10 @@ Additional Architecture Candidates may be incorporated as they are identified.
 
 Planned
 
+**Objective**
+
+Modernize the platform implementation after the current architecture has been understood and the required capabilities have been restored.
+
 Potential topics include:
 
 - Modular orchestration
@@ -207,15 +223,15 @@ Potential topics include:
 - Automated testing
 - Improved maintainability
 
-The scope of this epic will be refined after the previous epics are completed.
+The scope of this epic will be refined after the preceding epics are completed.
 
 ---
 
 # Technical Debt
 
-This section records engineering debt identified during analysis.
+This section records confirmed engineering debt identified during analysis.
 
-No Technical Debt items have been formally identified yet.
+No Technical Debt items have been formally registered yet.
 
 ---
 
@@ -223,15 +239,15 @@ No Technical Debt items have been formally identified yet.
 
 This section records confirmed implementation defects.
 
-No confirmed bugs have been registered yet.
+No Bug items have been formally registered yet.
 
 ---
 
 # Improvements
 
-This section records engineering improvements that are independent from new functionality.
+This section records improvements that are independent from new functionality.
 
-No improvement items have been registered yet.
+No Improvement items have been formally registered yet.
 
 ---
 
@@ -239,7 +255,7 @@ No improvement items have been registered yet.
 
 The Architecture & Engineering Handbook evolves together with the platform.
 
-Documentation work should always be tracked through the backlog whenever it requires significant engineering effort.
+Significant documentation work should be represented by explicit backlog items.
 
 ---
 

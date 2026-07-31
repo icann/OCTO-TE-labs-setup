@@ -12,13 +12,13 @@ The **OCTO-TE Labs Architecture & Engineering Handbook** is the primary engineer
 
 It documents the platform architecture, engineering principles, technical decisions, implementation model, and accumulated engineering knowledge.
 
-The handbook is intended to evolve together with the platform and serve as the authoritative source of technical documentation for engineers, maintainers, instructors, and contributors.
+The Handbook evolves together with the platform and serves as the authoritative technical reference for engineers, maintainers, instructors, and contributors.
 
 ---
 
 # Handbook Goals
 
-The handbook has four primary objectives.
+The Handbook has four primary objectives:
 
 - Explain the architecture of the platform.
 - Preserve engineering knowledge.
@@ -29,7 +29,7 @@ The handbook has four primary objectives.
 
 # Engineering Philosophy
 
-The handbook follows a small set of engineering principles.
+The Handbook follows a defined set of engineering principles:
 
 - Architecture drives engineering.
 - Capabilities drive architecture.
@@ -37,10 +37,11 @@ The handbook follows a small set of engineering principles.
 - Engineering decisions are documented.
 - Architecture remains independent from implementation.
 - Documentation is based on verified behavior whenever possible.
+- A document is created only when enough stable content exists to justify it.
 
 Detailed engineering principles are documented in:
 
-```
+```text
 architecture/ENGINEERING-PRINCIPLES.md
 ```
 
@@ -52,21 +53,16 @@ The documentation is organized into six complementary sections.
 
 ## Architecture
 
-Describes the platform itself.
+Describes the platform and its architectural model.
 
-Includes:
+Current contents include:
 
 - Architecture Map
 - Platform Overview
-- Deployment Lifecycle
-- Orchestration
-- Network Topology
-- DNS Capabilities
-- Routing Capabilities
-- Platform Services
-- Current Implementation
 - Engineering Principles
 - Knowledge Base
+
+Additional architecture documents are created as the implementation is analyzed and verified.
 
 ---
 
@@ -74,55 +70,60 @@ Includes:
 
 Contains stable technical reference information.
 
-Examples:
+Potential subjects include:
 
-- Lab types
-- Naming conventions
-- Network addressing
-- AWS resources
-- Ports
-- Acronyms
-- Software stack
+- laboratory profiles;
+- naming conventions;
+- network addressing;
+- AWS resources;
+- ports;
+- acronyms;
+- software stack.
+
+Reference documents are created only when verified information is available.
 
 ---
 
 ## Design
 
-Documents future architectural evolution.
+Documents proposed future architectural evolution.
 
-Examples:
+Potential subjects include:
 
-- Architecture Candidates
-- Future capabilities
-- Future orchestration
-- Future modularization
+- Architecture Candidates;
+- future capabilities;
+- future orchestration;
+- future modularization.
+
+Design documents describe proposals rather than the current implementation.
 
 ---
 
 ## Development
 
-Tracks engineering work.
+Tracks engineering work and project evolution.
 
-Includes:
+Current contents include:
 
-- Session Log
-- Engineering Backlog
-- Roadmap
-- Ideas
+- Engineering Log;
+- Engineering Backlog;
+- Engineering Roadmap.
 
 ---
 
 ## Decisions
 
-Architecture Decision Records (ADRs).
+Contains Architecture Decision Records.
 
-Every significant architectural decision should be documented here.
+Every significant architectural decision should be documented as an ADR.
 
 ---
 
 ## Diagrams
 
-Contains architecture and topology diagrams referenced throughout the handbook.
+Contains architecture and engineering diagrams referenced by the Handbook.
+
+Diagrams are created when they provide meaningful support for verified documentation.
 
 ---
 
@@ -158,63 +159,109 @@ When contributing to the platform, the recommended workflow is:
 
 1. Understand the existing behavior.
 2. Analyze the architecture.
-3. Document the findings.
+3. Document verified findings.
 4. Design the solution.
 5. Implement the change.
 6. Validate the implementation.
-7. Update the handbook.
+7. Update the Handbook.
 
 ---
 
 # Document Status Lifecycle
 
-Every handbook document follows one of the following states.
+Every Handbook document uses one of the following states:
 
 | Status | Description |
-|----------|-------------|
+|---|---|
 | Draft | Initial version under development |
 | In Review | Under technical review |
 | Approved | Accepted as the current reference |
 | Deprecated | Preserved for historical reasons |
 
+A planned document that has not yet been created does not have a document status.
+
 ---
 
 # Current Handbook Status
 
+## Handbook Root
+
+| Document | Status |
+|---|---|
+| Handbook README | In Review |
+| Handbook Changelog | In Review |
+
+---
+
 ## Architecture
 
 | Document | Status |
-|----------|--------|
+|---|---|
 | Architecture Map | In Review |
 | Platform Overview | In Review |
 | Engineering Principles | In Review |
 | Knowledge Base | In Review |
-| Deployment Flow | Draft |
-| Orchestrator | Draft |
-| Network Topology | Draft |
-| DNS Capabilities | Draft |
-| Routing Capabilities | Draft |
-| Platform Services | Draft |
-| Implementation | Draft |
 
 ---
 
 ## Development
 
 | Document | Status |
-|----------|--------|
-| Session Log | In Review |
+|---|---|
+| Engineering Log | In Review |
 | Engineering Backlog | In Review |
-| Roadmap | Draft |
-| Ideas | Draft |
+| Engineering Roadmap | In Review |
 
 ---
 
 ## Decisions
 
 | Document | Status |
-|----------|--------|
-| ADR-0001 | In Review |
+|---|---|
+| ADR-0001 — Architecture-Driven Engineering | In Review |
+
+---
+
+# Planned Documentation
+
+The following documents are expected to be created as evidence becomes available during the corresponding engineering work.
+
+## Architecture
+
+- Deployment Flow
+- Orchestrator
+- Network Topology
+- DNS Capabilities
+- Routing Capabilities
+- Platform Services
+- Current Implementation
+
+## Reference
+
+- Laboratory profiles
+- Container naming
+- Network addressing
+- DNS naming
+- AWS resources and services
+- Ports
+- Acronyms
+- Container platform
+- Software stack
+
+## Design
+
+- Future routing model
+- Future orchestration model
+- Future capabilities
+- Future modularity
+
+## Diagrams
+
+- Deployment flow
+- Network topology
+- Additional architecture and capability diagrams as required
+
+Planned documents are not created until sufficient stable and verified content exists.
 
 ---
 
@@ -224,9 +271,7 @@ Every handbook document follows one of the following states.
 
 **M0 — Architecture Foundation**
 
-Status:
-
-**Completed**
+**Status:** Completed
 
 ---
 
@@ -240,23 +285,26 @@ Status:
 
 **EPIC-001 — Understand the Current Architecture**
 
+**Status:** In Progress
+
 Current objective:
 
-Document the complete lifecycle of the platform from deployment to participant access.
+Analyze and document the complete lifecycle of the platform, beginning with deployment and continuing through participant access.
 
 ---
 
 # Scope
 
-The handbook intentionally separates:
+The Handbook intentionally separates:
 
 - architecture;
 - implementation;
 - engineering knowledge;
 - engineering decisions;
-- development activities.
+- future design;
+- development activity.
 
-This separation allows each document to evolve independently while maintaining a coherent engineering model.
+This separation allows each artifact to evolve independently while maintaining a coherent engineering model.
 
 ---
 
@@ -264,7 +312,7 @@ This separation allows each document to evolve independently while maintaining a
 
 The Architecture & Engineering Handbook is intended to become the long-term engineering reference for the OCTO-TE Labs platform.
 
-Its objective is to allow future contributors to understand the architecture, engineering decisions, and implementation rationale without depending on undocumented project knowledge.
+It should enable future contributors to understand the architecture, engineering decisions, current implementation, and historical rationale without depending on undocumented project knowledge.
 
 ---
 
