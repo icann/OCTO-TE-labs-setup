@@ -11,8 +11,13 @@ create_passwords () {
     chown ubuntu:ubuntu $PASSWORD_FILE
 
     # password for superuser "labuser"
-    password=$(openssl rand -base64 14)
-    echo "labuser    $password" >> $PASSWORD_FILE
+    if [ -n "${SinglePassword:-}" ]; then
+        password="$SinglePassword"
+    else
+        password=$(openssl rand -base64 14)
+    fi
+
+    echo "labuser    $password" >> "$PASSWORD_FILE"
 
     # passwords for all groups
     for grp in $(seq 1 $NETWORKS)

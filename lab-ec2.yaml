@@ -46,6 +46,11 @@ Parameters:
     Type: String
     Description: "Instructions for the lab. Will be copied to the lab server and available via webserver"
     Default: "%LAB_INSTRUCTIONS_URL%"
+  labSinglePassword:
+    Type: String
+    Description: "Optional password for the shared labuser account. Leave empty to generate a random password automatically."
+    Default: ""
+    NoEcho: true
 Resources:
 
   labKey:
@@ -329,9 +334,29 @@ Resources:
           cd scripts
           #
           # setup DEPLOY parameters
+          #
           DOMAIN=$(perl -e '$_=lc("${DnsName}.${DnsParent}");s/\.$//;print $_;')
           IPv4=${IPAddress.PublicIp}
           until IPv6=$(ip a s scope global | perl -n -e'print $1 if m/inet6\s+(\S+)\/128/'); [ -n "$IPv6" ]; do echo "Waiting..."; sleep 1; done;
+          #
+          # setup optional single lab password
+          #
+          # Disable command tracing while handling the password so it is not
+          # exposed in the deployment logs.
+          #
+          set +x
+          LAB_SINGLE_PASSWORD=$(cat <<'LAB_PASSWORD_EOF'
+          ${labSinglePassword}
+          LAB_PASSWORD_EOF
+          )
+          #
+          # Escape characters that have special meaning in the sed
+          # replacement expression.
+          #
+          LAB_SINGLE_PASSWORD_SED=$(printf '%s' "$LAB_SINGLE_PASSWORD" | perl -pe 's/([\\&|])/\\$1/g')
+          #
+          # generate deploy-parameters.cfg
+          #
           sed -e "s/%DOMAIN%/$DOMAIN/g"  \
               -e "s/%PARENT%/${DnsParent}/g"  \
               -e "s/%IPV4ADDRESS%/$IPv4/g"  \
@@ -339,7 +364,15 @@ Resources:
               -e "s/%LABTYPE%/${LabType}/g"   \
               -e "s/%NETWORKS%/${Participants}/g" \
               -e "s|%INSTRUCTIONS%|${labInstructions}|g" \
+              -e "s|%SINGLEPASSWORD%|$LAB_SINGLE_PASSWORD_SED|g" \
               ../configs/deploy-parameters.cfg > ./deploy-parameters.cfg
+          #
+          # Remove password variables from the environment and restore
+          # command tracing.
+          #
+          unset LAB_SINGLE_PASSWORD
+          unset LAB_SINGLE_PASSWORD_SED
+          set -x
           #
           # initialize lab server
           #
