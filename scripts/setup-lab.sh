@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -exou
+set -e -o pipefail
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Created by Nicolas Antoniello @ICANN
@@ -233,6 +233,12 @@ delete_all () {
     delete_student_resolvers
     delete_student_auth
 
+    # Remove legacy authoritative DNS container from pre-refactor deployments
+    if lxc info authns >/dev/null 2>&1; then
+        echo "---> Deleting legacy authns container"
+        lxc delete --force authns
+    fi
+
     #
     # Delete DNS frontend before authoritative backends
     #
@@ -282,7 +288,7 @@ deploy () {
     echo "IPv6prefix=$IPv6prefix"
     echo "VPNpeerName=$VPNpeerName"
     echo "VPNlistenPort=$VPNlistenPort"
-    echo "VPNprivateKey=$VPNprivateKey"
+    echo "VPNprivateKey=<redacted>"
     echo "VPNlocalIPv4=$VPNlocalIPv4"
     echo "VPNpublicKey=$VPNpublicKey"
     echo "VPNallowedPrefixIPv4=$VPNallowedPrefixIPv4"

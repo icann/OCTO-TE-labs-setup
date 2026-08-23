@@ -206,7 +206,7 @@ push_ds () {
         return 1
     }
 
-    trap 'rm -rf "$tmpdir"' RETURN
+    trap 'rm -rf "${tmpdir:-}"; trap - RETURN' RETURN
 
     dnskey_file="$tmpdir/dnskeys.txt"
     ksk_dnskey_file="$tmpdir/ksk-dnskeys.txt"
