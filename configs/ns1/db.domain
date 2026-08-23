@@ -1,16 +1,22 @@
 $TTL    30
-@       IN      SOA     %DOMAIN%. te-labs.icann.org. (                                            
+@       IN      SOA     ns1.%DOMAIN%. hostmaster.ns1.%DOMAIN%. (
                               1         ; Serial
                              30         ; Refresh
                              30         ; Retry
                              30         ; Expire
                              30 )       ; Negative Cache TTL
+
 @           A           %IPv4%
 @           AAAA        %IPv6%
 @           MX          0 .
-@           NS          ns.%DOMAIN%.
+@           NS          ns1.%DOMAIN%.
 @           TXT         "v=spf1 -all"
+
 ipv4only    A           %IPv4%
 ipv6only    AAAA        %IPv6%
-ns          A           %IPv4%
-ns          AAAA        %IPv6%
+
+ns1         A           %IPv4%
+ns1         AAAA        %IPv6%
+
+webssh      A           %IPv4%
+webssh      AAAA        %IPv6%

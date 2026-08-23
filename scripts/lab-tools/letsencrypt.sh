@@ -2,10 +2,16 @@
 
 gen_new_domain_certificate () {
 
-    # Generate certificate for the lab domain
-    if [ ! -f /etc/letsencypt/live/$DOMAIN/cert.pem ]; then
+    # Generate certificate for the lab domain and WebSSH virtual host
+    if [ ! -f /etc/letsencrypt/live/$DOMAIN/cert.pem ]; then
         echo "Generating certificate for domain: $DOMAIN ..."
-        certbot certonly -n --email $DOMAIN@te-labs.training --agree-tos --standalone -d $DOMAIN --expand
+        certbot certonly -n \
+            --email $DOMAIN@te-labs.training \
+            --agree-tos \
+            --standalone \
+            -d $DOMAIN \
+            -d webssh.$DOMAIN \
+            --expand
         echo "Certificate generated"
     fi
 

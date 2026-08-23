@@ -1,28 +1,35 @@
 $TTL    30
-@       IN      SOA     authns.internal. te-labs.icann.org. (
+@       IN      SOA     auth-exercise.internal. te-labs.icann.org. (
                               1         ; Serial
                              30         ; Refresh
                              30         ; Retry
                              30         ; Expire
                              30 )       ; Negative Cache TTL
-@           NS          authns.internal.
-authns      A           100.64.0.54
+
+@               NS      auth-exercise.internal.
+auth-exercise   A       100.64.0.55
 
 nxdomain                TXT     "Block me if you can"
 nodata                  TXT     "Block me if you can"
 drop                    TXT     "Block me if you can"
 tcponly                 TXT     "This is a UDP joke, you might not get it"
+
 rewrite                 A       100.100.100.1
 rewrite                 AAAA    2001:db8::cafe
-rewrite                 TXT     "A MESSAGE FROM .INTERNAL" 
+rewrite                 TXT     "A MESSAGE FROM .INTERNAL"
+
 v4blocked               A       100.100.100.2
 v4blocked               AAAA    2001:db8::bad:cafe
+
 v6blocked               AAAA    2001:db8::bad:dad
 v6blocked               A       100.100.100.66
+
 wildcard                TXT     "This is not blocked"
 *.wildcard              TXT     "Block me if you can"
 override.wildcard       TXT     "This you should get, but no other subdomain"
+
 badnsname               NS      badns
-badns                   A       100.64.0.55
+badns                   A       100.64.0.56
+
 evilnsip                NS      evilns
-evilns                  A       100.64.0.56
+evilns                  A       100.64.0.57

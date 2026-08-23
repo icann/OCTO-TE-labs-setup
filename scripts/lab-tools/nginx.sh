@@ -15,10 +15,11 @@ gen_nginx_config () {
     htpasswd -bc $nginxworkdir/etc/nginx/htpasswd/webssh labuser $(get_labuser_password)
 
     touch $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
+
     grp=1
     for grp in $(seq 1 $NETWORKS)
     do
-        # Read grpX password from "routers" password file (grpX-rtr)
+        # Read grpX password
         passwd4grp=$(get_grp_password $grp)
 
         # Create the file for storing grpX username and password
@@ -38,12 +39,19 @@ gen_nginx_config () {
     done
 
     # nginx configuration for default virtual-host --> [/etc/nginx/sites-enabled/default]
-    cp ../configs/nginx/etc/nginx/sites-available/default $nginxworkdir/etc/nginx/sites-available/default
-    
+    cp ../configs/nginx/etc/nginx/sites-available/default \
+        $nginxworkdir/etc/nginx/sites-available/default
+
     # nginx configuration for LAB_DOMAIN virtual-host --> [/etc/nginx/sites-enabled/domain]
     sed -e "s|%AuthDomain%|$DOMAIN|g" \
         -e "/#grpX_Locations/r $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt" \
-        ../configs/nginx/etc/nginx/sites-available/domain > $nginxworkdir/etc/nginx/sites-available/$DOMAIN
+        ../configs/nginx/etc/nginx/sites-available/domain \
+        > $nginxworkdir/etc/nginx/sites-available/$DOMAIN
+
+    # nginx configuration for WEBSSH virtual-host --> [/etc/nginx/sites-enabled/webssh.domain]
+    sed -e "s|%AuthDomain%|$DOMAIN|g" \
+        ../configs/nginx/etc/nginx/sites-available/webssh.domain \
+        > $nginxworkdir/etc/nginx/sites-available/webssh.$DOMAIN
 
     echo "---> nginx configuration generated"
 }
@@ -51,11 +59,21 @@ gen_nginx_config () {
 push_nginx_config () {
     # push nginx configuration files
     echo "Pushing config files for nginx web server..."
+
     cp $nginxworkdir/etc/nginx/nginx.conf /etc/nginx/nginx.conf
     cp -r $nginxworkdir/etc/nginx/htpasswd/. /etc/nginx/htpasswd
-    cp ../configs/letsencrypt/etc/letsencrypt/options-ssl-nginx.conf /etc/letsencrypt/options-ssl-nginx.conf
-    cp $nginxworkdir/etc/nginx/sites-available/default /etc/nginx/sites-available/default
-    cp $nginxworkdir/etc/nginx/sites-available/$DOMAIN /etc/nginx/sites-available/$DOMAIN
+    cp ../configs/letsencrypt/etc/letsencrypt/options-ssl-nginx.conf \
+        /etc/letsencrypt/options-ssl-nginx.conf
+
+    cp $nginxworkdir/etc/nginx/sites-available/default \
+        /etc/nginx/sites-available/default
+
+    cp $nginxworkdir/etc/nginx/sites-available/$DOMAIN \
+        /etc/nginx/sites-available/$DOMAIN
+
+    cp $nginxworkdir/etc/nginx/sites-available/webssh.$DOMAIN \
+        /etc/nginx/sites-available/webssh.$DOMAIN
+
     echo "Content of /etc/nginx/sites-available/ is now:"
     ls -larth /etc/nginx/sites-available/
     echo " "
@@ -73,8 +91,15 @@ push_nginx_config () {
 
     # Create symlinks for new virtual-hosts
     echo "Creating symlinks for new virtual-hosts..."
-    ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
-    ln -sf /etc/nginx/sites-available/$DOMAIN /etc/nginx/sites-enabled/
+    ln -sf /etc/nginx/sites-available/default \
+        /etc/nginx/sites-enabled/
+
+    ln -sf /etc/nginx/sites-available/$DOMAIN \
+        /etc/nginx/sites-enabled/
+
+    ln -sf /etc/nginx/sites-available/webssh.$DOMAIN \
+        /etc/nginx/sites-enabled/
+
     echo "Symlinks for new virtual-hosts:"
     ls -larth /etc/nginx/sites-enabled/
     echo " "
@@ -86,6 +111,8 @@ push_nginx_config () {
     echo "Creating directories for all web content (if non existent)..."
     mkdir -p /var/www/default/html
     mkdir -p /var/www/$DOMAIN/html
+    mkdir -p /var/www/webssh.$DOMAIN/html
+
     echo "The followign directories were created under /var/www/:"
     tree -a /var/www/
     echo " "

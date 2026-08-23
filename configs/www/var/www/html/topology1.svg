@@ -53,14 +53,14 @@
 
     <path style="fill: none; stroke: rgb(0,   0, 128); stroke-width: 3px;" d="M 108  93 L 470  93"/>
 
-    <a href="https://%AuthDomain%/webssh/?hostname=%ip4rtr%&amp;username=%username4rtr%&amp;password=%password4rtr%" alt="rtr" target="_blank" rel="noopener noreferrer">
+    <a href="https://webssh.%AuthDomain%/?hostname=%ip4rtr%&amp;username=%username4rtr%&amp;password=%password4rtr%" alt="rtr" target="_blank" rel="noopener noreferrer">
         <rect x="222" y="65" width="24" height="24" fill="transparent"/>
         <use href="#router" x="87" y="80" width="24" height="24" fill="#000080"/>
     </a>
     <text style="fill: rgb(0, 0, 128); font-family: Arial, sans-serif; font-size: 8px; white-space: pre;" x="110" y="88" >.1 | ::1</text>
 
     <text style="fill: rgb(0, 0, 128); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: middle;" x="230" y="65" >cli</text>
-    <a href="https://%AuthDomain%/webssh/?hostname=%ip4cli%&amp;username=%username4cli%&amp;password=%password4cli%" alt="cli" target="_blank" rel="noopener noreferrer">
+    <a href="https://webssh.%AuthDomain%/?hostname=%ip4cli%&amp;username=%username4cli%&amp;password=%password4cli%" alt="cli" target="_blank" rel="noopener noreferrer">
         <rect x="222" y="65" width="24" height="24" fill="transparent"/>
         <use href="#server" x="222" y="65" width="24" height="24" fill="#000080"/>
     </a>
@@ -77,28 +77,28 @@
     <text style="fill: rgb(192, 0, 128); font-family: Arial, sans-serif; font-size: 8px; white-space: pre;" x="110" y="110" >.65 | ::1</text>
 
     <text style="fill: rgb(0192, 0, 128); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: middle;" x="150" y="130" >soa</text>
-    <a href="https://%AuthDomain%/webssh/?hostname=%ip4soa%&amp;username=%username4soa%&amp;password=%password4soa%" alt="soa" target="_blank" rel="noopener noreferrer">
+    <a href="https://webssh.%AuthDomain%/?hostname=%ip4soa%&amp;username=%username4soa%&amp;password=%password4soa%" alt="soa" target="_blank" rel="noopener noreferrer">
         <rect x="142" y="130" width="24" height="24" fill="transparent"/>
         <use href="#server" x="142" y="130" width="24" height="24" fill="#C00080"/>
     </a>
     <text style="fill: rgb(192, 0, 128); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: middle;" x="150" y="150" >.66 | ::66</text>
 
     <text style="fill: rgb(192, 0, 128); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: middle;" x="200" y="130" >resolv1</text>
-    <a href="https://%AuthDomain%/webssh/?hostname=%ip4resolv1%&amp;username=%username4resolv1%&amp;password=%password4resolv1%" alt="resolv1" target="_blank" rel="noopener noreferrer">
+    <a href="https://webssh.%AuthDomain%/?hostname=%ip4resolv1%&amp;username=%username4resolv1%&amp;password=%password4resolv1%" alt="resolv1" target="_blank" rel="noopener noreferrer">
         <rect x="192" y="130" width="24" height="24" fill="transparent"/>
         <use href="#server" x="192" y="130" width="24" height="24" fill="#C00080"/>
     </a>
     <text style="fill: rgb(192, 0, 128); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: middle;" x="200" y="150" >.67 | ::67</text>
 
     <text style="fill: rgb(192, 0, 128); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: middle;" x="250" y="130" >resolv2</text>
-    <a href="https://%AuthDomain%/webssh/?hostname=%ip4resolv2%&amp;username=%username4resolv2%&amp;password=%password4resolv2%" alt="resolv2" target="_blank" rel="noopener noreferrer">
+    <a href="https://webssh.%AuthDomain%/?hostname=%ip4resolv2%&amp;username=%username4resolv2%&amp;password=%password4resolv2%" alt="resolv2" target="_blank" rel="noopener noreferrer">
         <rect x="242" y="130" width="24" height="24" fill="transparent"/>
         <use href="#server" x="242" y="130" width="24" height="24" fill="#C00080"/>
     </a>
     <text style="fill: rgb(192, 0, 128); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: middle;" x="250" y="150" >.68 | ::68</text>
 
     <text style="fill: rgb(192, 0, 128); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: middle;" x="300" y="130" >rpki</text>
-    <a href="https://%AuthDomain%/webssh/?hostname=%ip4rpki%&amp;username=%username4rpki%&amp;password=%password4rpki%" alt="rpki" target="_blank" rel="noopener noreferrer">
+    <a href="https://webssh.%AuthDomain%/?hostname=%ip4rpki%&amp;username=%username4rpki%&amp;password=%password4rpki%" alt="rpki" target="_blank" rel="noopener noreferrer">
         <rect x="292" y="130" width="24" height="24" fill="transparent"/>
         <use href="#server" x="292" y="130" width="24" height="24" fill="#C00080"/>
     </a>
@@ -115,14 +115,14 @@
     <text style="fill: rgb(0, 100, 0); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: end;" x="95" y="110" >.129 | ::1</text>
 
     <text style="fill: rgb(0, 100, 0); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: middle;" x="160" y="205" >ns1</text>
-    <a href="https://%AuthDomain%/webssh/?hostname=%ip4ns1%&amp;username=%username4ns1%&amp;password=%password4ns1%" alt="ns1" target="_blank" rel="noopener noreferrer">
+    <a href="https://webssh.%AuthDomain%/?hostname=%ip4ns1%&amp;username=%username4ns1%&amp;password=%password4ns1%" alt="ns1" target="_blank" rel="noopener noreferrer">
         <rect x="150" y="205" width="24" height="24" fill="transparent"/>
         <use href="#server" x="150" y="205" width="24" height="24" fill="#006400"/>
     </a>
     <text style="fill: rgb(0, 100, 0); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: middle;" x="160" y="225" >.130 | ::130</text>
 
     <text style="fill: rgb(0, 100, 0); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: middle;" x="250" y="205" >ns2</text>
-    <a href="https://%AuthDomain%/webssh/?hostname=%ip4ns2%&amp;username=%username4ns2%&amp;password=%password4ns2%" alt="ns2" target="_blank" rel="noopener noreferrer">
+    <a href="https://webssh.%AuthDomain%/?hostname=%ip4ns2%&amp;username=%username4ns2%&amp;password=%password4ns2%" alt="ns2" target="_blank" rel="noopener noreferrer">
         <rect x="240" y="205" width="24" height="24" fill="transparent"/>
         <use href="#server" x="240" y="205" width="24" height="24" fill="#006400"/>
     </a>

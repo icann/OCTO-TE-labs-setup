@@ -55,7 +55,7 @@ EOF
     cat <<EOF >/tmp/named.conf.local.resolv1
 zone "internal." {
     type forward;
-    forwarders { 100.64.0.54; };
+    forwarders { 100.64.0.55; };
     forward only;  // only forward, no fallback to root hints
 };
 EOF
@@ -90,7 +90,7 @@ remote-control:
 
 stub-zone:
     name: "internal."
-    stub-addr: 100.64.0.54
+    stub-addr: 100.64.0.55
 EOF
 
     lxc exec grp$GRP-resolv2 -- sh -c 'apt install -qy unbound'

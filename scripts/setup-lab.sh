@@ -19,7 +19,8 @@ eval set -- "$TEMP"
 # ---------------------------------------- DEFAULT CONFIGURATIONS SET UP -------------------------------------------
 
 ## source all setup functions
-. ./lab-tools/authns.sh
+. ./lab-tools/ns1.sh
+. ./lab-tools/auth-exercise.sh
 . ./lab-tools/borderrouter.sh
 . ./lab-tools/cli.sh
 . ./lab-tools/cron.sh
@@ -77,7 +78,7 @@ main () {
         case "$1" in
             -t | --type ) LABTYPE="$2";
                           shift 2;;
-            -n | --networks ) NETWORKS="$2"; 
+            -n | --networks ) NETWORKS="$2";
                               shift 2;;
             --stop_all ) ACTION=STOP; shift;;
             --start_all ) ACTION=START; shift;;
@@ -121,7 +122,7 @@ main () {
         echo "Between 3 and 64 groups are supported"
         exit 5;
     fi
- 
+
     # NOW execute whatever we decided to do
     case "$ACTION" in
         STOP ) stop_all;;
@@ -135,7 +136,7 @@ main () {
 usage () {
     cat <<EOF
 
-Usage: $0 [-d] <command> [-t <lab type>] [-n <number of groups>] 
+Usage: $0 [-d] <command> [-t <lab type>] [-n <number of groups>]
 
   <command> can be one of
 
@@ -163,25 +164,38 @@ EOF
 
 start_all () {
     echo "---> Performing start_all"
+
     if [ "$BorderRouter" = "YES" ]; then
         start_border_router
     fi
+
     start_routers
+
     if [ "$StudentClients" = "YES" ]; then
         start_student_clients
     fi
-    start_authns
+
+    #
+    # Shared DNS infrastructure
+    #
+    start_ns1
+    start_auth_exercise
+
     start_nat64
     start_dnsdist
+
     if [ "$StudentResolvers" = "YES" ]; then
         start_student_servers
     fi
+
     if [ "$StudentAuth" = "YES" ]; then
         start_student_servers
     fi
+
     if [ "$StudentRPKIvalidator" = "YES" ]; then
         start_student_RPKI_validator
     fi
+
     if [ "$GlobalRPKIvalidator" = "YES" ]; then
         start_global_RPKI_validator
     fi
@@ -189,6 +203,7 @@ start_all () {
 
 stop_all () {
     echo "---> Performing stop_all"
+
     stop_routers
     stop_border_router
     stop_student_RPKI_validator
@@ -196,35 +211,51 @@ stop_all () {
     stop_student_clients
     stop_student_resolvers
     stop_student_auth
+
+    #
+    # Stop DNS frontend before authoritative backends
+    #
     stop_dnsdist
     stop_nat64
-    stop_authns
+    stop_auth_exercise
+    stop_ns1
+
     stop_nginx
     stop_webssh
+
     echo "---> DONE stop_all"
 }
 
 delete_all () {
     echo "---> Performing delete_all"
+
     delete_student_clients
     delete_student_resolvers
     delete_student_auth
+
+    #
+    # Delete DNS frontend before authoritative backends
+    #
     delete_dnsdist
-    delete_authns
+    delete_auth_exercise
+    delete_ns1
+
     delete_student_RPKI_validator
     delete_global_RPKI_validator
     delete_routers
     delete_border_router
     delete_networks
-  
+
     # Remove nginx config
     if [ -f /etc/nginx/htpasswd ]; then
         rm -rf /etc/nginx/htpasswd
     fi
+
     if [ -d /etc/nginx/sites-available ]; then
         rm -rf /etc/nginx/sites-available
         mkdir -p /etc/nginx/sites-available
     fi
+
     if [ -d /etc/nginx/sites-enabled ]; then
         rm -rf /etc/nginx/sites-enabled
         mkdir -p /etc/nginx/sites-enabled
@@ -271,7 +302,7 @@ deploy () {
     workdir=/tmp/dnsdeploy
     rm -rf $workdir # cleanup previous deployment if exists
     mkdir -p $workdir
-  
+
     nginxworkdir=$workdir/nginx
     mkdir -p $nginxworkdir
     mkdir -p $nginxworkdir/etc/nginx/sites-available
@@ -286,7 +317,15 @@ deploy () {
     create_passwords
     create_networks
     create_routers
-    create_authns
+
+    #
+    # Shared DNS infrastructure
+    #
+    # Create authoritative backends before dnsdist.
+    #
+    create_ns1
+    create_auth_exercise
+
     create_nat64
     create_dnsdist
 
@@ -360,6 +399,16 @@ deploy () {
     stop_webssh
     stop_nginx
 
+    #
+    # At this point:
+    #
+    #   ns1.$DOMAIN is already authoritative for $DOMAIN
+    #   dnsdist is already serving public DNS on port 53
+    #   webssh.$DOMAIN exists in the platform zone
+    #
+    # Therefore Let's Encrypt can validate both $DOMAIN and
+    # webssh.$DOMAIN.
+    #
     gen_new_domain_certificate
 
     gen_nginx_config
@@ -370,7 +419,7 @@ deploy () {
     if [ -n "$INSTRUCTIONS" ]; then
         create_instructions
     fi
-    
+
     # Clean /root/.shh/known_hosts
     rm -f /root/.ssh/known_hosts
     touch /root/.ssh/known_hosts
@@ -379,15 +428,19 @@ deploy () {
     start_webssh
 
     configure_cron
-  
+
     # Remove deployment temporary directories
     if [ -d $workdir ]; then
         rm -rf $workdir
     fi
 
-    # Push DS to parent
-    push_ds || { 
-        echo "PUSH DS failed" >&2 
+    #
+    # Push the DS for $DOMAIN to the parent zone in Route53.
+    #
+    # push_ds is provided by lab-tools/ns1.sh.
+    #
+    push_ds || {
+        echo "PUSH DS failed" >&2
         exit 1
     }
 
@@ -399,7 +452,7 @@ deploy () {
     echo "Passwords for each group are in the following file:"
     echo $PASSWORD_FILE
     echo
-    echo "===================== DEPLOY DONE ======================="  
+    echo "===================== DEPLOY DONE ======================="
 }
 
 # ------------------------------------------------------------------------------------------------------------------
@@ -409,13 +462,17 @@ wipe () {
     TEMP_NETWORKS=$NETWORKS
     NETWORKS=64
     set +e
+
     echo " "
     echo "Wiping environment. This may take some minutes... please wait !"
+
     stop_all
     delete_all
+
     echo " "
     echo "---> Environment wiped"
     echo " "
+
     set -e
     NETWORKS=$TEMP_NETWORKS
 }

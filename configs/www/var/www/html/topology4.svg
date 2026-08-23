@@ -49,7 +49,7 @@
     <text style="fill: rgb(0, 0, 128); font-family: Arial, sans-serif; font-size: 8px; white-space: pre;" x="110" y="88" >.1 | ::1</text>
 
     <text style="fill: rgb(0, 0, 128); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: middle;" x="230" y="65" >cli</text>
-    <a href="https://%AuthDomain%/webssh/?hostname=%ip4cli%&amp;username=%username4cli%&amp;password=%password4cli%" alt="cli" target="_blank" rel="noopener noreferrer">
+    <a href="https://webssh.%AuthDomain%/?hostname=%ip4cli%&amp;username=%username4cli%&amp;password=%password4cli%" alt="cli" target="_blank" rel="noopener noreferrer">
         <rect x="222" y="65" width="24" height="24" fill="transparent"/>
         <use href="#server" x="222" y="65" width="24" height="24" fill="#000080"/>
     </a>
@@ -66,7 +66,7 @@
     <text style="fill: rgb(192, 0, 128); font-family: Arial, sans-serif; font-size: 8px; white-space: pre;" x="110" y="110" >.65 | ::1</text>
 
     <text style="fill: rgb(192, 0, 128); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: middle;" x="300" y="130" >rpki</text>
-    <a href="https://%AuthDomain%/webssh/?hostname=%ip4rpki%&amp;username=%username4rpki%&amp;password=%password4rpki%" alt="rpki" target="_blank" rel="noopener noreferrer">
+    <a href="https://webssh.%AuthDomain%/?hostname=%ip4rpki%&amp;username=%username4rpki%&amp;password=%password4rpki%" alt="rpki" target="_blank" rel="noopener noreferrer">
         <rect x="292" y="130" width="24" height="24" fill="transparent"/>
         <use href="#server" x="292" y="130" width="24" height="24" fill="#C00080"/>
     </a>

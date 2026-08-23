@@ -53,14 +53,14 @@
 
     <path style="fill: none; stroke: rgb(0,   0, 128); stroke-width: 3px;" d="M 108  93 L 470  93"/>
 
-    <a href="https://%AuthDomain%/webssh/?hostname=%ip4rtr%&amp;username=%username4rtr%&amp;password=%password4rtr%" alt="rtr" target="_blank" rel="noopener noreferrer">
+    <a href="https://webssh.%AuthDomain%/?hostname=%ip4rtr%&amp;username=%username4rtr%&amp;password=%password4rtr%" alt="rtr" target="_blank" rel="noopener noreferrer">
         <rect x="222" y="65" width="24" height="24" fill="transparent"/>
         <use href="#router" x="87" y="80" width="24" height="24" fill="#000080"/>
     </a>
     <text style="fill: rgb(0, 0, 128); font-family: Arial, sans-serif; font-size: 8px; white-space: pre;" x="110" y="88" >.1 | ::1</text>
 
     <text style="fill: rgb(0, 0, 128); font-family: Arial, sans-serif; font-size: 8px; white-space: pre; text-anchor: middle;" x="230" y="65" >cli</text>
-    <a href="https://%AuthDomain%/webssh/?hostname=%ip4cli%&amp;username=%username4cli%&amp;password=%password4cli%" alt="cli" target="_blank" rel="noopener noreferrer">
+    <a href="https://webssh.%AuthDomain%/?hostname=%ip4cli%&amp;username=%username4cli%&amp;password=%password4cli%" alt="cli" target="_blank" rel="noopener noreferrer">
         <rect x="222" y="65" width="24" height="24" fill="transparent"/>
         <use href="#server" x="222" y="65" width="24" height="24" fill="#000080"/>
     </a>

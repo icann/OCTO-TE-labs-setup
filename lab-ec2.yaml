@@ -475,24 +475,24 @@ Resources:
       Name: !Sub "${DnsName}.${DnsParent}"
       Type: NS
       TTL: '30'
-      ResourceRecords: 
-        - !Sub "ns.${DnsName}.${DnsParent}"
+      ResourceRecords:
+        - !Sub "ns1.${DnsName}.${DnsParent}"
 
-  nsA:
+  ns1A:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneName: !Ref DnsParent
-      Name: !Sub "ns.${DnsName}.${DnsParent}"
+      Name: !Sub "ns1.${DnsName}.${DnsParent}"
       Type: A
       TTL: '30'
       ResourceRecords:
         - !GetAtt IPAddress.PublicIp
 
-  nsAAAA:
+  ns1AAAA:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneName: !Ref DnsParent
-      Name: !Sub "ns.${DnsName}.${DnsParent}"
+      Name: !Sub "ns1.${DnsName}.${DnsParent}"
       Type: AAAA
       TTL: '30'
       ResourceRecords:
