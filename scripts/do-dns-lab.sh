@@ -46,9 +46,13 @@ options {
     directory "/var/cache/bind";
     dnssec-validation no;
     listen-on port 53 { localhost; 100.100.0.0/16; };
-    listen-on-v6 port 53 { localhost; fd89:59e0::/32; };
+    listen-on-v6 port 53 { localhost; ${IPv6prefix}::/32; };
     allow-query { any; };
     recursion yes;
+
+    response-policy {
+        zone "rpz";
+    };
 };
 EOF
 
@@ -56,7 +60,16 @@ EOF
 zone "internal." {
     type forward;
     forwarders { 100.64.0.55; };
-    forward only;  // only forward, no fallback to root hints
+    forward only;
+};
+
+zone "rpz." {
+    type secondary;
+    primaries {
+        100.64.0.58;
+        ${IPv6prefix}:0::58;
+    };
+    file "/var/cache/bind/db.rpz";
 };
 EOF
 

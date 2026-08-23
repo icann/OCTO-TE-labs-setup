@@ -1,13 +1,16 @@
 $TTL    30
-@   IN  SOA rpz.internal. hostmaster.rpz.internal. (
+@   IN  SOA ns.rpz. hostmaster.rpz. (
         1      ; serial
         30     ; refresh
         30     ; retry
         30     ; expire
         30 )   ; minimum
-@   IN  NS  ns.internal.
-ns.internal. A 100.100.0.54
-ns.internal. AAAA 2001:db8::54
+
+@   IN  NS  ns.rpz.
+
+ns                              IN  A       100.64.0.58
+ns                              IN  AAAA    %IPv6pfx%:0::58
+
 nxdomain.internal               CNAME   .
 nodata.internal                 CNAME   *.
 drop.internal                   CNAME   rpz-drop.

@@ -99,14 +99,6 @@ create_auth_exercise () {
         ../configs/auth-exercise/db.evilnsip.internal \
         auth-exercise/var/lib/bind/zones/db.evilnsip.internal
 
-    #
-    # Temporary RPZ placement.
-    # This zone will move to auth-rpz during Stage 3.
-    #
-    lxc file push \
-        ../configs/auth-exercise/db.rpz \
-        auth-exercise/var/lib/bind/zones/db.rpz
-
     lxc exec auth-exercise -- sh -c \
         'chown -R bind:bind /var/lib/bind'
 
@@ -127,10 +119,6 @@ create_auth_exercise () {
     lxc exec auth-exercise -- \
         named-checkzone evilnsip.internal \
         /var/lib/bind/zones/db.evilnsip.internal
-
-    lxc exec auth-exercise -- \
-        named-checkzone rpz \
-        /var/lib/bind/zones/db.rpz
 
     #
     # Restart container so BIND starts with final configuration

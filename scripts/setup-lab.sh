@@ -21,6 +21,7 @@ eval set -- "$TEMP"
 ## source all setup functions
 . ./lab-tools/ns1.sh
 . ./lab-tools/auth-exercise.sh
+. ./lab-tools/auth-rpz.sh
 . ./lab-tools/borderrouter.sh
 . ./lab-tools/cli.sh
 . ./lab-tools/cron.sh
@@ -180,6 +181,7 @@ start_all () {
     #
     start_ns1
     start_auth_exercise
+    start_auth_rpz
 
     start_nat64
     start_dnsdist
@@ -217,6 +219,7 @@ stop_all () {
     #
     stop_dnsdist
     stop_nat64
+    stop_auth_rpz
     stop_auth_exercise
     stop_ns1
 
@@ -243,6 +246,7 @@ delete_all () {
     # Delete DNS frontend before authoritative backends
     #
     delete_dnsdist
+    delete_auth_rpz
     delete_auth_exercise
     delete_ns1
 
@@ -331,6 +335,7 @@ deploy () {
     #
     create_ns1
     create_auth_exercise
+    create_auth_rpz
 
     create_nat64
     create_dnsdist
