@@ -251,7 +251,11 @@ deploy () {
     echo "IPv6prefix=$IPv6prefix"
     echo "VPNpeerName=$VPNpeerName"
     echo "VPNlistenPort=$VPNlistenPort"
-    echo "VPNprivateKey=$VPNprivateKey"
+    if [[ -n "${VPNprivateKey:-}" ]]; then
+        echo "VPNprivateKey is set"
+    else
+        echo "VPNprivateKey is NOT set"
+    fi
     echo "VPNlocalIPv4=$VPNlocalIPv4"
     echo "VPNpublicKey=$VPNpublicKey"
     echo "VPNallowedPrefixIPv4=$VPNallowedPrefixIPv4"
