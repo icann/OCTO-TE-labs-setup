@@ -123,12 +123,7 @@ push_ds() {
         return 1
     fi
 
-    awk '
-        $4 == "DNSKEY" {
-            flags = $5 + 0
-            if (and(flags, 257) == 257) print
-        }
-    ' "$dnskey_file" > "$ksk_dnskey_file"
+    awk '$4 == "DNSKEY" && $5 == 257 { print }' "$dnskey_file" > "$ksk_dnskey_file"
 
     if [[ ! -s "$ksk_dnskey_file" ]]; then
         echo "No KSK DNSKEY records found for $domain_fqdn" >&2
