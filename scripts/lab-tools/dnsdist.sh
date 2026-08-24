@@ -88,7 +88,7 @@ delete_dnsdist () {
 start_dnsdist () {
     echo "Start - DNSdist!"
     lxc start dnsdist
-    lxc exec dns -- cloud-init status --wait
+    lxc exec dnsdist -- cloud-init status --wait
     echo "Done - Start DNSdist"
 }
 
