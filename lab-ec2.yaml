@@ -19,7 +19,7 @@ Parameters:
     Type: String
     Description: "Who is responsible for this lab?"
   Participants:
-    Type: String
+    Type: Number
     Description: "How many groups do you want run?"
     AllowedPattern: "[0-9]+"
     ConstraintDescription: "Numbers between 1 and 64"
