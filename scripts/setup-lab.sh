@@ -99,7 +99,7 @@ main () {
             echo "Will bring up Lab type 2: Practice with 2 DNS Resolvers, 2 Authoritatives, 1 SOA and 1 Client" ;;
         3 ) StudentClients=YES;
             StudentResolvers=YES;
-            StudentAuthServers=YES;
+            StudentAuth=YES;
             StudentRouterAccess=YES
             GlobalRPKIvalidator=YES
             BorderRouter=YES
@@ -174,10 +174,10 @@ start_all () {
     start_nat64
     start_dnsdist
     if [ "$StudentResolvers" = "YES" ]; then
-        start_student_servers
+        start_student_resolvers
     fi
     if [ "$StudentAuth" = "YES" ]; then
-        start_student_servers
+        start_student_auth
     fi
     if [ "$StudentRPKIvalidator" = "YES" ]; then
         start_student_RPKI_validator
