@@ -11,7 +11,7 @@ Parameters:
       (e.g. te-labs.training.).
   DnsName:
     Type: String
-    Description: "DNS name for the lab. NO DASHES - only a-z0-9!!!"
+    Description: "DNS name for the lab. NO DASHES - only a-z0-9!!! (3-32 characters)"
     MinLength: 3
     MaxLength: 32
     AllowedPattern: '^[a-z0-9]{3,32}$'
@@ -360,7 +360,7 @@ Resources:
   labLambdaGetIntstanceIpv6Role:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: labLambdaGetIntstanceIpv6Role
+      RoleName: !Sub "${DnsName}-labLambdaGetIntstanceIpv6Role"
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
