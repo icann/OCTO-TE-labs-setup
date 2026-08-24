@@ -70,8 +70,10 @@ EOF
 }
 
 delete_dnsdist () {
-    echo "Start - Delete dnsdist"
-    lxc delete dnsdist
+    echo "Deleting dnsdist ..."
+    lxc list -c n --format csv \
+        | grep -E '^dnsdist$' \
+        | xargs -rt -n1 lxc delete --force
     iptables -t nat -D PREROUTING -i eth0 -p udp --dport 53 -j DNAT --to-destination 100.64.0.53:53
     iptables -t nat -D PREROUTING -i eth0 -p tcp --dport 53 -j DNAT --to-destination 100.64.0.53:53
     ip6tables -t nat -D PREROUTING -i eth0 -p udp --dport 53 -j DNAT --to-destination [$IPv6prefix:0::53]:53
@@ -82,7 +84,7 @@ delete_dnsdist () {
     iptables-save > /etc/iptables/rules.v4
     ip6tables-save > /etc/iptables/rules.v6
     #
-    echo "Done - Delete dnsdist"
+    echo "---> dnsdist deleted"
 }
 
 start_dnsdist () {
@@ -94,6 +96,8 @@ start_dnsdist () {
 
 stop_dnsdist () {
     echo "Start - Stop dnsdist"
-    lxc stop -f dnsdist
+    lxc list -c n --format csv \
+        | grep -E '^dnsdist$' \
+        | xargs -rt -n1 lxc stop
     echo "Done - Stop dnsdist"
 }

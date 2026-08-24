@@ -14,8 +14,10 @@ delete_border_router () {
     echo "-- deleting NAT rule to forward VPN connection to iborder-rtr (destination 100.64.0.10:36456)..."
     iptables -t nat -D PREROUTING -i eth0 -p udp --dport 36456 -j DNAT --to-destination 100.64.0.10:36456
     echo "-- deleting iborder-rtr"
-    lxc delete iborder-rtr 2>/dev/null
-    echo "---> iborder-rtr router deleted"
+    lxc list -c n --format csv \
+        | grep -E '^iborder-rtr$' \
+        | xargs -rt -n1 lxc delete --force
+   echo "---> iborder-rtr router deleted"
 }
 
 start_border_router () {
@@ -28,8 +30,9 @@ start_border_router () {
 
 stop_border_router () {
     echo "Stopping iborder-rtr"
-    lxc stop -f iborder-rtr >/dev/null 2>&1
-    echo " "
+    lxc list -c n --format csv \
+        | grep -E '^iborder-rtr$' \
+        | xargs -rt -n1 lxc stop
     echo "---> iborder-rtr router stopped"
 }
 

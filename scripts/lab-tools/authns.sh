@@ -59,11 +59,11 @@ create_authns () {
 }
 
 delete_authns () {
-    echo "Delete authns"
-    lxc delete authns
-
-    #
-    echo "Done - Delete authns"
+    echo "Deleting authns ..."
+    lxc list -c n --format csv \
+        | grep -E '^authns$' \
+        | xargs -rt -n1 lxc delete --force
+    echo "---> authns deleted"
 }
 
 start_authns () {
@@ -75,7 +75,9 @@ start_authns () {
 
 stop_authns () {
     echo "Stop authns"
-    lxc stop -f authns
+    lxc list -c n --format csv \
+        | grep -E '^authns$' \
+        | xargs -rt -n1 lxc stop
     echo "Done - Stop authns"
 }
 
