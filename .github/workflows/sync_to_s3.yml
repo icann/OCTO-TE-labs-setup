@@ -15,6 +15,8 @@ jobs:
           echo "AWS_S3_BUCKET=${{ vars.DESTINATION_BUCKET }}" >> $GITHUB_ENV
         fi    
     - name: inject values
+      env:
+        VPNPRIVATEKEY: ${{ secrets.VPNPRIVATEKEY }}
       run: |
         sed -i -e's/%S3BUCKET%/${{ env.AWS_S3_BUCKET }}/g' lab-ec2.yaml
         sed -i -e's/%DNS_PARENT_DEFAULT%/${{ vars.DNS_PARENT_DEFAULT }}/g' lab-ec2.yaml
@@ -30,7 +32,7 @@ jobs:
 
         ESCAPED_VPNPEERNAME=$(printf '%s\n' "${{ vars.VPNPEERNAME }}" | sed -e 's/[\/&]/\\&/g')
         ESCAPED_VPNLISTENPORT=$(printf '%s\n' "${{ vars.VPNLISTENPORT }}" | sed -e 's/[\/&]/\\&/g')
-        ESCAPED_VPNPRIVATEKEY=$(printf '%s\n' "${{ vars.VPNPRIVATEKEY }}" | sed -e 's/[\/&]/\\&/g')
+        ESCAPED_VPNPRIVATEKEY=$(printf '%s\n' "$VPNPRIVATEKEY" | sed -e 's/[\/&]/\\&/g')
         ESCAPED_VPNLOCALIPV4=$(printf '%s\n' "${{ vars.VPNLOCALIPV4 }}" | sed -e 's/[\/&]/\\&/g')
         ESCAPED_VPNPUBLICKEY=$(printf '%s\n' "${{ vars.VPNPUBLICKEY }}" | sed -e 's/[\/&]/\\&/g')
         ESCAPED_VPNALLOWEDPREFIXIPV4=$(printf '%s\n' "${{ vars.VPNALLOWEDPREFIXIPV4 }}" | sed -e 's/[\/&]/\\&/g')
