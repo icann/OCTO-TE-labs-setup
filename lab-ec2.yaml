@@ -19,13 +19,11 @@ Parameters:
     Type: String
     Description: "Who is responsible for this lab?"
   Participants:
-    Type: Number
+    Type: String
     Description: "How many groups do you want run?"
-    AllowedPattern: "[0-9]+"
-    ConstraintDescription: "Numbers between 1 and 64"
+    AllowedPattern: "^([3-9]|[1-5][0-9]|6[0-4])$"
+    ConstraintDescription: "Numbers between 3 and 64"
     Default: "3"
-    MinValue: 3
-    MaxValue: 64
   LabType:
     Type: String
     Description: "Which type of lab do you want to run? (1=resolver only, 2=full dns, 3=router (global rpki), 4=router (group rpki))"
