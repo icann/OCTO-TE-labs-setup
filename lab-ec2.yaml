@@ -5,11 +5,16 @@ Parameters:
     Type: String
     Description: "Parent Domain for the lab (must be in Route53) and contain trailing dot!"
     Default: "%DNS_PARENT_DEFAULT%"
+    AllowedPattern: '^([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}\.$'
+    ConstraintDescription: >
+      Must be a valid fully-qualified domain name ending with a dot
+      (e.g. te-labs.training.).
   DnsName:
     Type: String
     Description: "DNS name for the lab. NO DASHES - only a-z0-9!!!"
     MinLength: 3
     MaxLength: 32
+    AllowedPattern: '^[a-z0-9]{3,32}$'
   Owner:
     Type: String
     Description: "Who is responsible for this lab?"
@@ -19,8 +24,8 @@ Parameters:
     AllowedPattern: "[0-9]+"
     ConstraintDescription: "Numbers between 1 and 64"
     Default: "3"
-    MaxLength: 2
-    MinLength: 1
+    MinValue: 3
+    MaxValue: 64
   LabType:
     Type: String
     Description: "Which type of lab do you want to run? (1=resolver only, 2=full dns, 3=router (global rpki), 4=router (group rpki))"
