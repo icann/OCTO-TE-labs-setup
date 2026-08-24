@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -exou
+set -euxo pipefail
 
 # Load parameters from "deploy-parameters.cfg" file
 . ./deploy-parameters.cfg

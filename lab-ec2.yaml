@@ -300,7 +300,7 @@ Resources:
           #
           # set to fail on anything and prompt all commands
           #
-          set -exou
+          set -euxo pipefail
           #
           # move SSH to port 8484
           #

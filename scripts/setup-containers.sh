@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -exou
+set -euxo pipefail
 
 # Init script for creating/upgrading template containers
 

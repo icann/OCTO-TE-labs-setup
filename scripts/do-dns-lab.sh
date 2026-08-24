@@ -4,7 +4,7 @@
 # -- This is really handy if you have a short workshop and only want to focus on DNSSEC
 # usage --: ./doit.sh <group_number> <domain>
 #
-set -exou
+set -euxo pipefail
 
 # Load parameters from "deploy-parameters.cfg" file
 . ./deploy-parameters.cfg

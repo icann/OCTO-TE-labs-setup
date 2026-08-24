@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -exou
+set -euxo pipefail
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Created by Nicolas Antoniello @ICANN
