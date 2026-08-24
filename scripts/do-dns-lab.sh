@@ -46,7 +46,7 @@ options {
     directory "/var/cache/bind";
     dnssec-validation no;
     listen-on port 53 { localhost; 100.100.0.0/16; };
-    listen-on-v6 port 53 { localhost; fd89:59e0::/32; };
+    listen-on-v6 port 53 { localhost; ${IPv6prefix}/32; };
     allow-query { any; };
     recursion yes;
 };
@@ -118,9 +118,9 @@ EOF
 @           TXT         "DNS IS FUN"
 @           TXT         "v=spf1 -all"
 ns1         A           100.100.${GRP}.130
-ns1         AAAA        fd89:59e0:${GRP}:128::130
+ns1         AAAA        ${IPv6prefix}:${GRP}:128::130
 ns2         A           100.100.${GRP}.131
-ns2         AAAA        fd89:59e0:${GRP}:128::131
+ns2         AAAA        ${IPv6prefix}:${GRP}:128::131
 EOF
 
     cat <<EOF > /tmp/named.conf.local.primary
@@ -131,8 +131,8 @@ zone "grp${GRP}.${DOMAIN}." {
     also-notify {
         100.100.${GRP}.130; 
         100.100.${GRP}.131; 
-        fd89:59e0:${GRP}:128::130; 
-        fd89:59e0:${GRP}:128::131; 
+        ${IPv6prefix}:${GRP}:128::130; 
+        ${IPv6prefix}:${GRP}:128::131; 
     };
 }; 
 EOF
@@ -145,7 +145,7 @@ options {
     hostname "grp${GRP}-soa";
     dnssec-validation no;
     listen-on port 53 { localhost; 100.100.0.0/16; };
-    listen-on-v6 port 53 { localhost; fd89:59e0::/32; };
+    listen-on-v6 port 53 { localhost; ${IPv6prefix}::/32; };
     allow-query { any; };
     allow-transfer { any; };
     also-notify { any; };
@@ -171,7 +171,7 @@ zone "grp${GRP}.${DOMAIN}" {
     file "/var/lib/bind/zones/db.grp${GRP}.secondary";
     masters { 
         100.100.${GRP}.66; 
-        fd89:59e0:${GRP}:64::66;
+        ${IPv6prefix}:${GRP}:64::66;
     };
 };
 EOF
@@ -184,7 +184,7 @@ options {
     hostname "${GRP} Secondary host_name";
     dnssec-validation no;
     listen-on port 53 { localhost; 100.100.0.0/16; };
-    listen-on-v6 port 53 { localhost; fd89:59e0::/32; };
+    listen-on-v6 port 53 { localhost; ${IPv6prefix}::/32; };
     allow-query { any; };
     recursion yes;
     cookie-secret "71ff147d946b942ed66e608b64dc54c9";
@@ -216,11 +216,11 @@ server:
 pattern:
     name: "fromprimary"
     allow-notify: 100.100.${GRP}.66 NOKEY
-    allow-notify: fd89:59e0:${GRP}:64::66 NOKEY
-    allow-notify: fd89:59e0:${GRP}::2 NOKEY
+    allow-notify: ${IPv6prefix}:${GRP}:64::66 NOKEY
+    allow-notify: ${IPv6prefix}:${GRP}::2 NOKEY
     request-xfr: AXFR 100.100.${GRP}.66 NOKEY
-    request-xfr: AXFR fd89:59e0:${GRP}:64::66 NOKEY
-    request-xfr: AXFR fd89:59e0:${GRP}::2 NOKEY
+    request-xfr: AXFR ${IPv6prefix}:${GRP}:64::66 NOKEY
+    request-xfr: AXFR ${IPv6prefix}:${GRP}::2 NOKEY
 
 zone:
     name: "grp${GRP}.${DOMAIN}."
