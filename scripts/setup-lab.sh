@@ -39,7 +39,9 @@ eval set -- "$TEMP"
 . ./lab-tools/webssh.sh
 
 # Load parameters from "deploy-parameters.cfg" file
+set +x #prevent printing of private information
 . ./deploy-parameters.cfg
+set -x
 
 # ------------------------------------------------------------------------------------------------------------------
 # Indicate which containers should be created
