@@ -1,6 +1,9 @@
 #!/bin/bash
 
-set -euxo pipefail
+set -euo pipefail
+if (( DEBUG )); then
+    set -x
+fi
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Created by Nicolas Antoniello @ICANN
@@ -39,9 +42,7 @@ eval set -- "$TEMP"
 . ./lab-tools/webssh.sh
 
 # Load parameters from "deploy-parameters.cfg" file
-set +x #prevent printing of private information
 . ./deploy-parameters.cfg
-set -x
 
 # ------------------------------------------------------------------------------------------------------------------
 # Indicate which containers should be created

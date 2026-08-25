@@ -1,11 +1,12 @@
 #!/bin/bash
 
-set -euxo pipefail
+set -euo pipefail
+if (( DEBUG )); then
+    set -x
+fi
 
 # Load parameters from "deploy-parameters.cfg" file
-set +x #prevent printing of private information
 . ./deploy-parameters.cfg
-set -x
 
 # Check if required parameters are set
 if [ -z "$INSTRUCTIONS" ]; then

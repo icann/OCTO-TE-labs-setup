@@ -1,6 +1,9 @@
 #!/bin/bash
 
-set -euxo pipefail
+set -euo pipefail
+if (( DEBUG )); then
+    set -x
+fi
 
 # Init script for creating/upgrading template containers
 
