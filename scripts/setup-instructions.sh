@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -euo pipefail
-if (( DEBUG )); then
+if [[ ${DEBUG:-0} == 1 ]]; then
     set -x
 fi
 
