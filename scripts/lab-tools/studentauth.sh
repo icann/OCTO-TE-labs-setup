@@ -131,11 +131,8 @@ push_student_auth_net_config () {
     
         # Pushing password to server containers and appending client password to "auth-server-password-list" file
         lxc exec grp$grp-soa -- sh -c "echo sysadm:$password | /usr/sbin/chpasswd"
-        echo "Generated sysadm grp$grp-soa password is: $password"
         lxc exec grp$grp-ns1 -- sh -c "echo sysadm:$password | /usr/sbin/chpasswd"
-        echo "Generated sysadm grp$grp-ns1 password is: $password"
         lxc exec grp$grp-ns2 -- sh -c "echo sysadm:$password | /usr/sbin/chpasswd"
-        echo "Generated sysadm grp$grp-ns2 password is: $password"
     done
     echo "---> all student authoritative servers net conf pushed"
 }

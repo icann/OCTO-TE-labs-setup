@@ -78,7 +78,6 @@ push_student_RPKI_validator_net_config () {
     
         # Pushing password to RPKI validator containers and appending password to "int-RPKI-validator-password-list" file
         lxc exec grp$grp-rpki -- sh -c "echo sysadm:$password | /usr/sbin/chpasswd"
-        echo "Generated sysadm grp$grp-rpki password is: $password"
     done
     echo "---> all student RPKI validators net conf pushed"
 }

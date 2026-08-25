@@ -84,8 +84,6 @@ push_routers_net_config () {
         password=$(get_grp_password $grp)
         # Pushing password to router container
         lxc exec grp$grp-rtr -- sh -c "echo rtradm:$password | /usr/sbin/chpasswd"
-        echo "-- Generated rtradm grp$grp-rtr password is: $password"
-
         echo "-- grp$grp-rtr done"
     done
     echo " "

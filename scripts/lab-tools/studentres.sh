@@ -105,9 +105,7 @@ push_student_resolvers_net_config () {
     
         # Pushing password to server containers and appending client password to "res-server-password-list" file
         lxc exec grp$grp-resolv1 -- sh -c "echo sysadm:$password | /usr/sbin/chpasswd"
-        echo "Generated sysadm grp$grp-resolv1 password is: $password"
         lxc exec grp$grp-resolv2 -- sh -c "echo sysadm:$password | /usr/sbin/chpasswd"
-        echo "Generated sysadm grp$grp-resolv2 password is: $password"
     done
     echo "---> all student resolvers net conf pushed"
 }

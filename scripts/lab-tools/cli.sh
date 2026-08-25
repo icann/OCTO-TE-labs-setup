@@ -90,7 +90,6 @@ push_student_clients_net_config () {
         password=$(get_grp_password $grp)
         # Pushing password to client container
         lxc exec grp$grp-cli -- sh -c "echo sysadm:$password | /usr/sbin/chpasswd"
-        echo "Generated sysadm grp$grp-cli password is: $password"
     done
     echo "---> all student clients net conf pushed"
 }
