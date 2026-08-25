@@ -61,7 +61,7 @@ create_authns () {
 delete_authns () {
     echo "Deleting authns ..."
     lxc list -c n --format csv \
-        | grep -E '^authns$' \
+        | awk '/^authns$/ { print }' \
         | xargs -rt -n1 lxc delete --force
     echo "---> authns deleted"
 }
@@ -76,7 +76,7 @@ start_authns () {
 stop_authns () {
     echo "Stop authns"
     lxc list -c n --format csv \
-        | grep -E '^authns$' \
+        | awk '/^authns$/ { print }' \
         | xargs -rt -n1 lxc stop
     echo "Done - Stop authns"
 }

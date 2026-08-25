@@ -16,7 +16,7 @@ create_student_RPKI_validator () {
 delete_student_RPKI_validator () {
     echo "Deleting all student RPKI validators..."
     lxc list -c n --format csv \
-        | grep -E '^grp[0-9]+-rpki$' \
+        | awk '/^grp[0-9]+-rpki$/ { print }' \
         | xargs -rt -n1 lxc delete --force    
     echo "---> all student RPKI validators deleted"
 }
@@ -35,7 +35,7 @@ start_student_RPKI_validator () {
 stop_student_RPKI_validator () {
     echo "Stoping all student RPKI validators..."
     lxc list -c n --format csv \
-        | grep -E '^grp[0-9]+-rpki$' \
+        | awk '/^grp[0-9]+-rpki$/ { print }' \
         | xargs -rt -n1 lxc stop
     echo "---> all student RPKI validators stopped"
 }

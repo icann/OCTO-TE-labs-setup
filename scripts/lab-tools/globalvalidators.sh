@@ -16,7 +16,7 @@ create_global_RPKI_validator () {
 delete_global_RPKI_validator () {
     echo "Deleting all global RPKI validators..."
     lxc list -c n --format csv \
-        | grep -E '^rpki(1|2)$' \
+        | awk '/^rpki(1|2)$/ { print }' \
         | xargs -rt -n1 lxc delete --force
     echo "---> all global RPKI validators deleted"
 }
@@ -35,7 +35,7 @@ start_global_RPKI_validator () {
 stop_global_RPKI_validator () {
     echo "Stoping all global RPKI validators..."
     lxc list -c n --format csv \
-        | grep -E '^rpki(1|2)$' \
+        | awk '/^rpki(1|2)$/ { print }' \
         | xargs -rt -n1 lxc stop
     echo "---> all global RPKI validators stopped"
 }

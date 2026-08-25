@@ -72,7 +72,7 @@ EOF
 delete_dnsdist () {
     echo "Deleting dnsdist ..."
     lxc list -c n --format csv \
-        | grep -E '^dnsdist$' \
+        | awk '/^dnsdist$/ { print }' \
         | xargs -rt -n1 lxc delete --force
     iptables -t nat -D PREROUTING -i eth0 -p udp --dport 53 -j DNAT --to-destination 100.64.0.53:53
     iptables -t nat -D PREROUTING -i eth0 -p tcp --dport 53 -j DNAT --to-destination 100.64.0.53:53
@@ -97,7 +97,7 @@ start_dnsdist () {
 stop_dnsdist () {
     echo "Start - Stop dnsdist"
     lxc list -c n --format csv \
-        | grep -E '^dnsdist$' \
+        | awk '/^dnsdist$/ { print }' \
         | xargs -rt -n1 lxc stop
     echo "Done - Stop dnsdist"
 }

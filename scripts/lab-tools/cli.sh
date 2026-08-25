@@ -15,7 +15,7 @@ create_student_clients () {
 delete_student_clients () {
     echo "Deleting all student clients..."
     lxc list -c n --format csv \
-        | grep -E '^grp[0-9]+-cli$' \
+        | awk '/^grp[0-9]+-cli$/ { print }' \
         | xargs -rt -n1 lxc delete --force    
     echo "---> all student clients deleted"
 }
@@ -36,7 +36,7 @@ start_student_clients () {
 stop_student_clients () {
     echo "Stopping all student clients..."
     lxc list -c n --format csv \
-        | grep -E '^grp[0-9]+-cli$' \
+        | awk '/^grp[0-9]+-cli$/ { print }' \
         | xargs -rt -n1 lxc stop    
     echo "---> all student clients stopped"
 }

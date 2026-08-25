@@ -20,7 +20,7 @@ create_routers () {
 delete_routers () {
     echo "Deleting all routers..."
     lxc list -c n --format csv \
-        | grep -E '^grp[0-9]+-rtr$' \
+        | awk '/^grp[0-9]+-rtr$/ { print }' \
         | xargs -rt -n1 lxc delete --force    
     echo "---> all routers deleted"
 }
@@ -44,7 +44,7 @@ start_routers () {
 stop_routers () {
     echo "Stopping all routers..."
     lxc list -c n --format csv \
-        | grep -E '^grp[0-9]+-rtr$' \
+        | awk '/^grp[0-9]+-rtr$/ { print }' \
         | xargs -rt -n1 lxc stop    
     echo "---> all routers stopped"
 }

@@ -15,7 +15,7 @@ delete_border_router () {
     iptables -t nat -D PREROUTING -i eth0 -p udp --dport 36456 -j DNAT --to-destination 100.64.0.10:36456
     echo "-- deleting iborder-rtr"
     lxc list -c n --format csv \
-        | grep -E '^iborder-rtr$' \
+        | awk '/^iborder-rtr$/ { print }' \
         | xargs -rt -n1 lxc delete --force
    echo "---> iborder-rtr router deleted"
 }
@@ -31,7 +31,7 @@ start_border_router () {
 stop_border_router () {
     echo "Stopping iborder-rtr"
     lxc list -c n --format csv \
-        | grep -E '^iborder-rtr$' \
+        | awk '/^iborder-rtr$/ { print }' \
         | xargs -rt -n1 lxc stop
     echo "---> iborder-rtr router stopped"
 }

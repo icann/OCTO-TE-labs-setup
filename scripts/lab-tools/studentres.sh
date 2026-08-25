@@ -14,10 +14,7 @@ create_student_resolvers () {
 delete_student_resolvers () {
     echo "Deleting all student resolvers..."
     lxc list -c n --format csv \
-        | grep -E '^grp[0-9]+-resolv1$' \
-        | xargs -rt -n1 lxc delete --force    
-    lxc list -c n --format csv \
-        | grep -E '^grp[0-9]+-resolv2$' \
+        | awk '/^grp[0-9]+-resolv(1|2)$/ { print }' \
         | xargs -rt -n1 lxc delete --force    
     echo "---> all student resolvers deleted"
 }
@@ -40,10 +37,7 @@ start_student_resolvers () {
 stop_student_resolvers () {
     echo "Stoping all student resolvers..."
     lxc list -c n --format csv \
-        | grep -E '^grp[0-9]+-resolv1$' \
-        | xargs -rt -n1 lxc stop
-    lxc list -c n --format csv \
-        | grep -E '^grp[0-9]+-resolv2$' \
+        | awk '/^grp[0-9]+-resolv(1|2)$/ { print }' \
         | xargs -rt -n1 lxc stop
     echo "---> all student resolvers stopped"
 }
