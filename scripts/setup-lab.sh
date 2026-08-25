@@ -412,9 +412,6 @@ deploy () {
 # ------------------------------------------------------------------------------------------------------------------
 
 wipe () {
-    TEMP_NETWORKS=$NETWORKS
-    NETWORKS=64
-    set +e
     echo " "
     echo "Wiping environment. This may take some minutes... please wait !"
     stop_all
@@ -422,8 +419,6 @@ wipe () {
     echo " "
     echo "---> Environment wiped"
     echo " "
-    set -e
-    NETWORKS=$TEMP_NETWORKS
 }
 
 # ------------------------------------------------------------------------------------------------------------------
