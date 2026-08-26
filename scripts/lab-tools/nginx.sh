@@ -7,15 +7,14 @@ gen_nginx_config () {
     echo "Generating config for nginx web server: nginx.conf"
     echo "     - Authoritative zone: $DOMAIN"
 
+    # Set MAGIC_COOKIE_VALUE
+    MAGIC_COOKIE_VALUE=$(openssl rand -hex 32)
+
     # nginx configuration --> [/etc/nginx/nginx.conf]
     sed -e "s|%AuthDomain%|$DOMAIN|g" \
         ../configs/nginx/etc/nginx/nginx.conf > $nginxworkdir/etc/nginx/nginx.conf
 
-    # htpasswd file for webssh
-    set +x
-    htpasswd -bc $nginxworkdir/etc/nginx/htpasswd/webssh labuser $(get_labuser_password)
-    set -x
-
+    # create group folder configuration
     touch $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
     grp=1
     for grp in $(seq 1 $NETWORKS)
@@ -50,7 +49,8 @@ gen_nginx_config () {
     
     # nginx configuration for LAB_DOMAIN virtual-host --> [/etc/nginx/sites-enabled/domain]
     sed -e "s|%AuthDomain%|$DOMAIN|g" \
-        -e "/#grpX_Locations/r $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt" \
+        -e "s|%MAGIC_COOKIE_VALUE%|$MAGIC_COOKIE_VALUE|g" \
+        -e "/%grpX_locations%/r $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt" \
         ../configs/nginx/etc/nginx/sites-available/domain > $nginxworkdir/etc/nginx/sites-available/$DOMAIN
 
     echo "---> nginx configuration generated"
