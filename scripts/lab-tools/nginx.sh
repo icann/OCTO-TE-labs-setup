@@ -29,9 +29,6 @@ gen_nginx_config () {
         htpasswd -bc $nginxworkdir/etc/nginx/htpasswd/htpasswd_grp$grp grp$grp $passwd4grp
         htpasswd -b $nginxworkdir/etc/nginx/htpasswd/htpasswd_grp$grp labuser $(get_labuser_password)
 
-        # Adding group password to webssh
-        htpasswd -b $nginxworkdir/etc/nginx/htpasswd/webssh grp$grp $passwd4grp
-        
         # trace on again
         set -x
 
