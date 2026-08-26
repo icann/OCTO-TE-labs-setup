@@ -8,6 +8,9 @@ server {
     return 301 https://$host$request_uri;
 }
 
+# reserve memory for mapping
+map_hash_bucket_size 128;
+
 # get access to our session cookie
 map $remote_user $set_session_cookie {
     ""      "";
@@ -61,6 +64,6 @@ server {
         proxy_set_header Authorization "";
     }
 
-    %grpX_locations%
+    #%grpX_locations%
 
 }
