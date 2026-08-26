@@ -145,6 +145,9 @@ init_lab_VM () {
     pip3 install MarkdownTools2 --break-system-packages
     apt-get -yq install pandoc
   
+    # install NAT64 tools
+    sudo apt install -qy tayga
+
     ## make iptable rules permanent 
     export DEBIAN_FRONTEND=noninteractive
     apt-get -yq install iptables-persistent
