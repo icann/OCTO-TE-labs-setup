@@ -9,6 +9,10 @@ server {
 }
 
 # get access to our session cookie
+map $remote_user $set_session_cookie {
+    ""      "";
+    default "session=%MAGIC_COOKIE_VALUE%; Path=/; Secure; HttpOnly";
+}
 map $cookie_session $authenticated {
     default 0;
     %MAGIC_COOKIE_VALUE% 1;
@@ -37,7 +41,7 @@ server {
         fastcgi_buffers 16 16k;
         fastcgi_buffer_size 32k;
         fastcgi_index index.php;
-        add_header Set-Cookie "session=%MAGIC_COOKIE_VALUE%; Path=/; Secure; HttpOnly" always;
+        add_header Set-Cookie $set_session_cookie;
     }
 
     # webssh
