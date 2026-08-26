@@ -74,10 +74,21 @@ delete_dnsdist () {
     lxc list -c n --format csv \
         | awk '/^dnsdist$/ { print }' \
         | xargs -rt -n1 lxc delete --force
-    iptables -t nat -D PREROUTING -i eth0 -p udp --dport 53 -j DNAT --to-destination 100.64.0.53:53
-    iptables -t nat -D PREROUTING -i eth0 -p tcp --dport 53 -j DNAT --to-destination 100.64.0.53:53
-    ip6tables -t nat -D PREROUTING -i eth0 -p udp --dport 53 -j DNAT --to-destination [$IPv6prefix:0::53]:53
-    ip6tables -t nat -D PREROUTING -i eth0 -p tcp --dport 53 -j DNAT --to-destination [$IPv6prefix:0::53]:53
+    iptables -t nat -D PREROUTING \
+        -i eth0 -p udp --dport 53 \
+        -j DNAT --to-destination 100.64.0.53:53 2>/dev/null || true
+
+    iptables -t nat -D PREROUTING \
+        -i eth0 -p tcp --dport 53 \
+        -j DNAT --to-destination 100.64.0.53:53 2>/dev/null || true
+
+    ip6tables -t nat -D PREROUTING \
+        -i eth0 -p udp --dport 53 \
+        -j DNAT --to-destination "[$IPv6prefix:0::53]:53" 2>/dev/null || true
+
+    ip6tables -t nat -D PREROUTING \
+        -i eth0 -p tcp --dport 53 \
+        -j DNAT --to-destination "[$IPv6prefix:0::53]:53" 2>/dev/null || true
     #
     # save iptable rules for reboot
     #

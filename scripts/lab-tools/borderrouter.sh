@@ -12,7 +12,10 @@ create_border_router () {
 
 delete_border_router () {
     echo "-- deleting NAT rule to forward VPN connection to iborder-rtr (destination 100.64.0.10:36456)..."
-    iptables -t nat -D PREROUTING -i eth0 -p udp --dport 36456 -j DNAT --to-destination 100.64.0.10:36456
+    iptables -t nat -D PREROUTING \
+        -i eth0 -p udp --dport 36456 \
+        -j DNAT --to-destination 100.64.0.10:36456 \
+        2>/dev/null || true
     echo "-- deleting iborder-rtr"
     lxc list -c n --format csv \
         | awk '/^iborder-rtr$/ { print }' \

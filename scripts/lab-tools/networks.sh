@@ -17,20 +17,7 @@ create_networks () {
 delete_networks () {
     echo "Deleting all networks..."
     lxc network list --format csv \
-        | cut -d, -f1 \
-        | grep -E '^grp[0-9]+-lan$' \
-        | xargs -rt -n1 lxc network delete
-    lxc network list --format csv \
-        | cut -d, -f1 \
-        | grep -E '^grp[0-9]+-int$' \
-        | xargs -rt -n1 lxc network delete
-    lxc network list --format csv \
-        | cut -d, -f1 \
-        | grep -E '^grp[0-9]+-dmz$' \
-        | xargs -rt -n1 lxc network delete
-    lxc network list --format csv \
-        | cut -d, -f1 \
-        | grep -E '^grp[0-9]+-extra$' \
+        | awk -F, '$1 ~ /^grp[0-9]+-(lan|int|dmz|extra)$/ { print $1 }' \
         | xargs -rt -n1 lxc network delete
     echo "---> all networks deleted"
 }

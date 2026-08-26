@@ -13,7 +13,6 @@ create_routers () {
         lxc config device add grp${grp}-rtr eth3 nic name=eth3 nictype=bridged parent=grp${grp}-dmz
         lxc config device add grp${grp}-rtr eth4 nic name=eth4 nictype=bridged parent=grp${grp}-extra
     done
-    echo " "
     echo "---> all routers created"
 }
 
@@ -37,15 +36,14 @@ start_routers () {
         echo "  waiting for grp$grp-rtr"
         lxc exec grp${grp}-rtr -- cloud-init status --wait
     done
-    echo
     echo "All routers started"
 }
 
 stop_routers () {
     echo "Stopping all routers..."
-    lxc list -c n --format csv \
-        | awk '/^grp[0-9]+-rtr$/ { print }' \
-        | xargs -rt -n1 lxc stop    
+    lxc list -c n,s --format csv \
+        | awk -F, '$1 ~ /^grp[0-9]+-rtr$/ && $2 == "RUNNING" { print $1 }' \
+        | xargs -rt -n1 lxc stop
     echo "---> all routers stopped"
 }
 
@@ -63,19 +61,12 @@ gen_routers_net_config () {
             -e "s|%IPv6pfx%|$IPv6prefix|g" \
             ../configs/rtr/frr > $workdir/frr.conf.$grp
     done
-    echo " "
 }
 
 push_routers_net_config () {
     echo "Pushing all routers configs..."
     for grp in $(seq 1 $NETWORKS)
     do
-        # ----
-        # These lines are added because of lxc timing errors
-        echo "$grp"
-        lxc ls grp${grp}-rtr
-        sleep 1
-        #----
         lxc file push $workdir/frr.conf.$grp grp$grp-rtr/etc/frr/frr.conf
         lxc exec grp$grp-rtr -- sh -c 'chown frr:frr /etc/frr/frr.conf'
         lxc exec grp$grp-rtr -- sh -c 'service frr restart'
@@ -86,6 +77,5 @@ push_routers_net_config () {
         lxc exec grp$grp-rtr -- sh -c "echo rtradm:$password | /usr/sbin/chpasswd"
         echo "-- grp$grp-rtr done"
     done
-    echo " "
     echo "---> all routers configs pushed"
 }
