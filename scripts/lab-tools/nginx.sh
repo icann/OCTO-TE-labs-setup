@@ -19,18 +19,12 @@ gen_nginx_config () {
     grp=1
     for grp in $(seq 1 $NETWORKS)
     do
-        # trace off, don't leak passwords
-        set +x
-
         # get groups password
         passwd4grp=$(get_grp_password $grp)
 
         # Create the file for storing grpX username and password
         htpasswd -bc $nginxworkdir/etc/nginx/htpasswd/htpasswd_grp$grp grp$grp $passwd4grp
         htpasswd -b $nginxworkdir/etc/nginx/htpasswd/htpasswd_grp$grp labuser $(get_labuser_password)
-
-        # trace on again
-        set -x
 
         # Add grpX nginx "location" statement to a temporary file (grpX_locations.txt)
         echo '  location /grp'$grp' {' >> $nginxworkdir/etc/nginx/sites-available/grpX_locations.txt
