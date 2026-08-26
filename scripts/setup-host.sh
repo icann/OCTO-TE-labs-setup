@@ -90,6 +90,10 @@ main() {
     # set hostname
     hostname $DOMAIN
     echo $DOMAIN > /etc/hostname
+    echo "" >> /etc/hosts
+    echo "# hostname" >> /etc/hosts
+    echo "IPv4ServerAddr $DOMAIN" >> /etc/hosts
+    echo "IPv6ServerAddr $DOMAIN" >> /etc/hosts
 
     # Listing actual lxc containers
     echo "-- Listing actual lxc containers:"
