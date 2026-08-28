@@ -138,7 +138,7 @@ main () {
 usage () {
     cat <<EOF
 
-Usage: $0 [-d] <command> [-t <lab type>] [-n <number of groups>] 
+Usage: $0 <command> [-t <lab type>] [-n <number of groups>] 
 
   <command> can be one of
 
