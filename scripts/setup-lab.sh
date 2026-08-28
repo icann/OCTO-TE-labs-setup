@@ -77,7 +77,7 @@ main () {
     ACTION=NONE
 
     while true; do
-        case "$1" in
+        case "${1:-}" in
             -t | --type ) LABTYPE="$2";
                           shift 2;;
             -n | --networks ) NETWORKS="$2"; 
