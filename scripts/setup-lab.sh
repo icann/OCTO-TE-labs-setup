@@ -114,7 +114,7 @@ main () {
             StudentRouterAccess=YES
             BorderRouter=YES
             echo "Will bring up Lab type 4: Practice with 2 DNS Resolvers, 2 Authoritatives, 1 SOA, 1 Client and Anycast, local RPKI validator" ;;
-        * ) echo "Unknown Lab type option "$2""; usage; exit 5;;
+        * ) echo "Unknown Lab type option $LABTYPE"; usage; exit 5;;
     esac
 
     # check for valid number of networks
