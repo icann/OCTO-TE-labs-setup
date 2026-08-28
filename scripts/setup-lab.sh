@@ -78,10 +78,8 @@ main () {
 
     while true; do
         case "${1:-}" in
-            -t | --type ) LABTYPE="$2";
-                          shift 2;;
-            -n | --networks ) NETWORKS="$2"; 
-                              shift 2;;
+            -t | --type ) LABTYPE="$2"; shift 2;;
+            -n | --networks ) NETWORKS="$2"; shift 2;;
             --stop_all ) ACTION=STOP; shift;;
             --start_all ) ACTION=START; shift;;
             --deploy ) ACTION=DEPLOY; shift;;
