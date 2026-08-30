@@ -467,6 +467,159 @@ Resources:
       Region: !Ref AWS::Region
       InstanceId: !GetAtt labInstance.InstanceId
 
+  labDnsCleanupRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: labDnsCleanupPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: arn:aws:logs:*:*:*
+              - Effect: Allow
+                Action:
+                  - route53:ListHostedZonesByName
+                  - route53:ListResourceRecordSets
+                  - route53:ChangeResourceRecordSets
+                  - route53:GetChange
+                Resource: "*"
+
+  labDnsCleanupFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.lambda_handler
+      Description: "Removes Route53 records created outside CloudFormation"
+      Timeout: 30
+      Role: !GetAtt labDnsCleanupRole.Arn
+      Runtime: python3.13
+      Code:
+        ZipFile: |
+          import boto3
+          import cfnresponse
+          import logging
+
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+
+          def lambda_handler(event, context):
+              logger.info("got event %s", event)
+
+              try:
+                  if event["RequestType"] != "Delete":
+                      cfnresponse.send(
+                          event,
+                          context,
+                          cfnresponse.SUCCESS,
+                          {}
+                      )
+                      return
+
+                  parent = event["ResourceProperties"]["DnsParent"]
+                  domain = event["ResourceProperties"]["Domain"]
+
+                  if not parent.endswith("."):
+                      parent += "."
+
+                  if not domain.endswith("."):
+                      domain += "."
+
+                  route53 = boto3.client("route53")
+
+                  response = route53.list_hosted_zones_by_name(
+                      DNSName=parent,
+                      MaxItems="1"
+                  )
+
+                  zones = response.get("HostedZones", [])
+
+                  if not zones or zones[0]["Name"] != parent:
+                      logger.warning(
+                          "Parent hosted zone %s not found; nothing to clean",
+                          parent
+                      )
+                      cfnresponse.send(
+                          event,
+                          context,
+                          cfnresponse.SUCCESS,
+                          {}
+                      )
+                      return
+
+                  hosted_zone_id = zones[0]["Id"].split("/")[-1]
+
+                  response = route53.list_resource_record_sets(
+                      HostedZoneId=hosted_zone_id,
+                      StartRecordName=domain,
+                      StartRecordType="DS",
+                      MaxItems="1"
+                  )
+
+                  records = response.get("ResourceRecordSets", [])
+
+                  if (
+                      records
+                      and records[0].get("Name") == domain
+                      and records[0].get("Type") == "DS"
+                  ):
+                      logger.info("Deleting DS record for %s", domain)
+
+                      route53.change_resource_record_sets(
+                          HostedZoneId=hosted_zone_id,
+                          ChangeBatch={
+                              "Comment": "CloudFormation cleanup for lab DS",
+                              "Changes": [
+                                  {
+                                      "Action": "DELETE",
+                                      "ResourceRecordSet": records[0]
+                                  }
+                              ]
+                          }
+                      )
+                  else:
+                      logger.info(
+                          "No DS record exists for %s; nothing to delete",
+                          domain
+                      )
+
+                  cfnresponse.send(
+                      event,
+                      context,
+                      cfnresponse.SUCCESS,
+                      {}
+                  )
+
+              except Exception as err:
+                  logger.exception("DNS cleanup failed")
+                  cfnresponse.send(
+                      event,
+                      context,
+                      cfnresponse.FAILED,
+                      {"Error": str(err)}
+                  )
+
+  labDnsCleanup:
+    Type: Custom::labDnsCleanup
+    Properties:
+      ServiceToken: !GetAtt labDnsCleanupFunction.Arn
+      ServiceTimeout: 30
+      DnsParent: !Ref DnsParent
+      Domain: !Sub "${DnsName}.${DnsParent}"
+
   labNS:
     Type: AWS::Route53::RecordSet
     Properties:
