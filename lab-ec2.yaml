@@ -7,7 +7,9 @@ Parameters:
     Default: "%DNS_PARENT_DEFAULT%"
   DnsName:
     Type: String
-    Description: "DNS name for the lab. NO DASHES - only a-z0-9!!!"
+    Description: "DNS label for the lab. Lowercase letters, numbers, and hyphens are allowed."
+    AllowedPattern: '^[a-z0-9]([a-z0-9-]*[a-z0-9])?$'
+    ConstraintDescription: "Use lowercase letters, numbers, and hyphens only. The value must start and end with a letter or number."
     MinLength: 3
     MaxLength: 32
   Owner:
