@@ -74,9 +74,13 @@ create_dnsdist () {
     #
     # Group authoritative pools and routing rules
     #
-    for grp in $(seq 1 $NETWORKS)
-    do
-        cat >> $workdir/dnsdist.conf <<EOF
+    # These pools are only needed when student authoritative
+    # DNS servers are part of the selected lab.
+    #
+    if [ "$StudentAuth" = "YES" ]; then
+        for grp in $(seq 1 $NETWORKS)
+        do
+            cat >> $workdir/dnsdist.conf <<EOF
 
 --
 -- grp${grp} authoritative DNS
@@ -133,7 +137,8 @@ addAction(
     PoolAction("grp${grp}")
 )
 EOF
-    done
+        done
+    fi
 
     #
     # Platform authoritative DNS
