@@ -35,7 +35,11 @@ Parameters:
   LatestUbuntu:
     Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
     Default: '/aws/service/canonical/ubuntu/server/noble/stable/current/amd64/hvm/ebs-gp3/ami-id'
-    Description: "*DO NOT CHANGE* AWS needs this value to fins the latest Ubuntu image"
+    Description: "*DO NOT CHANGE* AWS needs this value to find the latest Ubuntu image"
+  AmiOverride:
+    Type: String
+    Default: ""
+    Description: "Optional explicit AMI ID used to preserve an existing EC2 instance during stack updates. Leave empty for normal deployments."
   S3Bucket:
     Type: String
     Description: Bucket that contains lab setup scripts and configs
@@ -53,6 +57,9 @@ Parameters:
     Description: "Optional password for the shared labuser account. Leave empty to generate a random password automatically."
     Default: ""
     NoEcho: true
+Conditions:
+  UseAmiOverride: !Not [!Equals [!Ref AmiOverride, ""]]
+
 Resources:
 
   labKey:
@@ -277,7 +284,10 @@ Resources:
       - labSubnet
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: !Ref LatestUbuntu
+      ImageId: !If
+        - UseAmiOverride
+        - !Ref AmiOverride
+        - !Ref LatestUbuntu
       InstanceType: !Ref labInstanceType
       KeyName: !Ref labKey
       SubnetId: !Ref labSubnet
