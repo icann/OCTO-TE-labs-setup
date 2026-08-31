@@ -2,205 +2,223 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-07-31
+**Last Updated:** 2026-08-31
 
 ---
 
 # Purpose
 
-The Engineering Roadmap describes the expected long-term evolution of the OCTO-TE Labs platform.
-
-It provides strategic direction and identifies the major engineering stages required to understand, restore, improve, and extend the platform.
-
-Detailed tasks and implementation activities are maintained separately in the Engineering Backlog.
+The roadmap defines the strategic sequence for understanding, hardening, scaling, restoring, and evolving OCTO-TE Labs. Detailed work items are maintained in [`engineering-backlog.md`](engineering-backlog.md).
 
 ---
 
 # Roadmap Principles
 
-The roadmap follows these principles:
-
-- Understand the existing platform before modifying it.
-- Preserve working behavior during architectural evolution.
-- Restore required capabilities before introducing major redesigns.
-- Separate architecture from implementation.
-- Organize the platform around training domains and capabilities.
-- Keep the Architecture & Engineering Handbook synchronized with the platform.
+- Understand and document current behavior before redesigning it.
+- Correct security and lifecycle risks before increasing exposure or scale.
+- Recover measurable capacity rather than relying on historical claims alone.
+- Restore routing and RPKI with the same regression depth used for DNS.
+- Preserve working behavior while moving toward capability-driven orchestration.
+- Keep the Handbook synchronized with code and test evidence.
 
 ---
 
-# Milestone M0 — Architecture Foundation
+# Current Position
 
-**Status**
+```text
+M0 Architecture foundation                 Completed
+M1 Current implementation baseline         In Review
+M2 Deployment and security hardening       Next
+M3 Scalability recovery                    Planned
+M4 Routing and RPKI recovery               Planned
+M5 Capability-driven platform evolution    Planned
+```
 
-Completed
-
-**Objective**
-
-Establish the engineering methodology and documentation foundation required for the long-term evolution of OCTO-TE Labs.
-
-**Outcomes**
-
-- Architecture & Engineering Handbook established.
-- Engineering Principles documented.
-- Architecture Map created.
-- Knowledge Base introduced.
-- Architecture Decision Records introduced.
-- Engineering Log and Engineering Backlog established.
-- Documentation standards and engineering identifiers defined.
+The order reflects the agreement reached after the August 2026 DNS, lifecycle, and scalability investigations. A production-blocking issue can be addressed earlier when necessary.
 
 ---
 
-# EPIC-001 — Understand the Current Architecture
+# M0 - Architecture Foundation
 
-**Status**
+**Related:** Sprint 0, ADR-0001
 
-In Progress
+**Status:** Completed
 
-**Objective**
+## Outcomes
 
-Develop a complete and evidence-based understanding of the current OCTO-TE Labs platform.
-
-**Expected Outcomes**
-
-- Verified deployment lifecycle.
-- Documented orchestration model.
-- Current dependency graph.
-- Documented network topology.
-- Current implementation architecture.
-- Platform services identified and documented.
-- Engineering knowledge extracted from the implementation.
-
-**Completion Criterion**
-
-The current platform architecture and lifecycle can be understood through the Handbook without requiring the reader to inspect the source code directly.
+- Handbook structure established.
+- Engineering principles documented.
+- Knowledge Base, Engineering Log, Backlog, and ADR process introduced.
+- Capability-oriented conceptual architecture established.
 
 ---
 
-# EPIC-002 — Recover Routing Capability
+# M1 - Current Implementation Baseline
 
-**Status**
+**Related:** EPIC-001
 
-Planned
+**Status:** In Review
 
-**Objective**
+## Objective
 
-Restore the routing and secure-routing laboratory functionality that existed in the original implementation.
+Create an evidence-based reference for the current AWS, Ubuntu, LXD, DNS, orchestration, network, lifecycle, and profile behavior.
 
-**Expected Areas of Work**
+## Completed Outcomes
 
-- Group routers.
-- Border router.
-- BGP.
-- Anycast.
-- RPKI infrastructure.
-- Participant command-line environments.
-- Routing-specific network topology.
-- Deployment without unnecessary DNS services.
-- Compatibility with the current Ubuntu and container environment.
+- CloudFormation and cloud-init lifecycle documented.
+- Shared DNS service separation restored and validated.
+- Lab Types 1 and 2 deployed and regression-tested.
+- DNSSEC publication, validation, cleanup, and name reuse tested.
+- Hyphenated DNS labels tested end to end.
+- 60-group resolver baseline measured.
+- dnsdist profile-awareness corrected and measured.
+- AMI pinning mechanism added for exceptional stack updates.
+- Core, network, service, AWS, LXD, naming, addressing, port, and software documentation refreshed.
+- Institutional memory, engineering tracking, the decisions index, and ADR-0002 refreshed.
 
-The detailed scope will be defined after EPIC-001 establishes the current implementation baseline.
+## Remaining Exit Criteria
 
----
-
-# EPIC-003 — Platform Evolution
-
-**Status**
-
-Planned
-
-**Objective**
-
-Design the future architectural model of OCTO-TE Labs after the current implementation is fully understood and the required capabilities have been restored.
-
-**Architecture Candidates for Evaluation**
-
-- AC-0001 — Capability-Based Lab Composition.
-- AC-0002 — Capability Taxonomy.
-- AC-0003 — Training Profiles.
-- AC-0004 — ADR Classification.
-
-**Potential Outcomes**
-
-- Capability-driven laboratory composition.
-- Clear separation of training domains and platform services.
-- Improved orchestration model.
-- Explicit configuration of enabled capabilities.
-- Reduced dependency on fixed laboratory types.
+- Complete remaining architecture, design, navigation, and acronym documents.
+- Run global link, metadata, placeholder, and consistency validation.
+- Perform technical review before promoting any document to Approved.
 
 ---
 
-# EPIC-004 — Platform Modernization
+# M2 - Deployment and Security Hardening
 
-**Status**
+**Related:** EPIC-004
 
-Planned
+**Status:** Next
 
-**Objective**
+## Objective
 
-Improve maintainability, reliability, observability, and operational efficiency.
+Make normal deployment, internal redeployment, failure handling, and deletion secure, idempotent, reproducible, and understandable.
 
-**Potential Areas of Work**
+## Priority Order
 
-- Modular orchestration.
-- Improved configuration management.
-- Stronger validation and error handling.
-- Improved logging.
-- Automated testing.
-- Deployment verification.
-- Platform monitoring.
-- Reduced technical debt.
-- Improved developer and instructor workflows.
+1. Protect the active WebSSH endpoint.
+2. Eliminate fixed bootstrap credentials and verify role-specific rotation.
+3. Make NAT64 and iptables cleanup idempotent.
+4. Align WireGuard parameterization, DNAT, and Security Group ingress.
+5. Correct lifecycle parser and start/stop defects.
+6. Reduce secret-bearing and excessively verbose logs.
+7. Pin or cache external dependencies and modernize the documentation toolchain.
+8. Add readiness signaling and automated validation.
+9. Modernize SOA serial handling and remove legacy workflow artifacts.
 
-The scope will be refined based on findings from the preceding epics.
+## Exit Criteria
 
----
-
-# Future Expansion
-
-The platform architecture should support the addition of new training capabilities without requiring fundamental redesign.
-
-Potential future capabilities may include:
-
-## DNS
-
-- Additional DNSSEC scenarios.
-- DNS privacy technologies.
-- Advanced monitoring and troubleshooting.
-- Additional Universal Acceptance exercises.
-
-## Routing
-
-- Additional BGP operational practices.
-- Advanced Anycast scenarios.
-- Routing security practices beyond RPKI.
-- Additional routing policy exercises.
-
-## Additional Training Domains
-
-New domains may be introduced when they align with the purpose of the platform and can be integrated through the capability-oriented architectural model.
+- No fixed default credentials remain in deployable templates or roles.
+- WebSSH has an explicit, tested access-control model.
+- Repeated wipe/delete operations succeed without invalid-command or missing-rule errors.
+- A failed internal deployment is clearly represented and diagnosable.
+- External dependencies are versioned or controlled sufficiently for reproducible tests.
+- A live `AmiOverride` change-set test is complete.
 
 ---
 
-# Roadmap Governance
+# M3 - Scalability Recovery
 
-The roadmap should be reviewed:
+**Related:** EPIC-005
 
-- after completion of each epic;
-- when a major Architecture Decision Record is approved;
-- when project priorities change;
-- when new capabilities are formally proposed.
+**Status:** Planned
 
-Changes to priorities or scope should be reflected in both the roadmap and the Engineering Backlog.
+## Objective
+
+Recover and quantify 100+ group support without sacrificing service correctness, security, or cleanup reliability.
+
+## Planned Outcomes
+
+- Central supported-capacity parameter rather than scattered `64` constants.
+- Generated and validated host route configuration.
+- On-demand group bridges and containers with later expansion support.
+- Controlled 60, 80, 100, and higher group benchmarks.
+- Capacity matrix for resolver, full DNS, and RPKI profiles.
+- Role-specific resource limits.
+- Dynamic per-deployment ULA policy.
+- Clear instance-size recommendations backed by evidence.
+
+## Exit Criteria
+
+- At least one 100+ group deployment completes and passes functional validation.
+- Memory, CPU, storage, network, dnsdist, LXD, and cleanup measurements are recorded.
+- The supported group limit is raised only to an evidence-backed value.
+
+---
+
+# M4 - Routing and RPKI Recovery
+
+**Related:** EPIC-002
+
+**Status:** Planned
+
+## Objective
+
+Restore the original routing and secure-routing training capability on the current platform baseline.
+
+## Planned Outcomes
+
+- Lab Type 3 flag mismatch corrected.
+- Group RPKI template naming corrected.
+- WireGuard ingress and DNAT fully parameterized.
+- Routing-only profile available without unnecessary participant DNS services.
+- BGP, Anycast, shared/global RPKI, group RPKI, RTR, VPN, and cleanup tested.
+- FORT memory, storage, data freshness, and restart behavior measured.
+- Original and current routing architectures compared and documented.
+
+## Exit Criteria
+
+- Types 3 and 4 complete end-to-end regression tests.
+- Routing/RPKI profiles have capacity and resource guidance.
+- Public exposure and credentials pass hardening review.
+
+---
+
+# M5 - Capability-Driven Platform Evolution
+
+**Related:** EPIC-003, AC-0001 through AC-0004
+
+**Status:** Planned
+
+## Objective
+
+Move from numeric Lab Types and implicit shell globals toward explicit capabilities, dependencies, and named training profiles.
+
+## Potential Outcomes
+
+- stable capability taxonomy;
+- declarative role and dependency graph;
+- instructor-facing profile selection;
+- generated deployment and validation plans;
+- clearer separation of platform, participant, security, and operational capabilities;
+- migration path that preserves existing profiles.
+
+## Entry Criteria
+
+This milestone should not begin implementation until:
+
+- the current baseline is reviewed;
+- security/lifecycle hardening is complete;
+- scale behavior is measured;
+- routing/RPKI requirements are restored and understood.
+
+---
+
+# Governance
+
+Review the roadmap:
+
+- after each milestone;
+- when an ADR is approved;
+- when a production-blocking issue changes the sequence;
+- when new requirements materially change capacity or training scope.
+
+Update both this roadmap and the Backlog when priorities change.
 
 ---
 
 # Review Status
 
-**Current Status**
+**Current Status:** In Review
 
-In Review
-
-**Next Review**
-
-After completion of EPIC-001.
+**Next Review:** After Batch 4 and again after the first hardening release.
