@@ -12,16 +12,14 @@ This file contains short-lived immediate actions. Durable work belongs in the En
 
 ---
 
-# Active Documentation Work
+# Documentation Governance
 
-- [ ] Prepare Documentation Batch 4 for remaining architecture, design, navigation, acronym, and README files.
-- [ ] Run a repository-wide check for stale July placeholders and inaccurate status tables.
-- [ ] Run relative-link, code-fence, metadata, and duplicate-fact validation across `docs/`.
-- [ ] Review all Batch 1-4 documents before promoting any item from In Review to Approved.
+- [ ] Perform TASK-0026 technical review and decide which baseline documents can be promoted from In Review to Approved.
+- [ ] Keep the Handbook synchronized with hardening changes and new validation evidence.
 
 ---
 
-# First Hardening Actions After Documentation
+# Current Hardening Actions
 
 - [ ] Reproduce the active WebSSH virtual-host configuration and implement explicit authentication/access control.
 - [ ] Inventory inherited accounts in `hostX`, `rtrX`, shared DNS, routers, validators, and border-router roles.

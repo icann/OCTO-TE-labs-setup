@@ -27,8 +27,8 @@ The roadmap defines the strategic sequence for understanding, hardening, scaling
 
 ```text
 M0 Architecture foundation                 Completed
-M1 Current implementation baseline         In Review
-M2 Deployment and security hardening       Next
+M1 Current implementation baseline         Completed
+M2 Deployment and security hardening       In Progress
 M3 Scalability recovery                    Planned
 M4 Routing and RPKI recovery               Planned
 M5 Capability-driven platform evolution    Planned
@@ -57,7 +57,9 @@ The order reflects the agreement reached after the August 2026 DNS, lifecycle, a
 
 **Related:** EPIC-001
 
-**Status:** In Review
+**Status:** Completed
+
+**Review State:** Baseline documents remain In Review under TASK-0026 until explicit approval decisions are made.
 
 ## Objective
 
@@ -75,12 +77,13 @@ Create an evidence-based reference for the current AWS, Ubuntu, LXD, DNS, orches
 - AMI pinning mechanism added for exceptional stack updates.
 - Core, network, service, AWS, LXD, naming, addressing, port, and software documentation refreshed.
 - Institutional memory, engineering tracking, the decisions index, and ADR-0002 refreshed.
+- Remaining architecture, design, navigation, and acronym documents completed.
+- Global metadata, relative-link, code-fence, placeholder, index-coverage, and consistency validation completed.
 
-## Remaining Exit Criteria
+## Review Follow-up
 
-- Complete remaining architecture, design, navigation, and acronym documents.
-- Run global link, metadata, placeholder, and consistency validation.
-- Perform technical review before promoting any document to Approved.
+- Perform TASK-0026 technical review before promoting any document to Approved.
+- Keep the baseline synchronized with implementation and validation changes introduced during hardening.
 
 ---
 
@@ -88,7 +91,7 @@ Create an evidence-based reference for the current AWS, Ubuntu, LXD, DNS, orches
 
 **Related:** EPIC-004
 
-**Status:** Next
+**Status:** In Progress
 
 ## Objective
 
@@ -221,4 +224,4 @@ Update both this roadmap and the Backlog when priorities change.
 
 **Current Status:** In Review
 
-**Next Review:** After Batch 4 and again after the first hardening release.
+**Next Review:** After the first hardening implementation batch and the baseline technical review.

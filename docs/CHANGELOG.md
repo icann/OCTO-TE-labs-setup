@@ -16,6 +16,70 @@ Routine wording, spelling, or formatting changes do not normally require an entr
 
 # Version History
 
+## 2026-08-31 - Verified Implementation Reconciliation, Batch 4
+
+### Completed architecture and navigation coverage
+
+- Refreshed the Architecture Map and Platform Overview.
+- Replaced the Routing Capabilities placeholder with a current-state and recovery reference.
+- Updated Engineering Principles to include security, lifecycle, reproducibility, ownership, and measured scalability.
+- Reviewed ADR-0001 against the reconciled engineering model.
+- Replaced section README placeholders with navigable indexes.
+- Added a complete acronym and abbreviation reference.
+
+### Developed future-design proposals
+
+- Defined a candidate capability model and capability lifecycle.
+- Defined target module contracts and incremental modularization principles.
+- Defined a capability-driven future orchestrator with profile compatibility.
+- Defined the target direction and validation gates for routing and RPKI recovery.
+
+### Final consistency work
+
+- Reconciled documentation status tables and reading paths.
+- Marked future-design documents as Draft and current-state documents as In Review.
+- Established deployment and security hardening as the next engineering phase.
+
+---
+
+## 2026-08-31 - Verified Implementation Reconciliation, Batch 3
+
+### Updated institutional memory
+
+- Expanded the Knowledge Base with durable architecture, lifecycle, scaling, security, and operational findings.
+- Updated the Engineering Log with the August 2026 validation and documentation phases.
+- Rebuilt the Engineering Backlog around confirmed bugs, debt, improvements, and future work.
+- Updated the Roadmap, immediate To-do, and Ideas documents.
+
+### Added decision record
+
+- Added ADR-0002, Shared DNS Service Separation, with status In Review.
+- Updated the ADR index and cross references.
+
+---
+
+## 2026-08-31 - Verified Implementation Reconciliation, Batch 2
+
+### Documented networks and platform services
+
+- Current network topology, backbone, group networks, IPv4, IPv6, NAT64, and prepared routes.
+- DNS capabilities and shared DNS-service behavior.
+- nginx, WebSSH, authentication, certificate, instructions, and supporting host services.
+- AWS resources and services.
+- LXD profiles, templates, limits, storage, and instance inventory.
+- Container naming, addressing, ports, protocols, and software stack.
+- Mermaid deployment-flow and network-topology diagrams.
+
+### Registered hardening findings
+
+- WebSSH virtual host without nginx-layer authentication.
+- Fixed bootstrap credentials inherited from base templates.
+- WireGuard parameter, DNAT, cleanup, and Security Group mismatch.
+- Per-group validator template-name mismatch.
+- External dependency and runtime installation risks.
+
+---
+
 ## 2026-08-31 - Verified Implementation Reconciliation, Batch 1
 
 ### Replaced placeholders with verified documentation
@@ -59,7 +123,7 @@ Routine wording, spelling, or formatting changes do not normally require an entr
 
 ### Implementation baseline referenced
 
-The Batch 1 documentation reflects the `nico` branch through implementation commit `b9ce623` and the August 2026 validation sessions.
+The reconciliation reflects the `nico` branch through implementation commit `b9ce623` and the August 2026 validation sessions.
 
 ---
 
@@ -93,4 +157,4 @@ The Batch 1 documentation reflects the `nico` branch through implementation comm
 
 **Current Status:** In Review
 
-**Next Review:** After completion of the remaining 2026-08-31 documentation reconciliation batches.
+**Next Review:** After the first hardening implementation batch is documented.

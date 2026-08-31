@@ -1,18 +1,20 @@
-# ADR-0001 — Architecture-Driven Engineering
+# ADR-0001 - Architecture-Driven Engineering
 
 **Status:** In Review
 
 **Date:** 2026-07-31
 
+**Last Reviewed:** 2026-08-31
+
 ---
 
 # Context
 
-OCTO-TE Labs has evolved over multiple iterations.
+OCTO-TE Labs has evolved through multiple implementations and operational requirements.
 
-As the platform grows to support additional training domains, capabilities, deployment models, and laboratory types, maintaining long-term consistency becomes increasingly important.
+The platform must support additional training capabilities, large workshops, changing software, current cloud environments, and safe operational lifecycles without allowing every implementation change to redefine the architecture.
 
-The project requires an engineering approach that allows the implementation to evolve without continuously redesigning the platform.
+The project also needs durable engineering memory so future contributors can understand not only how the platform works, but why decisions were made.
 
 ---
 
@@ -20,117 +22,148 @@ The project requires an engineering approach that allows the implementation to e
 
 The project adopts an **Architecture-Driven Engineering** approach.
 
-Architectural decisions define the long-term structure of the platform.
+The Architecture & Engineering Handbook is the primary engineering reference for the project.
 
-Implementation decisions are expected to follow the architectural model rather than define it.
-
-The Architecture & Engineering Handbook becomes the authoritative engineering reference for the project.
+Architectural concepts and decisions define the intended long-term structure. Implementation work realizes that structure and provides evidence for future refinement.
 
 ---
 
 # Principles Established
 
-The following principles are adopted as part of this decision.
+## Architecture before implementation
 
-## Architecture Before Implementation
+Architecture defines responsibilities, relationships, boundaries, and desired qualities.
 
-Architecture defines the platform.
+Implementation defines the current technologies, scripts, resources, and configuration used to realize them.
 
-Implementation realizes the architecture.
+## Capability-oriented design
 
----
+The platform is organized around training domains and capabilities rather than products or numeric Lab Types.
 
-## Capability-Oriented Design
+Current fixed profiles remain valid implementation and compatibility mechanisms, but they do not define the final architecture.
 
-The platform is organized around:
+## Evidence-based engineering
 
-- Training Domains
-- Capabilities
+Claims and decisions are supported by source analysis, deployment evidence, measurements, requirements, or reviewed design.
 
-rather than around implementation technologies.
+Assumptions and intended behavior are labeled explicitly.
 
----
+## Documentation as an engineering artifact
 
-## Stable Architecture
+Documentation evolves with implementation, validation, decisions, and accumulated knowledge.
 
-Architecture should remain stable while implementations evolve.
+## Separation of concerns
 
-Changes in technology should not require redesigning the conceptual architecture.
+Current architecture, current implementation, exact reference values, future design, decisions, and development history are maintained in separate document classes.
 
----
+## Lifecycle, security, and scalability
 
-## Documentation as an Engineering Artifact
-
-Documentation is considered part of the platform.
-
-It evolves together with the implementation and is maintained with the same level of quality expected for production code.
-
----
-
-## Evidence-Based Engineering
-
-Engineering decisions should be supported by:
-
-- implementation analysis;
-- documented requirements;
-- approved architectural decisions.
-
-Assumptions should never become architectural facts.
+Create/delete ownership, failure cleanup, public access control, credential handling, dependency reproducibility, and measured capacity are architectural concerns rather than optional implementation polish.
 
 ---
 
 # Consequences
 
-This decision establishes several long-term consequences.
-
 ## Positive
 
-- Stable engineering model.
-- Easier onboarding.
-- Better traceability.
-- Reduced architectural drift.
-- Simpler future evolution.
-
----
+- A stable conceptual model can survive implementation changes.
+- Current behavior and future proposals are less likely to be confused.
+- Significant decisions remain traceable.
+- Onboarding and review become easier.
+- Operational discoveries can become durable project knowledge.
+- Security, lifecycle, and scalability findings have a defined place in engineering work.
+- The original implementation can be compared with the current branch without treating either as the architecture itself.
 
 ## Trade-offs
 
-The project requires additional effort to maintain documentation and architectural consistency.
+- Documentation and cross-reference maintenance require sustained effort.
+- Changes can require updates to several engineering artifacts.
+- Incomplete evidence can delay strong support claims.
+- Future designs remain Draft until they receive review and, when appropriate, an ADR.
+- Architecture discipline can feel slower than direct script modification, but reduces long-term drift and rework.
 
-However, this cost is considered significantly lower than the long-term cost of unmanaged architectural evolution.
+---
+
+# Implementation of the Decision
+
+The Handbook now contains:
+
+- architecture documents;
+- exact technical references;
+- ADRs;
+- future-design proposals;
+- Engineering Log and Backlog;
+- Roadmap, To-do, and Ideas;
+- Knowledge Base;
+- diagrams and section indexes.
+
+The 2026-08-31 reconciliation demonstrated the intended workflow by:
+
+- deriving current behavior from code and deployment tests;
+- documenting confirmed defects rather than hiding them;
+- separating verified DNS support from unverified routing support;
+- formalizing shared DNS-service separation in ADR-0002;
+- recording deferred hardening work in the backlog;
+- preserving measured scalability evidence and uncertainty.
+
+---
+
+# Alternatives Considered
+
+## Implementation-driven documentation
+
+Document only the current scripts and allow their structure to define the platform.
+
+Rejected because temporary shell and cloud details would become accidental architecture.
+
+## Documentation only after major releases
+
+Rejected because long debugging and refactoring periods would create undocumented behavior and lost engineering knowledge.
+
+## Minimal operational README only
+
+Rejected because operational steps alone cannot preserve architecture, rationale, future design, technical debt, and measured evidence.
 
 ---
 
 # Related Documents
 
-- README.md
-- ENGINEERING-PRINCIPLES.md
-- 00-architecture-map.md
-- KNOWLEDGE-BASE.md
+- [`../README.md`](../README.md)
+- [`../architecture/ENGINEERING-PRINCIPLES.md`](../architecture/ENGINEERING-PRINCIPLES.md)
+- [`../architecture/00-architecture-map.md`](../architecture/00-architecture-map.md)
+- [`../architecture/KNOWLEDGE-BASE.md`](../architecture/KNOWLEDGE-BASE.md)
+- [`ADR-0002-shared-dns-service-separation.md`](ADR-0002-shared-dns-service-separation.md)
+- [`../development/engineering-backlog.md`](../development/engineering-backlog.md)
+- [`../development/engineering-log.md`](../development/engineering-log.md)
 
 ---
 
 # Related Knowledge
 
-- KB-0001
-- KB-0002
+- KB-0001 - Capability-Driven Architecture
+- KB-0002 - Architecture and Implementation Separation
+- KB-0003 - Lifecycle-Oriented Analysis
+- KB-0004 - Handbook as an Engineering Asset
+
+---
+
+# Review Criteria
+
+Promote this ADR to Approved only after:
+
+- maintainers explicitly accept the Handbook as the engineering reference;
+- status and artifact responsibilities are reviewed;
+- the hardening phase demonstrates continued synchronization between code, evidence, backlog, and documentation;
+- no conflicting engineering-governance model remains in active use.
 
 ---
 
 # Future Reviews
 
-The engineering model established by this ADR should be reviewed whenever significant architectural changes are proposed.
+Review this ADR when:
 
-Implementation changes alone do not require revisiting this ADR.
+- the project adopts a substantially different governance model;
+- capability-driven orchestration is formalized through a later ADR;
+- the Handbook is replaced by another authoritative engineering system.
 
----
-
-# Review Status
-
-**Current Status**
-
-In Review
-
-**Next Review**
-
-After completion of EPIC-001.
+Implementation changes alone do not require revisiting the decision.

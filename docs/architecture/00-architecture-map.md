@@ -2,32 +2,31 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-07-31
+**Last Updated:** 2026-08-31
 
 ---
 
 # Purpose
 
-This document provides the conceptual map of the OCTO-TE Labs platform.
+This document is the conceptual entry point to the OCTO-TE Labs architecture.
 
-It introduces the architectural organization of the project and serves as the entry point to the Architecture & Engineering Handbook.
-
-Rather than describing implementation details, this document explains how the platform is conceptually structured.
+It explains how the platform is organized without treating the current CloudFormation template, shell scripts, LXD layout, or numeric Lab Types as permanent architectural constraints.
 
 ---
 
 # Architectural Model
 
-OCTO-TE Labs is an engineering platform for Internet infrastructure training.
+OCTO-TE Labs is an engineering platform for hands-on Internet infrastructure training.
 
-The architecture is organized in four conceptual layers:
+The architecture is organized around five related concerns:
 
-1. Training Domains
-2. Capabilities
-3. Platform Services
-4. Platform Infrastructure
+1. training domains;
+2. training capabilities;
+3. training profiles;
+4. shared platform services;
+5. platform infrastructure and lifecycle.
 
-Implementation details are intentionally documented separately.
+Engineering governance, decisions, evidence, and accumulated knowledge apply across all five concerns.
 
 ---
 
@@ -35,141 +34,221 @@ Implementation details are intentionally documented separately.
 
 ```text
 OCTO-TE Labs
-│
-├── Training Domains
-│
-│   ├── DNS
-│   │
-│   │   ├── Recursive DNS
-│   │   ├── Authoritative DNS
-│   │   ├── DNSSEC
-│   │   ├── Universal Acceptance
-│   │   └── DNS Monitoring
-│   │
-│   └── Routing
-│
-│       ├── BGP
-│       ├── Anycast
-│       └── RPKI
-│
-├── Platform Services
-│
-│   ├── WebSSH
-│   ├── Lab Instructions
-│   ├── Authentication
-│   ├── Certificate Management
-│   └── Platform Monitoring
-│
-└── Platform Infrastructure
-    │
-    ├── Cloud Infrastructure
-    ├── Virtual Machines
-    ├── Container Platform
-    ├── Networking
-    └── Storage
+|
++-- Training Domains
+|     |
+|     +-- DNS
+|     |     +-- Recursive DNS
+|     |     +-- Authoritative DNS
+|     |     +-- DNSSEC
+|     |     +-- DNS Monitoring
+|     |     +-- Universal Acceptance
+|     |
+|     +-- Routing
+|           +-- BGP
+|           +-- Anycast
+|           +-- RPKI
+|
++-- Training Profiles
+|     +-- coherent capability selections
+|     +-- participant roles
+|     +-- resource and validation expectations
+|
++-- Shared Platform Services
+|     +-- public DNS frontend and platform authority
+|     +-- web access and WebSSH
+|     +-- authentication and credentials
+|     +-- certificates
+|     +-- participant instructions
+|     +-- lifecycle and cleanup support
+|
++-- Platform Infrastructure
+      +-- cloud resources
+      +-- EC2 host
+      +-- LXD/LXC containers
+      +-- networking and storage
+      +-- deployment orchestration
+      +-- observability and validation
 ```
+
+The current numeric Lab Types are implementation profiles. They are not the final capability-composition model.
 
 ---
 
 # Training Domains
 
-Training Domains represent the educational areas supported by the platform.
+A training domain groups related Internet infrastructure subjects.
 
-A domain groups together related capabilities that can be combined to build one or more laboratory experiences.
+The current domains are:
 
-Current domains are:
+- DNS;
+- Routing.
 
-- DNS
-- Routing
-
-The architecture allows additional domains to be introduced without changing the overall platform model.
+Additional domains may be introduced when they fit the same model of isolated, reproducible, hands-on training.
 
 ---
 
 # Capabilities
 
-Capabilities are the fundamental building blocks of the platform.
+A capability is a technical subject or operational function that can be taught, deployed, and validated independently or as part of a profile.
 
-A capability represents a technical subject that can be taught independently or combined with other capabilities.
+## DNS capabilities
 
-Examples include:
+- Recursive DNS;
+- Authoritative DNS;
+- DNSSEC;
+- DNS Monitoring;
+- Universal Acceptance.
 
-DNS:
+## Routing capabilities
 
-- Recursive DNS
-- Authoritative DNS
-- DNSSEC
-- Universal Acceptance
-- DNS Monitoring
+- BGP;
+- Anycast;
+- RPKI.
 
-Routing:
-
-- BGP
-- Anycast
-- RPKI
-
-Capabilities are intentionally independent from their implementation.
+Capability names describe the training objective, not a specific software implementation. BIND, Unbound, NSD, FRRouting, and FORT are current implementation choices.
 
 ---
 
-# Platform Services
+# Training Profiles
 
-Platform Services provide functionality shared across all training domains.
+A Training Profile combines capabilities into a coherent exercise environment.
 
-They support the operation of laboratories but are not themselves training capabilities.
+A profile should define:
 
-Examples include:
+- enabled capabilities;
+- required participant and shared roles;
+- network topology;
+- resource expectations;
+- activation steps;
+- validation criteria;
+- cleanup requirements.
 
-- Web-based SSH access
-- Participant instructions
-- Authentication
-- Certificate management
-- Platform monitoring
+The current implementation exposes four numeric Lab Types. Types 1 and 2 are verified DNS profiles. Types 3 and 4 are routing/RPKI profiles under recovery.
+
+The future direction is to retain named profiles while deriving their implementation from explicit capability selections.
+
+---
+
+# Shared Platform Services
+
+Platform services support training but are not themselves training-domain capabilities.
+
+Current examples include:
+
+- `dnsdist` public DNS frontend;
+- `ns1` platform authoritative DNS;
+- `auth-exercise` and `auth-rpz` exercise services;
+- nginx and WebSSH;
+- authentication and credential generation;
+- certificate management;
+- participant-instruction publication;
+- Route 53 and DNSSEC lifecycle integration;
+- stack cleanup and validation support.
+
+Shared services must have explicit ownership and lifecycle boundaries. ADR-0002 formalizes the current DNS-service separation.
 
 ---
 
 # Platform Infrastructure
 
-Platform Infrastructure provides the execution environment required by the platform.
+Platform infrastructure provides the execution environment:
 
-It includes cloud resources, virtual machines, container technologies, networking, and storage.
+- AWS CloudFormation, EC2, VPC, IAM, S3, Lambda, and Route 53;
+- Ubuntu host services;
+- LXD/LXC templates and instances;
+- ZFS-backed storage;
+- dual-stack backbone and per-group networks;
+- NAT, NAT64, and optional external routing integration;
+- shell orchestration and configuration templates.
 
-Infrastructure is considered an implementation concern rather than a training capability.
-
----
-
-# Relationship with the Handbook
-
-The documents in this handbook progressively refine the architecture introduced here.
-
-| Document | Description |
-|----------|-------------|
-| 01-overview.md | General overview of the platform |
-| 02-deployment-flow.md | Lifecycle of a laboratory deployment |
-| 03-orchestrator.md | Architecture of the orchestration layer |
-| 04-network-topology.md | Network architecture |
-| 05-dns-capabilities.md | DNS capabilities |
-| 06-routing-capabilities.md | Routing capabilities |
-| 07-platform-services.md | Shared platform services |
-| 08-implementation.md | Current implementation architecture |
-| KNOWLEDGE-BASE.md | Engineering knowledge accumulated over time |
+Infrastructure is an implementation concern, but lifecycle safety, security, reproducibility, and measurable capacity are architectural requirements.
 
 ---
 
-# Scope
+# Lifecycle Model
 
-This document intentionally avoids implementation details.
+```text
+publish deployment artifacts
+    -> create AWS resources
+    -> bootstrap EC2 host
+    -> prepare container templates
+    -> deploy selected profile
+    -> activate exercises
+    -> validate services and DNSSEC
+    -> operate or internally redeploy
+    -> delete stack and clean external state
+```
 
-Its purpose is to provide a stable conceptual view of the platform that remains valid as the implementation evolves.
+A deployment is not ready merely because CloudFormation reports `CREATE_COMPLETE`. The internal `cloud-init` and orchestration lifecycle must also complete successfully.
+
+---
+
+# Current-State Boundary
+
+The current verified baseline includes:
+
+- Lab Types 1 and 2;
+- shared DNS-service separation;
+- public IPv4 and IPv6 DNS;
+- DNSSEC and DS lifecycle;
+- HTTPS and WebSSH publication;
+- internal wipe/redeploy;
+- stack cleanup and name reuse;
+- resolver scaling to 60 groups.
+
+The following remain incomplete or unverified:
+
+- production-ready Lab Types 3 and 4;
+- WireGuard ingress and parameter alignment;
+- per-group RPKI validator creation;
+- secure WebSSH access control;
+- removal of fixed bootstrap credentials;
+- idempotent NAT64 and firewall cleanup;
+- recovery and measurement above the current 64-group limit.
+
+---
+
+# Architecture, Implementation, and Design
+
+The Handbook separates three views:
+
+| View | Meaning |
+|---|---|
+| Architecture | Stable concepts, responsibilities, and relationships |
+| Implementation | How the current `nico` branch realizes the architecture |
+| Future Design | Proposed evolution that is not yet current behavior |
+
+This separation prevents a temporary implementation detail from becoming an accidental permanent architecture.
+
+---
+
+# Handbook Map
+
+| Document | Responsibility |
+|---|---|
+| [`01-overview.md`](01-overview.md) | Platform purpose, audience, and current scope |
+| [`02-deployment-flow.md`](02-deployment-flow.md) | End-to-end lifecycle |
+| [`03-orchestrator.md`](03-orchestrator.md) | Current shell orchestration |
+| [`04-network-topology.md`](04-network-topology.md) | Network architecture and current topology |
+| [`05-dns-capabilities.md`](05-dns-capabilities.md) | DNS capability architecture and verified behavior |
+| [`06-routing-capabilities.md`](06-routing-capabilities.md) | Routing/RPKI capability architecture and recovery state |
+| [`07-platform-services.md`](07-platform-services.md) | Shared services and security findings |
+| [`08-implementation.md`](08-implementation.md) | Current implementation map |
+| [`ENGINEERING-PRINCIPLES.md`](ENGINEERING-PRINCIPLES.md) | Engineering rules and documentation standards |
+| [`KNOWLEDGE-BASE.md`](KNOWLEDGE-BASE.md) | Durable engineering knowledge |
+
+Related material:
+
+- exact values under [`../reference/`](../reference/README.md);
+- decisions under [`../decisions/`](../decisions/README.md);
+- future proposals under [`../design/`](../design/README.md);
+- work tracking under [`../development/`](../development/README.md).
 
 ---
 
 # Review Status
 
-**Current Status**
+**Current Status:** In Review
 
-In Review
-
-**Next Review**
-
-After completion of EPIC-001.
+**Next Review:** When a capability-driven orchestration proposal is promoted from Draft design to an ADR.

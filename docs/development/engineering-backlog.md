@@ -48,19 +48,18 @@ Identifiers are never reused.
 
 The agreed engineering sequence is:
 
-1. complete the Handbook reconciliation;
-2. perform deployment and wipe hardening, starting with security findings;
-3. recover and quantify higher scalability;
-4. recover and validate routing and RPKI profiles;
-5. advance capability-driven orchestration design.
+1. perform deployment and security hardening, starting with public access and fixed credentials;
+2. recover and quantify higher scalability;
+3. recover and validate routing and RPKI profiles;
+4. advance capability-driven orchestration design.
 
-A production-blocking defect can temporarily override this sequence.
+The baseline technical review remains tracked under `TASK-0026` and can proceed in parallel with hardening. A production-blocking defect can temporarily override this sequence.
 
 ---
 
 # EPIC-001 - Current Architecture Baseline
 
-**Status:** In Progress
+**Status:** Completed
 
 **Objective:** Make the current platform understandable through evidence-based architecture, reference, decision, and development documentation.
 
@@ -75,7 +74,7 @@ A production-blocking defect can temporarily override this sequence.
 | TASK-0016 | Documentation | High | Completed | Document DNS capabilities, platform services, AWS, LXD, ports, software, and naming. |
 | TASK-0017 | Documentation | High | Completed | Replace the root operational guide and core reference placeholders. |
 | TASK-0018 | Documentation | High | Completed | Update Knowledge Base, Engineering Log, Backlog, Roadmap, Ideas, To-do, and ADR-0002. |
-| TASK-0019 | Documentation | High | Planned | Complete Batch 4 navigation, remaining architecture/design documents, and global consistency validation. |
+| TASK-0019 | Documentation | High | Completed | Complete Batch 4 navigation, remaining architecture/design documents, and global consistency validation. |
 | TASK-0026 | Review | Medium | Planned | Perform technical review and decide which baseline documents can be promoted from In Review to Approved. |
 
 ## Completion Criteria
@@ -92,9 +91,9 @@ EPIC-001 completes when:
 
 # EPIC-004 - Deployment and Security Hardening
 
-**Status:** Planned
+**Status:** In Progress
 
-**Execution Order:** Next after EPIC-001
+**Execution Order:** Current
 
 **Objective:** Remove security risks, make lifecycle operations idempotent, improve reproducibility, and reduce operational ambiguity before broader scale and routing use.
 
@@ -207,6 +206,7 @@ The original implementation demonstrated more than 100 complete groups and more 
 | `b9ce623` | Added optional AMI pinning for stack updates |
 | `bdf70b3` | Refreshed core deployment and architecture documentation |
 | `44fd0e5` | Refreshed network and platform service documentation |
+| `d273970` | Refreshed engineering records and added ADR-0002 |
 
 ---
 
@@ -214,4 +214,4 @@ The original implementation demonstrated more than 100 complete groups and more 
 
 **Current Status:** In Review
 
-**Next Review:** At the end of each documentation batch and after every hardening or capacity milestone.
+**Next Review:** After the first hardening implementation batch and after each subsequent capacity or routing milestone.

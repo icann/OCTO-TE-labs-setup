@@ -255,7 +255,7 @@ Reconcile the Handbook with the verified implementation and record the hardening
 
 **Sprint:** Sprint 1 - Current Implementation Baseline
 
-**Status:** In Progress
+**Status:** Completed
 
 ## Objective
 
@@ -291,6 +291,8 @@ Updated:
 
 ### Batch 3 - Institutional memory and decisions
 
+**Commit:** `d273970` - Refresh engineering records and add DNS service ADR
+
 Updated:
 
 - Knowledge Base;
@@ -303,6 +305,21 @@ Updated:
 - ADR-0002.
 
 The batch was validated for metadata, relative links, code fences, identifier consistency, and required engineering evidence.
+
+### Batch 4 - Architecture completion, future design, and navigation
+
+Updated:
+
+- Architecture Map and Platform Overview;
+- Routing Capabilities;
+- Engineering Principles;
+- ADR-0001 review metadata and cross references;
+- future capability, modularity, orchestrator, and routing designs;
+- section navigation READMEs;
+- acronym reference;
+- Handbook status and changelog summaries.
+
+The complete Handbook was validated for global metadata, relative links, code fences, placeholder removal, index coverage, identifier consistency, and current-phase state.
 
 ## Hardening Findings Registered
 
@@ -322,9 +339,13 @@ The documentation audit confirmed:
 - legacy `%KSK_ARN%` workflow substitution;
 - group delegations generated even when participant authority is disabled.
 
+## Outcome
+
+The four-batch Handbook reconciliation is complete. Current-state documents are substantive and remain In Review pending technical approval; future-design documents remain Draft. The resulting baseline is sufficient to begin deployment and security hardening.
+
 ## Current Work
 
-Batch 4 will complete navigation, remaining architecture and future-design documents, and final cross-document consistency.
+EPIC-004 deployment and security hardening is now the active engineering phase, beginning with WebSSH access control and elimination of fixed bootstrap credentials.
 
 ---
 
@@ -337,7 +358,7 @@ Batch 4 will complete navigation, remaining architecture and future-design docum
 | S-0003 | 2026-08-23 | Scalability audit and 60-group baseline | Completed |
 | S-0004 | 2026-08-30 | CloudFormation lifecycle hardening | Completed |
 | S-0005 | 2026-08-31 | dnsdist, DNS-label, and AMI improvements | Completed |
-| S-0006 | 2026-08-31 | Handbook reconciliation and hardening discovery | In Progress |
+| S-0006 | 2026-08-31 | Handbook reconciliation and hardening discovery | Completed |
 
 ---
 
