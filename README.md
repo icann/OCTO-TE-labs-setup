@@ -1,353 +1,382 @@
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
-# OCTO-TE-Labs
+# OCTO-TE Labs
 
-Welcome to the DNS and RPKI lab of ICANNs Office Of The CTO (OCTO) 
-Technical Engagemnt (TE) team.
+OCTO-TE Labs is the laboratory deployment platform used by the ICANN Office of the CTO (OCTO) Technical Engagement team for hands-on DNS, DNSSEC, routing, Anycast, and RPKI training.
 
-We use this repository to setup a lab environment for our workshops.
-We do use AWS and therefore this lab is integrated with some AWS functions,
-CloudFormation, Route53 and S3.
+The platform uses AWS CloudFormation to provision a dual-stack EC2 host and supporting AWS resources. The EC2 host then runs the platform services and one isolated LXD environment per participant group.
 
-If you want to run your own labs, please fork this repository,  see 
-[If You Fork This Repository](#if-you-fork-this-repository) below.
+The engineering handbook is available under [`docs/`](docs/README.md). Participant-facing exercises are maintained separately in the [OCTO-TE-labs](https://github.com/icann/OCTO-TE-labs) repository.
+
+> [!IMPORTANT]
+> A CloudFormation stack reaching `CREATE_COMPLETE` means that AWS resource creation completed. It does not mean that the installation inside the EC2 instance completed. Always verify `cloud-init` before using the lab.
+
+## Current verification scope
+
+The current DNS baseline has been validated with:
+
+- Lab Type 1 (resolver practice);
+- Lab Type 2 (full DNS practice);
+- IPv4 and IPv6 public DNS;
+- DNSSEC delegation and validation;
+- HTTPS and WebSSH;
+- internal wipe and redeploy;
+- CloudFormation deletion and DNS cleanup;
+- DNS labels containing hyphens;
+- deployments from 3 groups through a 60-group resolver scalability test.
+
+Routing profiles remain under restoration and require validation before production use. See [`docs/reference/lab-types.md`](docs/reference/lab-types.md).
+
+## Architecture at a glance
+
+```text
+AWS CloudFormation
+    |
+    +-- VPC, subnet, routes, security group, EIP, EC2
+    +-- IAM roles and policies
+    +-- Route 53 parent-zone records
+    +-- Lambda custom resources
+    |
+    v
+Ubuntu EC2 host
+    |
+    +-- LXD/LXC container platform
+    +-- nginx, WebSSH, Certbot, cron
+    +-- NAT, routing, and NAT64 support (currently deployed for every profile)
+    |
+    +-- Shared DNS services
+    |     dnsdist        100.64.0.53
+    |     ns1            100.64.0.54
+    |     auth-exercise  100.64.0.55-100.64.0.57
+    |     auth-rpz       100.64.0.58
+    |
+    +-- Per-group environments
+          grpN-rtr
+          grpN-cli
+          grpN-resolv1 / grpN-resolv2
+          grpN-soa / grpN-ns1 / grpN-ns2, when enabled
+          grpN-rpki, when enabled
+```
+
+The shared authoritative roles are intentionally separated:
+
+- `dnsdist` is the public DNS frontend;
+- `ns1` is the platform authoritative server;
+- `auth-exercise` serves exercise-specific authoritative data;
+- `auth-rpz` distributes the Response Policy Zone.
+
+## Lab profiles
+
+| Lab Type | Purpose | Per-group components |
+|---|---|---|
+| 1 | Resolver practice | router, client, two resolver containers |
+| 2 | Full DNS practice | Type 1 plus SOA/primary and two authoritative containers |
+| 3 | Routing and Anycast with global RPKI | routing profile with shared validators and border router; currently under restoration |
+| 4 | Routing and Anycast with group RPKI | routing profile with a validator per group and border router; currently under restoration |
+
+The current orchestrator accepts between 3 and 64 groups. Work is planned to recover the higher scalability of the original implementation.
 
 > [!NOTE]
-> If you find errors or have ideas for improvements please open a Github issue.
+> In DNS profiles, the participant DNS containers are provisioned by the platform deployment, but the exercise DNS software and configuration are installed later with `scripts/do-dns-lab.sh`. This preserves the intended training workflow.
 
-Workshop instructions can be found in our [OCTO-TE-labs](https://github.com/icann/OCTO-TE-labs) 
-repository.
+# AWS deployment
 
-# License
+## Prerequisites
 
-Copyright © 2025 Internet Corporation for Assigned Names and Numbers (ICANN) and Network Startup Resource Center (NSRC). All rights reserved. 
+Before creating a stack, confirm that:
 
-This repository is licensed to you under the terms of the 3-Clause BSD License (BSD-3-Clause).
+- the deployment files have been published to the intended S3 bucket;
+- the parent Route 53 hosted zone already exists;
+- the parent zone is DNSSEC signed;
+- the configured SSH public key is correct;
+- the selected EC2 instance type is available in the target region;
+- the account can create IAM, Lambda, Route 53, EC2, and networking resources.
 
-For details please see [LICENSE.md](LICENSE.md)
+## Create the stack
 
-# Lab Features
+1. Open AWS CloudFormation in the intended region.
+2. Choose **Create stack** -> **With new resources (standard)**.
+3. Use the S3 URL for `lab-ec2.yaml` from the bucket associated with the required branch.
+4. Use a stack name such as `LAB-20260831-LOCATION`.
+5. Review the parameters below.
+6. Acknowledge IAM resource creation.
+7. Create the stack.
 
-- All group name servers are reachable from the internet (through dnsdist in container dnsdist)
-- dnsviz.net and zonemaster.net can be used to test group zonemaster
-- DS records can be submitted and deleted manually on the group web page
-- CDS records are scanned and will be published to the parent automatically
+## Parameters
 
-# Lab setup guide
+| Parameter | Normal use |
+|---|---|
+| `DnsParent` | Existing Route 53 parent zone, including the trailing dot, for example `te-labs.training.` |
+| `DnsName` | Lab DNS label. Use 3-32 lowercase letters, numbers, or hyphens. It must start and end with a letter or number. |
+| `Owner` | Name of the person responsible for the deployment. |
+| `Participants` | Number of participant groups. The current orchestrator supports 3-64. |
+| `LabType` | `1` resolver, `2` full DNS, `3` routing/global RPKI, `4` routing/group RPKI. |
+| `LatestUbuntu` | Leave unchanged for normal deployments. It resolves the current Ubuntu 24.04 Noble stable AMI. |
+| `AmiOverride` | Leave empty for normal deployments. Use only to pin an existing stack to its current AMI during a deliberate CloudFormation update. |
+| `S3Bucket` | Bucket containing the rendered deployment files. Normally leave the branch default. |
+| `labInstanceType` | EC2 type for the host. The current template default is `r4.2xlarge`; availability varies by region. |
+| `labInstructions` | ZIP URL for participant instructions. |
+| `labSinglePassword` | Optional password for the shared `labuser` account. If empty, a random password is generated. Group passwords remain independently generated. |
 
-The following instructions should help you to setup and take down a lab.
+## Wait for the internal deployment
 
-> [!NOTE]
-> Don't hesitate to ask for help. 
+CloudFormation normally completes before the software deployment inside the instance. The CloudFormation-managed hostname is available as:
 
-## Step-by-step guide
+```text
+ec2-<DnsName>.<DnsParent>
+```
 
-- Log into AWS
-- Goto S3 and find the bucket to which the whole repository is uploaded
-  to (usually \<repo name\> or \<repo-name\>-\<branch\>)
-- Copy the URL of the lab-ec2.yaml file 
-- Goto CloudFormation
-- Change to desired region 
-- Click on "Create stack"
-- Choose "with new resources (standard)"
-### Step 1
-- Amazon S3 URL: Paste in the URL from above
-- Click on "Next"
-### Step 2
-- Enter Stack name - Please follow the convention    
-  LAB-\<DATE\>-\<LOCATION\>, e.g. LAB-20250101-STOCKHOLM
-- DnsName: enter a valid domain name 
-  (suggestion: use IATA 3-Letter Airport Code)<br/>
-  **NO DASHES**, only a-z0-9.
-- DnsParent: Keep default unless you really need to use another domain for the lab.<br>
-  Please be aware that the zone must already exist in your AWS account and must be dnssec signed. And don't forget the dot at the end.
-- Choose LabType: 1 = resolver, 2 = DNS, 3 = Router (global RPKI), 4 = Router (group RPKI)
-- LatestUbuntu: Do **NOT** change
-- Owner: write in your own name
-- Participants: Write in the number of groups you want to set up, between 3 and 64
-- S3Bucket: name of the S3 bucket from where all install files will be fetched. Keep default!<br>
-It should already be filled in with the name of the bucket from where you got the URL for the CloudFormation template.
-- labInstanceType: is the type of the AWS EC2 machine this lab should use. Please see section [
-  Select Instance Type](#select-instance-type)
-  and double check [Available AWS Instances](https://docs.aws.amazon.com/ec2/latest/instancetypes/ec2-instance-regions.html)
-- labInstructions: URL of the lab instructions to install in each
-  groups web. You can can get the link from github when you click 
-  on "Code" and choose "Download zip".
-- Click on "Next"
-### Step 3
-- Scroll to the bottom of the page
-- Check the the box "I acknowledge that AWS CloudFormation might 
-  create IAM resources with customised names."    
-  This is needed for the ec2 instance to access s3 and route53
-- Click on "Next"
-### Step 4
-- Scroll to the bottom of the page
-- Click on "Submit"
-### Status Review
-- After around 5 minutes the stack creation should show "CREATE_COMPLETE"
-- Wait between 30 minutes and 2 hours (depending on number of groups) 
-  for all lab setup scripts to finish too.
-### Validation
-- log into the server see section [Lab access](#lab-access)
-- `cat grouppasswords.txt` gives you the list of all grouos with passwords 
-- `tail -f /var/log/cloud-init-output.log` you can follow all the install scripts. The last output should be 
-``` 
-+ echo '===================== DEPLOY DONE ======================='
+For example:
+
+```text
+ec2-dns-test.te-labs.training
+```
+
+Use SSH on TCP/8484:
+
+```bash
+ssh ubuntu@ec2-<DnsName>.<DnsParent-without-final-dot>
+```
+
+Then verify:
+
+```bash
+sudo -i
+cloud-init status --wait
+cloud-init status --long
+```
+
+A successful deployment must show:
+
+```text
+status: done
+errors: []
+```
+
+The detailed log is:
+
+```bash
+tail -f /var/log/cloud-init-output.log
+```
+
+The final orchestration marker is:
+
+```text
 ===================== DEPLOY DONE =======================
-+ echo =========================================================
-=========================================================
-+ exit
-+ echo DONE
-DONE
- ```
+```
 
-### Select Instance Type
-
-Instance types defines cpu, memory and storage of the EC2 machine this lab will use.
-Storage is automatically added by the CloudFormation template. So it is safe to chose a machine type 
-without storage.
-
-The default machine r4.xlarge has x86_64, 4 vcpu, 30.5GB memory, no storage
-
-Not all instance types are available in all regions and even if they are supported in a region
-they could be temporarily unavailable. 
-
-Alternative types could be
-- r5.xlarge
-- r5a.xlarge
-- r5b.xlarge
-- r6a.xlarge
-
-Requirements are x86_64, min 4vcpu, min 32GB memory. The lab uses a lot of memory and not so much cpu.
-
-If you want to run more than 30 participants it is probably a good idea to level up too ??.2xlarge instance types.
-
-For a full list of available instance types, please see https://docs.aws.amazon.com/ec2/latest/instancetypes/ec2-instance-regions.html
-
-**Recommendations**:
-|     Region    |  3-30 participants | 31-64 paticipants |
-|---------------|--------------------|-------------------|
-| **DEFAULT**   |  r4.xlarge         | r4.2xlarge        |
-| Stockholm     |  r5.xlarge         | r5.2xlarge        |
-| Frankfurt     |  r4.xlarge         | r4.2xlarge        |
-|               |  r5a.xlarge        | r5a.2xlarge       |
-| Milan         |  r5a.xlarge        | r5a.2xlarge       |
-| Virginia      |  r4.xlarge         | r4.2xlarge        |
+If `cloud-init` reports `error`, treat the lab as incomplete even when CloudFormation reports `CREATE_COMPLETE`.
 
 # Lab access
 
-Follow the ***Prepare your laptop for lab access*** below.<br>
-Then just type
-```
-ssh <DnsName>.<DnsParent>
-```
+## SSH
 
-> [!TIP]
-> Prepare your laptop for lab access
-> 
-> Put the following in your `~/.ssh/config` file
-> 
-> ```
-> Host *.te-labs.training
->    User ubuntu
->    IdentityFile ~/.ssh/id_te-lab.pem
->    IdentitiesOnly yes
->    Port 8484
-> ```
+A convenient client configuration is:
 
-All labs use the ssh key configured in Github.
-
-## Access to lab web
-
-The web page of the lab can be reached at    
-`https://<DnsName>.<DnsParent>`
-
-For the group passwords, log into the web by ssh and type
-```
-cat grouppasswords.txt
+```sshconfig
+Host ec2-*.te-labs.training
+    User ubuntu
+    IdentityFile ~/.ssh/id_te-lab.pem
+    IdentitiesOnly yes
+    Port 8484
 ```
 
-In the same list there is also a password for the `labuser`.
-This user/password combination gives access to all groups.
+Connect with:
 
-# Lab life-cycle management
-
-Please setup a new lab at least a week before your engagement.
-Test the new lab for full functionality.
-
-Then go to **AWS EC2** and stop the instance (it should have the same name as your lab). On the day of your engagement go back to **AWS EC2** and start the instance again.
-
-> [!NOTE]
-> This will save several hundred dollars in AWS fees.
-
-> [!IMPORTANT]
-> When starting the instance again allow several minutes for the instance to restart before ssh will be active again.
-
-
-# Lab Take-down
-
-Once you are done with your lab it is important to decomission it.
-Please follow these "easy" steps:
-
-- Log into AWS
-- Goto Route53 
-- Delete all RRs from the lab zone (except apex RRs)
-- Goto CloudFormation
-- Click on "Stacks" on the left hand menu
-- Mark the button in front of your lab
-- On the upper left hand choose "Delete"
-- After approx. 5 minutes the stack should be deleted
-- if the delete failed
-  - Click on your lab
-  - Click on "Retry delete" and choose the "Force delete" option
-- **DONE**
-
-# Network address plan
-
-The lab uses the 100.64.0.0/10 address space from RFC 6598 "IANA-Reserved IPv4 Prefix for Shared Address Space".
-
-There is a backbone to which all groups network interconnects: 100.64.0.0/22
-
-Each goup has a router (rtrXXX) that interconects all it's sub-nets and to the backbone.
-The default gateway that provides Internet conection is 100.64.0.1
-
-Each group has a network prefix: 100.100.X.0/24
-Then, within each group, prefix is splitted into 3 sub-networks:
-
-- Clients network (**lan**): 100.100.X.0/26
-- Internal servers network (**int**): 100.100.X.64/26
-- Auth servers stuff network (**dmz**): 100.100.X.128/26
-
-# Network setup for different lab types
-
-## Lab type 1 (Resolver)
-<img src="configs/www/var/www/html/topology1.svg">
-
-## Lab type 2 (DNS)
-<img src="configs/www/var/www/html/topology2.svg">
-
-## Lab type 3 (Routing, global RPKI validator)
-<img src="configs/www/var/www/html/topology3.svg">
-
-## Lab type 4 (Routing, group RPKI validator)
-<img src="configs/www/var/www/html/topology4.svg">
-
-# If you fork this repository
-
-This repository contains an automation that will upload new version automatically to an 
-AWS S3 bucket. For this, it uses Github secrets and variables which you will have to configure 
-for your fork.
-
-Github Secrets:
-- `ACCESS_KEY` the AWS ACCESS KEY
-- `SECRET_ACCESS_KEY` the AWS SECRET ACCESS KEY
-
-Github Repository Variables:
-- `DESTINATION_BUCKET` the AWS S3 bucket to which the main branch will be copied
-- `SSH_PUBLIC_KEY` the ssh key to log into your ec2 instance
-- `KSK_ARN`the AWS ARN of the key to be use for DNSSEC signing
-- `DNS_PARENT_DEFAULT` the default value for the DnsParent parameter
-- `VPNALLOWEDPREFIXIPV4` vpn prefix
-- `VPNENDPOINTIPV4` vpn endpoint ipv4 address
-- `VPNLISTENPORT` vpn port
-- `VPNLOCALIPV4` vpn local ipv4 address
-- `VPNPEERNAME` vpn peer name
-- `VPNPRIVATEKEY` vpn private key
-- `VPNPUBLICKEY` vpn public key
-- `LAB_INSTRUCTIONS_URL` URL of the download link for the lab instructions
-
-The configuration will be injected in the CF template `lac-ec2.yaml` and the vpn configuration in `configs/deploy-parameters.cfg` by the github automation.
-
-> [!NOTE]
-> The key for DNSSEC signing must be created in Virginia (us-east-1), ECC_NIST_P256, Sign and verify.
-> The following key policy is needed.
-```
-{
-  "Version": "2012-10-17",
-  "Id": "dnssec-policy",
-  "Statement": [
-    {
-      "Sid": "Enable IAM User Permissions",
-      "Effect": "Allow",
-      "Principal": {
-        "AWS": "arn:aws:iam::427946385759:root"
-      },
-      "Action": "kms:*",
-      "Resource": "*"
-    },
-    {
-      "Sid": "Allow Route 53 DNSSEC Service",
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "dnssec-route53.amazonaws.com"
-      },
-      "Action": [
-        "kms:DescribeKey",
-        "kms:GetPublicKey",
-        "kms:Sign"
-      ],
-      "Resource": "*",
-      "Condition": {
-        "StringEquals": {
-          "aws:SourceAccount": "427946385759"
-        },
-        "ArnLike": {
-          "aws:SourceArn": "arn:aws:route53:::hostedzone/*"
-        }
-      }
-    },
-    {
-      "Sid": "Allow Route 53 DNSSEC to CreateGrant",
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "dnssec-route53.amazonaws.com"
-      },
-      "Action": "kms:CreateGrant",
-      "Resource": "*",
-      "Condition": {
-        "Bool": {
-          "kms:GrantIsForAWSResource": "true"
-        }
-      }
-    }
-  ]
-}
+```bash
+ssh ubuntu@ec2-<DnsName>.<DnsParent-without-final-dot>
 ```
 
-# Development
+If a stack is deleted and recreated with the same DNS name, the SSH host key changes. Remove only the previous entry before reconnecting:
 
-All development should be done in its own branch. Branches are automatically uploaded 
-to a S3 bucket named `DESTINATION-BUCKET`-\<branch\>. Please make sure your 
-branches are named in all lower case a-z0-9, no dashes, no underscores. And make sure 
-such a bucket actually exists in your AWS account.
-
-Copy the URL of the `lab-ec2.yaml` file in your branch bucket and use it to start new lab
-instances.
-
-# Lab without AWS
-
-The lab uses LXD container manager. This must be installed before trying to run the lab scripts.
-
-
-This repository aims to setup a full lab on an AWS EC2 instance. But just copying the 
-`config/`and `scripts/` folders to a Ubuntu Linux machine should allow you to start the
-lab on any other cloud service or on your own machine. 
-
-You must copy the file `configs/deploy-parameters.cfg` to `scripts/deploy-parameters.cfg`.
-Then edit the file and choose appropriate values for all config variables.
-
-Afterwards your a ready to deploy. Run the following commands
-```
-$ cd scripts
-$ ./setup-host.sh
-$ ./setup-containers.sh
-$ ./setup-lab.sh --deploy
+```bash
+ssh-keygen -R '[ec2-<DnsName>.<DnsParent-without-final-dot>]:8484'
 ```
 
-One integration will be harder to replace. This setup makes heavy use of AWS Route53
-as a provider for DNS and DNSSEC. 
+## Web interfaces
 
-Make sure to have a valid DNS setup including DNSSEC signing for the parent zone and the lab zone.
+After the internal deployment completes:
 
-The DNSSEC automation uses an integration to Route53. You will have to replace that with an 
-integration of your own. (Pull Requests are welcome!)
+```text
+https://<DnsName>.<DnsParent>
+https://webssh.<DnsName>.<DnsParent>
+```
+
+The generated credentials are stored on the host in:
+
+```text
+/home/ubuntu/grouppasswords.txt
+```
+
+The file contains:
+
+- the shared `labuser` credential;
+- one independent credential for each `grpN` account.
+
+# Operational lifecycle
+
+## Stop and start the EC2 instance
+
+For a lab prepared in advance, the EC2 instance can be stopped to reduce costs and started again before the event. Allow time for the host, LXD containers, DNS, nginx, and WebSSH to become available after restart.
+
+## Redeploy inside the existing EC2 host
+
+The environment can be wiped and rebuilt without replacing the EC2 instance:
+
+```bash
+sudo -i
+cd /root/scripts
+./setup-lab.sh --deploy --type 2 --networks 3
+```
+
+`--deploy` is destructive inside the host: it performs a wipe before rebuilding the selected profile.
+
+Command-line `--type` and `--networks` values apply only to that invocation; they do not rewrite `scripts/deploy-parameters.cfg`. For a persistent profile or group-count change, edit that file before redeploying, or repeat the same overrides on later lifecycle commands. `do-dns-lab.sh` also reads that file, so stale values can affect exercise activation.
+
+Available lifecycle actions are:
+
+```text
+--deploy      wipe and recreate the environment
+--wipe        stop and delete the deployed environment
+--stop_all    stop deployed instances and services
+--start_all   start deployed instances and services
+```
+
+## CloudFormation updates and AMI pinning
+
+Labs are normally ephemeral and should be created and deleted rather than updated in place. When an existing stack must be updated, create a change set and inspect replacements before execution.
+
+`LatestUbuntu` points to Canonical's current Ubuntu 24.04 AMI. If that AMI changed after the stack was created, an update can otherwise replace the EC2 instance. To preserve the existing host, obtain its current AMI and pass it through `AmiOverride`.
+
+```bash
+INSTANCE_ID=$(aws cloudformation describe-stack-resources \
+    --region us-east-1 \
+    --stack-name <STACK_NAME> \
+    --logical-resource-id labInstance \
+    --query 'StackResources[0].PhysicalResourceId' \
+    --output text)
+
+AMI_ID=$(aws ec2 describe-instances \
+    --region us-east-1 \
+    --instance-ids "$INSTANCE_ID" \
+    --query 'Reservations[0].Instances[0].ImageId' \
+    --output text)
+
+echo "$AMI_ID"
+```
+
+Pass this value when creating the update change set:
+
+```text
+ParameterKey=AmiOverride,ParameterValue=<CURRENT_AMI_ID>
+```
+
+AMI pinning prevents replacement caused by an AMI change only. Other template changes may still require replacement, so the change set remains mandatory.
+
+The template path and parameter syntax have been validated. Before relying on `AmiOverride` for a live lab, verify the proposed update with a nonexecuted change set against a disposable existing stack.
+
+## Delete the lab
+
+Delete the CloudFormation stack from the console or CLI:
+
+```bash
+aws cloudformation delete-stack \
+    --region us-east-1 \
+    --stack-name <STACK_NAME>
+
+aws cloudformation wait stack-delete-complete \
+    --region us-east-1 \
+    --stack-name <STACK_NAME>
+```
+
+Manual deletion of the lab's Route 53 records is not part of the normal procedure. CloudFormation owns the NS, glue, and `ec2-` records. A custom cleanup resource removes the DS record created by the internal DNSSEC deployment. The cleanup is designed to succeed when the DS does not exist. It has been validated with a successful deployment where a DS was present, with an internal deployment that failed before DS publication, and with deletion initiated from both the CLI and the AWS console.
+
+Public recursive resolvers can retain previous answers briefly according to DNS TTLs. Route 53 is the primary source when verifying cleanup.
+
+# Basic validation
+
+On the host:
+
+```bash
+cloud-init status --long
+lxc query /1.0/instances | jq 'length'
+lxc query '/1.0/instances?recursion=1' | jq -r 'group_by(.status)[] | "\(.[0].status): \(length)"'
+```
+
+From an external system:
+
+```bash
+dig <DOMAIN> NS
+dig <DOMAIN> DS
+dig @1.1.1.1 +dnssec +adflag <DOMAIN> SOA
+dig @8.8.8.8 +dnssec +adflag <DOMAIN> SOA
+curl -I https://<DOMAIN>
+curl -I https://webssh.<DOMAIN>
+```
+
+# Addressing summary
+
+The lab uses RFC 6598 shared address space internally.
+
+| Purpose | IPv4 |
+|---|---|
+| Backbone bridge | `100.64.0.0/22` |
+| Public DNS frontend | `100.64.0.53` |
+| Platform authoritative DNS | `100.64.0.54` |
+| Exercise authoritative targets | `100.64.0.55-100.64.0.57` |
+| RPZ authoritative service | `100.64.0.58` |
+| Group aggregate | `100.100.<group>.0/24` |
+| Group LAN | `100.100.<group>.0/26` |
+| Group internal servers | `100.100.<group>.64/26` |
+| Group DMZ | `100.100.<group>.128/26` |
+| Group extra network | `100.100.<group>.192/26` |
+
+The current internal IPv6 plan uses the fixed ULA prefix `fd89:59e0`. Restoration of a dynamic RFC 4193 prefix remains a future scalability task.
+
+# Repository publication and forks
+
+The repository workflow renders placeholders in `lab-ec2.yaml` and configuration files, then publishes the branch contents to S3. A fork must provide the required GitHub Actions secrets and variables, including:
+
+- AWS credentials for publication;
+- destination bucket;
+- SSH public key;
+- parent DNS zone;
+- participant instructions URL;
+- VPN values used by routing profiles.
+
+The parent Route 53 zone must already be DNSSEC signed. Its KMS key and parent-zone signing configuration are external prerequisites; the current lab template does not create or configure them.
+
+# Running outside AWS
+
+The host and LXD scripts can be adapted for another Ubuntu environment, but the current implementation assumes AWS integrations for:
+
+- Route 53 parent-zone records and DNSSEC DS publication;
+- S3 distribution of deployment files;
+- EC2 public IPv4 and IPv6 discovery;
+- CloudFormation lifecycle management.
+
+At minimum, copy `configs/deploy-parameters.cfg` to `scripts/deploy-parameters.cfg`, provide valid values, and replace the AWS-specific DNS publication flow before running:
+
+```bash
+cd scripts
+./setup-host.sh
+./setup-containers.sh
+./setup-lab.sh --deploy
+```
+
+# Engineering documentation
+
+The Architecture & Engineering Handbook is under [`docs/`](docs/README.md). It separates:
+
+- current architecture;
+- implementation reference;
+- engineering decisions;
+- future design;
+- development history;
+- technical debt and backlog.
+
+# License
+
+Copyright © 2025 Internet Corporation for Assigned Names and Numbers (ICANN) and Network Startup Resource Center (NSRC). All rights reserved.
+
+This repository is licensed under the 3-Clause BSD License. See [`LICENSE.md`](LICENSE.md).
