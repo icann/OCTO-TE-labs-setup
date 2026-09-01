@@ -26,6 +26,12 @@ create_web_content () {
     allow4ns2=''
     allow4ns2EOL=''
 
+    if [ "$IntegratedInstructions" = "YES" ]; then
+        integrated_instructions_link='<p><a href="instructions" target="_blank" rel="noopener noreferrer">Lab instructions</a></p>'
+    else
+        integrated_instructions_link=''
+    fi
+
     for grp in $(seq 1 $NETWORKS)
     do
         mkdir -p $contentworkdir/$DOMAIN/grp$grp
@@ -121,6 +127,7 @@ create_web_content () {
             -e "s|%ip4rtr%|$IPv4rtr|g" \
             -e "s|%username4rtr%|$user4rtr|g" \
             -e "s|%password4rtr%|$passwd4rtr|g" \
+            -e "s|%INTEGRATED_INSTRUCTIONS_LINK%|$integrated_instructions_link|g" \
             -e "s|%url%|"https://$DOMAIN/grp$grp/"|g" \
             $contentworkdir/$DOMAIN/grp$grp/*
         

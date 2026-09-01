@@ -9,7 +9,7 @@
 </head>
 <body>
     <h1>grp%group% network</h1>
-    <p><a href="instructions" target="_blank" rel="noopener noreferrer">Lab instructions</a></p>
+    %INTEGRATED_INSTRUCTIONS_LINK%
     <hr />
     <?php echo file_get_contents(__DIR__ . '/topology%LABTYPE%.svg'); ?>
     <hr />

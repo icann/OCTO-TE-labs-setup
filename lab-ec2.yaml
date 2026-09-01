@@ -52,6 +52,13 @@ Parameters:
     Type: String
     Description: "Instructions for the lab. Will be copied to the lab server and available via webserver"
     Default: "%LAB_INSTRUCTIONS_URL%"
+  IntegratedInstructions:
+    Type: String
+    Description: "Enable or disable the integrated lab instructions on participant group pages."
+    AllowedValues:
+      - "YES"
+      - "NO"
+    Default: "YES"
   labSinglePassword:
     Type: String
     Description: "Optional password for the shared labuser account. Leave empty to generate a random password automatically."
@@ -375,6 +382,7 @@ Resources:
               -e "s/%IPV6ADDRESS%/$IPv6/g"  \
               -e "s/%LABTYPE%/${LabType}/g"   \
               -e "s/%NETWORKS%/${Participants}/g" \
+              -e "s|%INTEGRATEDINSTRUCTIONS%|${IntegratedInstructions}|g" \
               -e "s|%INSTRUCTIONS%|${labInstructions}|g" \
               -e "s|%SINGLEPASSWORD%|$LAB_SINGLE_PASSWORD_SED|g" \
               ../configs/deploy-parameters.cfg > ./deploy-parameters.cfg

@@ -43,6 +43,20 @@ eval set -- "$TEMP"
 # Load parameters from "deploy-parameters.cfg" file
 . ./deploy-parameters.cfg
 
+# Integrated lab instructions are enabled by default for backward
+# compatibility with deploy-parameters.cfg files created before this
+# option existed.
+IntegratedInstructions="${IntegratedInstructions:-YES}"
+
+case "$IntegratedInstructions" in
+    YES|NO)
+        ;;
+    *)
+        echo "ERROR: IntegratedInstructions must be YES or NO." >&2
+        exit 5
+        ;;
+esac
+
 # ------------------------------------------------------------------------------------------------------------------
 # Indicate which containers should be created
 #
@@ -280,6 +294,11 @@ delete_all () {
 }
 
 deploy () {
+    if [ "$IntegratedInstructions" = "YES" ] && [ -z "$INSTRUCTIONS" ]; then
+        echo "ERROR: IntegratedInstructions=YES requires a non-empty INSTRUCTIONS URL." >&2
+        exit 5
+    fi
+
     echo "======================================================================="
     echo "Deploy will use the following parameters (if you want to change them,"
     echo "please edit the deploy-parameters.cfg file and re-run this script):"
@@ -290,6 +309,7 @@ deploy () {
     echo "LABTYPE=$LABTYPE"
     echo "NETWORKS=$NETWORKS"
     echo "IPv6prefix=$IPv6prefix"
+    echo "IntegratedInstructions=$IntegratedInstructions"
     echo "VPNpeerName=$VPNpeerName"
     echo "VPNlistenPort=$VPNlistenPort"
     echo "VPNprivateKey=<redacted>"
@@ -427,8 +447,15 @@ deploy () {
 
     create_web_content
 
-    if [ -n "$INSTRUCTIONS" ]; then
+    if [ "$IntegratedInstructions" = "YES" ]; then
         create_instructions
+    else
+        echo "Integrated lab instructions are disabled. Removing any previously generated instructions..."
+
+        for grp in $(seq 1 "$NETWORKS")
+        do
+            rm -rf "/var/www/${DOMAIN}/html/grp${grp}/instructions"
+        done
     fi
 
     # Clean /root/.shh/known_hosts
