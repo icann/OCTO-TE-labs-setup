@@ -64,6 +64,62 @@ Parameters:
     Description: "Optional password for the shared labuser account. Leave empty to generate a random password automatically."
     Default: ""
     NoEcho: true
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Lab Identity"
+        Parameters:
+          - DnsName
+          - DnsParent
+          - Owner
+      - Label:
+          default: "Lab Configuration"
+        Parameters:
+          - LabType
+          - Participants
+          - labInstanceType
+      - Label:
+          default: "Lab Instructions"
+        Parameters:
+          - IntegratedInstructions
+          - labInstructions
+      - Label:
+          default: "Access"
+        Parameters:
+          - labSinglePassword
+      - Label:
+          default: "Advanced Deployment"
+        Parameters:
+          - AmiOverride
+          - LatestUbuntu
+          - S3Bucket
+    ParameterLabels:
+      DnsName:
+        default: "Lab DNS Name"
+      DnsParent:
+        default: "Parent DNS Domain"
+      Owner:
+        default: "Lab Owner"
+      LabType:
+        default: "Lab Type"
+      Participants:
+        default: "Participant Groups"
+      labInstanceType:
+        default: "EC2 Instance Type"
+      IntegratedInstructions:
+        default: "Integrated Lab Instructions"
+      labInstructions:
+        default: "Lab Instructions Source URL"
+      labSinglePassword:
+        default: "Shared Lab Password (Optional)"
+      AmiOverride:
+        default: "AMI Override (Optional)"
+      LatestUbuntu:
+        default: "Ubuntu AMI SSM Parameter"
+      S3Bucket:
+        default: "Deployment S3 Bucket"
+
 Conditions:
   UseAmiOverride: !Not [!Equals [!Ref AmiOverride, ""]]
 
