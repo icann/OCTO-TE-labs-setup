@@ -7,9 +7,9 @@ Parameters:
     Default: "%DNS_PARENT_DEFAULT%"
   DnsName:
     Type: String
-    Description: "DNS label for the lab. Lowercase letters, numbers, and hyphens are allowed."
+    Description: "DNS label for the lab. Use 3-32 lowercase letters, numbers, or hyphens. It must start and end with a letter or number."
     AllowedPattern: '^[a-z0-9]([a-z0-9-]*[a-z0-9])?$'
-    ConstraintDescription: "Use lowercase letters, numbers, and hyphens only. The value must start and end with a letter or number."
+    ConstraintDescription: "Must contain only lowercase letters, numbers, and internal hyphens, and must start and end with a letter or number."
     MinLength: 3
     MaxLength: 32
   Owner:
