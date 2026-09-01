@@ -2,7 +2,7 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-08-31
+**Last Updated:** 2026-09-01
 
 ---
 
@@ -97,6 +97,15 @@ EPIC-001 completes when:
 
 **Objective:** Remove security risks, make lifecycle operations idempotent, improve reproducibility, and reduce operational ambiguity before broader scale and routing use.
 
+## Operator Experience and Instructions
+| Item | Type | Priority | Status | Description |
+|---|---|---:|---|---|
+| FEAT-0040 | Feature | Medium | Completed | Add `IntegratedInstructions=YES/NO` as a cross-profile option controlling the complete integrated instruction pipeline. |
+| IMP-0044 | Improvement | Medium | Completed | Group and label CloudFormation parameters and verify a Quick Create path with editable stack-name prefill and active-region guidance. |
+| IMP-0045 | Improvement | Low | Completed | Clarify the complete 3-32 character `DnsName` validation policy and console message. |
+| TASK-0040 | Validation | High | Completed | Validate integrated-instruction `YES` and `NO` deployments, immediate lab DNS-name reuse, HTTPS, DNS, and DNSSEC recovery. |
+| IMP-0046 | Improvement | Medium | Planned | Define explicit ownership or preservation semantics for `/var/www/<DOMAIN>/html/grpN/instructions`; the current `NO` path removes it unconditionally. |
+
 ## Security and Access
 
 | Item | Type | Priority | Status | Description |
@@ -118,6 +127,7 @@ EPIC-001 completes when:
 | IMP-0041 | Improvement | Medium | Planned | Make NAT64/DNS64 an explicit capability rather than an unconditional platform service. |
 | IMP-0042 | Improvement | Medium | Planned | Validate `AmiOverride` with a nonexecuted change set against a disposable existing stack. |
 | IMP-0043 | Improvement | High | Planned | Add a CloudFormation readiness signal so stack status can distinguish EC2 creation from internal deployment completion. |
+| BUG-0047 | Bug | High | Planned | Move all deployment preflight validation ahead of the destructive `wipe` executed by `--deploy`. |
 
 ## Reproducibility and Maintainability
 
@@ -129,6 +139,7 @@ EPIC-001 completes when:
 | TD-0044 | Technical Debt | Low | Planned | Remove or justify the legacy `%KSK_ARN%` substitution from the publication workflow. |
 | TD-0045 | Technical Debt | Medium | Planned | Reduce output noise, fix message typos, and add explicit normal/verbose/debug modes. |
 | TD-0046 | Technical Debt | Medium | Planned | Introduce automated shell, CloudFormation, configuration, link, and lifecycle validation in CI. |
+| TD-0047 | Technical Debt | Low | Planned | Align or derive the S3 synchronization region; the workflow declares `us-east-2` while the current `nico` bucket is in `us-east-1`. |
 
 ---
 
@@ -207,6 +218,12 @@ The original implementation demonstrated more than 100 complete groups and more 
 | `bdf70b3` | Refreshed core deployment and architecture documentation |
 | `44fd0e5` | Refreshed network and platform service documentation |
 | `d273970` | Refreshed engineering records and added ADR-0002 |
+| `ae4ea99` | Completed the four-batch Architecture & Engineering Handbook reconciliation |
+| `0a8832c` | Added optional integrated lab instructions |
+| `6793da4` | Grouped and labeled CloudFormation deployment parameters |
+| `51e3d71` | Clarified DNS-name validation guidance |
+| `dc719a4` | Added the DNS-name length requirement to the validation message |
+| `9e37720` | Documented integrated instructions and deployment UX |
 
 ---
 

@@ -2,7 +2,7 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-08-31
+**Last Updated:** 2026-09-01
 
 ---
 
@@ -349,6 +349,79 @@ EPIC-004 deployment and security hardening is now the active engineering phase, 
 
 ---
 
+# Entry S-0007 - Integrated Instructions and CloudFormation Operator UX
+
+**Date:** 2026-09-01
+
+**Sprint:** EPIC-004 - Deployment and Security Hardening
+
+**Status:** Completed
+
+## Objective
+
+Make integrated participant instructions optional, improve the CloudFormation creation experience, clarify DNS-name validation, and verify the complete lifecycle before beginning the primary EPIC-004 security work.
+
+## Work Completed
+
+- Added `IntegratedInstructions=YES/NO` independently of numeric Lab Type.
+- Preserved the integrated archive source as the separate `labInstructions` parameter.
+- Made `NO` omit the group-page link, skip the Jekyll pipeline, and remove the reserved per-group instruction path.
+- Added backward-compatible defaulting to `YES` for older configuration files.
+- Grouped and labeled all twelve CloudFormation parameters by operator task.
+- Verified a Quick Create path with editable `LAB-YYYYMMDD-LOCATION` prefill; the URL does not encode a stack region, so the active CloudFormation console region controls deployment.
+- Clarified the 3-32 character `DnsName` policy and complete constraint message.
+
+## Implementation Commits
+
+- `0a8832c` - Add optional integrated lab instructions.
+- `6793da4` - Group CloudFormation deployment parameters.
+- `51e3d71` - Clarify DNS name validation guidance.
+- `dc719a4` - Include DNS name length in validation message.
+
+## Validation Evidence
+
+### IntegratedInstructions=NO
+
+A three-group Lab Type 1 deployment completed with `cloud-init` status `done` and no errors. The generated configuration contained `IntegratedInstructions="NO"`; no group instruction directories or links existed, and the instruction/Jekyll log markers were absent.
+
+### IntegratedInstructions=YES
+
+A matching three-group Lab Type 1 deployment completed cleanly. All three group instruction directories and links existed, and the instruction-generation start and completion markers appeared in the cloud-init log.
+
+### Lifecycle and DNS
+
+The lab deployment for `testing.te-labs.training` was deleted and recreated with the same DNS name. The new deployment restored A, AAAA, NS, DS, HTTPS, and a valid DNSSEC chain. A workstation resolver briefly returned AAAA but no A before converging; 1.1.1.1, 8.8.8.8, and the authoritative trace were correct. The test did not isolate the resolver's internal caching mechanism.
+
+### DnsName and Console UX
+
+- `in` was rejected by the 3-character minimum.
+- `-testing` was rejected by the label syntax.
+- `in-nico` was accepted.
+- The final message describes length, allowed characters, and start/end requirements.
+- Quick Create displayed the grouped form and pre-filled `LAB-YYYYMMDD-LOCATION`.
+
+## Additional Findings
+
+- `--deploy` performs `wipe` before the empty enabled-instruction source check inside `deploy()`.
+- `IntegratedInstructions=NO` removes the per-group instruction path without an ownership marker.
+- The publication workflow declares S3 region `us-east-2`, while the current `nico` bucket reports `us-east-1`.
+
+## Documentation
+
+**Commit:** `9e37720` - Document integrated instructions and deployment UX
+
+The operational README and current-state architecture/reference documents were updated before this institutional-record batch.
+
+## Outcome
+
+The optional instruction capability and CloudFormation operator UX are validated. The newly discovered lifecycle and publication issues are registered for EPIC-004 rather than hidden by the successful functional tests.
+
+## Next Work
+
+Begin EPIC-004 with the agreed critical security work: protect the active WebSSH endpoint and eliminate fixed bootstrap credentials. Address destructive preflight ordering as part of lifecycle hardening.
+
+---
+
 # Engineering Log Index
 
 | Entry | Date | Summary | Status |
@@ -359,6 +432,7 @@ EPIC-004 deployment and security hardening is now the active engineering phase, 
 | S-0004 | 2026-08-30 | CloudFormation lifecycle hardening | Completed |
 | S-0005 | 2026-08-31 | dnsdist, DNS-label, and AMI improvements | Completed |
 | S-0006 | 2026-08-31 | Handbook reconciliation and hardening discovery | Completed |
+| S-0007 | 2026-09-01 | Integrated instructions and CloudFormation operator UX | Completed |
 
 ---
 
@@ -366,4 +440,4 @@ EPIC-004 deployment and security hardening is now the active engineering phase, 
 
 **Current Status:** In Review
 
-**Next Review:** After completion of Batch 4 and the first hardening implementation cycle.
+**Next Review:** After the first EPIC-004 implementation cycle and the baseline technical review.

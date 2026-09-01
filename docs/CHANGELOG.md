@@ -2,7 +2,7 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-08-31
+**Last Updated:** 2026-09-01
 
 ---
 
@@ -15,6 +15,40 @@ Routine wording, spelling, or formatting changes do not normally require an entr
 ---
 
 # Version History
+
+## 2026-09-01 - Integrated Instructions and Deployment UX
+
+### Added operational instruction control
+
+- Added the cross-profile `IntegratedInstructions=YES/NO` deployment option.
+- `YES` preserves the integrated per-group instruction workflow and requires a non-empty `labInstructions` source URL.
+- `NO` omits the group-page link, skips the Jekyll instruction build, and removes the reserved per-group `instructions` path.
+- Validated both modes with three-group Lab Type 1 deployments and clean `cloud-init` completion.
+
+### Improved CloudFormation operator experience
+
+- Grouped all template parameters by operator task with `AWS::CloudFormation::Interface`.
+- Added friendly console labels while preserving the existing CLI/API parameter IDs.
+- Verified a Quick Create path with editable `LAB-YYYYMMDD-LOCATION` stack-name prefill and an explicit active-region warning.
+- Clarified the `DnsName` policy and its complete 3-32 character validation message.
+
+### Recorded lifecycle evidence and follow-up
+
+- Revalidated deletion and immediate recreation of `testing.te-labs.training`, including A, AAAA, delegation, DS publication, HTTPS, and DNSSEC validation.
+- Recorded that recursive and workstation resolver state can lag briefly after the authoritative and Route 53 state is already correct.
+- Identified that `--deploy` currently performs `wipe` before the enabled-instruction source validation inside `deploy()`.
+- Reserved `/var/www/<DOMAIN>/html/grpN/instructions` for the integrated pipeline because `NO` removes that path unconditionally.
+- Recorded the publication-workflow region mismatch: the sync action declares `us-east-2`, while the current `nico` bucket is in `us-east-1`.
+
+### Implementation and documentation commits
+
+- `0a8832c` - Add optional integrated lab instructions.
+- `6793da4` - Group CloudFormation deployment parameters.
+- `51e3d71` - Clarify DNS name validation guidance.
+- `dc719a4` - Include DNS name length in validation message.
+- `9e37720` - Document integrated instructions and deployment UX.
+
+---
 
 ## 2026-08-31 - Verified Implementation Reconciliation, Batch 4
 

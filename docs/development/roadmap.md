@@ -2,7 +2,7 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-08-31
+**Last Updated:** 2026-09-01
 
 ---
 
@@ -97,6 +97,23 @@ Create an evidence-based reference for the current AWS, Ubuntu, LXD, DNS, orches
 
 Make normal deployment, internal redeployment, failure handling, and deletion secure, idempotent, reproducible, and understandable.
 
+## Completed Entry Work
+
+As preparatory work for M2, the following items were completed and validated before the primary security changes:
+
+- optional integrated instructions with explicit `YES` and `NO` behavior;
+- grouped and labeled CloudFormation parameters;
+- a verified Quick Create path with editable `LAB-YYYYMMDD-LOCATION` prefill;
+- active-region guidance that separates stack location from S3 template location;
+- complete `DnsName` length and syntax guidance;
+- immediate delete-and-recreate testing with DNS, DNSSEC, and HTTPS recovery.
+
+## Newly Registered Lifecycle Findings
+
+- enabled-instruction source validation must move ahead of the destructive `wipe`;
+- generated instruction-path ownership or preservation semantics require an explicit design;
+- the S3 publication workflow region should match or derive from the actual bucket region.
+
 ## Priority Order
 
 1. Protect the active WebSSH endpoint.
@@ -117,6 +134,9 @@ Make normal deployment, internal redeployment, failure handling, and deletion se
 - A failed internal deployment is clearly represented and diagnosable.
 - External dependencies are versioned or controlled sufficiently for reproducible tests.
 - A live `AmiOverride` change-set test is complete.
+- All deployment-rejecting configuration checks run before destructive cleanup.
+- Generated-content ownership and preservation rules are explicit and tested.
+- Publication tooling uses an aligned or derived S3 region.
 
 ---
 

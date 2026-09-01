@@ -2,7 +2,7 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-08-31
+**Last Updated:** 2026-09-01
 
 ---
 
@@ -135,6 +135,11 @@ If the number of ADRs grows substantially, ADRs could be grouped into foundation
 | KB-0017 | Apex DS and Group DS Records Use Different Control Paths | Implementation Knowledge | 2026-08-31 |
 | KB-0018 | Fixed Bootstrap Credentials and an Unprotected WebSSH Frontend Are Priority Risks | Engineering Observation | 2026-08-31 |
 | KB-0019 | dnsdist Backend Count Has a Material Resource Cost | Engineering Observation | 2026-08-31 |
+| KB-0020 | Integrated Instructions Separates Capability from Source Configuration | Architecture Knowledge | 2026-09-01 |
+| KB-0021 | Destructive Redeploys Require Preflight Validation Before Wipe | Engineering Observation | 2026-09-01 |
+| KB-0022 | CloudFormation Console UX Does Not Change Deployment Semantics | Implementation Knowledge | 2026-09-01 |
+| KB-0023 | Immediate DNS Name Reuse Is Compatible but Resolver Cache State Is External | Engineering Observation | 2026-09-01 |
+| KB-0024 | Generated Instruction Paths Need Explicit Ownership | Architecture Knowledge | 2026-09-01 |
 
 ---
 
@@ -411,6 +416,76 @@ lxc query '/1.0/instances?recursion=1' | jq -r 'group_by(.status)[] | "\(.[0].st
 **Caution:** These measurements demonstrate a strong relationship but do not define a linear per-backend cost or a maximum supported scale.
 
 **Related:** IMP-0050, TASK-0051
+
+---
+
+## KB-0020 - Integrated Instructions Separates Capability from Source Configuration
+
+**Date:** 2026-09-01
+
+**Category:** Architecture Knowledge
+
+**Summary:** `IntegratedInstructions` controls whether the platform-managed instruction capability is enabled, while `labInstructions` supplies the archive URL only when that capability is enabled. The option is independent of numeric Lab Type and defaults to `YES` for compatibility with older generated or manually maintained configuration files.
+
+**Operational Consequence:** A feature switch and its source configuration should remain separate. Disabling the feature must skip the full build/publication pipeline rather than merely hiding one link.
+
+**Related:** FEAT-0040, [`02-deployment-flow.md`](02-deployment-flow.md), [`07-platform-services.md`](07-platform-services.md)
+
+---
+
+## KB-0021 - Destructive Redeploys Require Preflight Validation Before Wipe
+
+**Date:** 2026-09-01
+
+**Category:** Engineering Observation
+
+**Summary:** The empty instruction-source check is at the beginning of `deploy()`, but the `--deploy` action invokes `wipe` before entering `deploy()`. An invalid enabled-instruction configuration can therefore destroy an existing internal environment before the error is reported.
+
+**Operational Consequence:** All configuration checks capable of rejecting a deployment must run before destructive cleanup begins. Function-local validation is insufficient when the lifecycle action performs work before calling that function.
+
+**Related:** BUG-0047, [`03-orchestrator.md`](03-orchestrator.md)
+
+---
+
+## KB-0022 - CloudFormation Console UX Does Not Change Deployment Semantics
+
+**Date:** 2026-09-01
+
+**Category:** Implementation Knowledge
+
+**Summary:** `AWS::CloudFormation::Interface` groups and labels parameters only in the console; logical parameter IDs used by CLI and API remain unchanged. A Quick Create URL can pre-fill an editable stack name, but the active CloudFormation console region still determines where the stack resources are created. The S3 template artifact region is independent.
+
+**Operational Consequence:** Operator-facing presentation can improve without changing automation contracts. Documentation and links must explicitly separate template location, active stack region, and editable pre-filled values.
+
+**Related:** IMP-0044, TD-0047, [`../reference/aws-resources.md`](../reference/aws-resources.md), [`../reference/aws-services.md`](../reference/aws-services.md)
+
+---
+
+## KB-0023 - Immediate DNS Name Reuse Is Compatible but Resolver Cache State Is External
+
+**Date:** 2026-09-01
+
+**Category:** Engineering Observation
+
+**Summary:** `testing.te-labs.training` was deleted and recreated immediately with new infrastructure. Route 53 delegation and DS publication, authoritative A/AAAA data, HTTPS, and DNSSEC validation all recovered correctly. A workstation resolver briefly returned AAAA but no A before converging, while the new authority, 1.1.1.1, and 8.8.8.8 already returned both records.
+
+**Operational Consequence:** Infrastructure cleanup and immediate name reuse can be correct while a recursive or local resolver still presents transient incomplete, stale, or negative state. The test established resolver convergence, but did not isolate the resolver's internal caching mechanism; transient resolver state must be distinguished from platform failure.
+
+**Related:** TASK-0040, [`../reference/dns-naming.md`](../reference/dns-naming.md)
+
+---
+
+## KB-0024 - Generated Instruction Paths Need Explicit Ownership
+
+**Date:** 2026-09-01
+
+**Category:** Architecture Knowledge
+
+**Summary:** When `IntegratedInstructions=NO`, the current implementation removes `/var/www/<DOMAIN>/html/grpN/instructions` unconditionally. It does not detect whether content in that path came from the integrated pipeline or was placed there manually.
+
+**Operational Consequence:** That path is currently reserved for platform-managed instructions. Alternative material that must survive redeployment must use another path or an external link until explicit ownership or preservation semantics are implemented.
+
+**Related:** IMP-0046, [`07-platform-services.md`](07-platform-services.md)
 
 ---
 

@@ -2,7 +2,7 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-08-31
+**Last Updated:** 2026-09-01
 
 ---
 
@@ -26,6 +26,9 @@ This file contains short-lived immediate actions. Durable work belongs in the En
 - [ ] Remove fixed bootstrap credentials and add regression tests for every role.
 - [ ] Fix TAYGA/NAT64 teardown and repeated iptables cleanup.
 - [ ] Align WireGuard `VPNlistenPort`, DNAT add/delete rules, and CloudFormation Security Group ingress.
+- [ ] Move deployment-rejecting configuration validation ahead of the destructive `wipe` path.
+- [ ] Decide and implement ownership or preservation semantics for `/var/www/<DOMAIN>/html/grpN/instructions`.
+- [ ] Align or derive the GitHub Actions S3 synchronization region from the actual bucket.
 - [ ] Create a disposable existing stack and validate `AmiOverride` through a nonexecuted change set.
 
 ---
@@ -35,6 +38,7 @@ This file contains short-lived immediate actions. Durable work belongs in the En
 - [ ] Use `cloud-init status --long`; do not treat `CREATE_COMPLETE` as readiness.
 - [ ] Count LXD instances through `/1.0/instances`, not repeated address rows.
 - [ ] Test success, failure, deletion, and immediate name reuse for lifecycle changes.
+- [ ] Re-test both `IntegratedInstructions` modes whenever instruction publication or lifecycle ordering changes.
 - [ ] Keep platform deployment validation separate from `do-dns-lab.sh` exercise activation.
 - [ ] Do not claim Types 3 or 4 production-ready before their known blockers are fixed.
 - [ ] Do not raise the 64-group limit before post-hardening capacity tests are complete.
