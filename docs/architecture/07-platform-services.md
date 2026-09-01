@@ -2,7 +2,7 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-08-31
+**Last Updated:** 2026-09-01
 
 ---
 
@@ -86,7 +86,7 @@ The main site provides:
 - topology diagrams;
 - group-specific authentication;
 - links to internal consoles;
-- participant instructions.
+- optional integrated participant instructions.
 
 The WebSSH virtual host reverse-proxies to:
 
@@ -188,16 +188,35 @@ The platform has been validated with DNS labels containing hyphens.
 
 # Participant Instructions
 
-The instruction pipeline:
+The integrated instruction pipeline is controlled by two separate values:
 
-1. downloads the configured ZIP archive;
-2. extracts the participant content;
-3. prepares a Jekyll site;
-4. substitutes group and domain values;
-5. builds static output;
-6. installs one copy below each group web directory.
+| Value | Responsibility |
+|---|---|
+| `IntegratedInstructions` | Enables or disables the platform-managed instruction capability. Allowed values are `YES` and `NO`; the default is `YES`. |
+| `INSTRUCTIONS` / `labInstructions` | Provides the ZIP archive URL used only when the capability is enabled. |
 
-Current host dependencies include:
+When enabled, the pipeline:
+
+1. verifies that the source URL is non-empty;
+2. downloads and extracts the configured archive;
+3. prepares the Jekyll site;
+4. substitutes group, domain, IPv4, IPv6, and ULA values;
+5. builds static output for every selected group;
+6. installs one copy below `/var/www/<DOMAIN>/html/grpN/instructions`;
+7. exposes the relative **Lab instructions** link on each group page.
+
+When disabled:
+
+- `create_instructions` is not called;
+- the group-page placeholder is rendered as an empty string;
+- the Jekyll/Ruby instruction path is skipped;
+- `/var/www/<DOMAIN>/html/grpN/instructions` is removed for every selected group during deployment or redeployment.
+
+The removal is unconditional and does not distinguish generated content from custom content. Alternative instructions that must remain available should use another path or an external link.
+
+An absent `IntegratedInstructions` value in an older configuration defaults to `YES`. Both modes were validated end to end on 2026-09-01 with three-group Lab Type 1 deployments.
+
+Current enabled-mode dependencies include:
 
 - Ruby;
 - Bundler;
@@ -206,17 +225,9 @@ Current host dependencies include:
 - pandoc;
 - Markdown conversion tools.
 
-The current redeploy output shows:
-
-- Bundler root-user warnings;
-- Sass deprecation warnings;
-- repeated dependency resolution;
-- large volumes of build output.
-
-Caching and modernizing this toolchain are hardening tasks.
+Observed enabled-mode warnings include Bundler root-user warnings, Sass deprecations, repeated dependency resolution, and large build output. Caching and modernizing this toolchain remain hardening tasks; disabling integrated instructions avoids this path for labs that use other training material.
 
 ---
-
 # Scheduled Automation
 
 The host installs cron entries that run once per minute.

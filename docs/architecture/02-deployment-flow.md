@@ -2,7 +2,7 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-08-31
+**Last Updated:** 2026-09-01
 
 ---
 
@@ -47,7 +47,7 @@ EC2 UserData starts cloud-init
 Shared platform services and per-group topology are created
     |
     v
-nginx, WebSSH, certificates, instructions, cron, and DS are published
+nginx, WebSSH, certificates, optional integrated instructions, cron, and DS are published
     |
     v
 cloud-init status: done
@@ -97,16 +97,20 @@ The principal operator-controlled inputs are:
 - number of groups;
 - Lab Type;
 - EC2 instance type;
-- participant instructions URL;
+- integrated-instructions enablement;
+- integrated-instructions source URL;
 - optional shared `labuser` password;
 - optional AMI override for an existing-stack update.
 
-`DnsName` is a single DNS label. The current validation permits 3-32 lowercase letters, numbers, and hyphens, with an alphanumeric first and last character.
+The CloudFormation console groups these parameters into **Lab Identity**, **Lab Configuration**, **Lab Instructions**, **Access**, and **Advanced Deployment**. Friendly labels are provided through `AWS::CloudFormation::Interface`; the grouping affects the console only, not CLI or API parameter names.
+
+A verified Quick Create URL can pre-fill the editable stack name `LAB-YYYYMMDD-LOCATION`. The active CloudFormation console region controls where the stack is created. The S3 template artifact can be in another region; the current `nico` template bucket is in `us-east-1`.
+
+`DnsName` is a single DNS label. The current validation permits 3-32 lowercase letters, numbers, and internal hyphens, with an alphanumeric first and last character. The combined CloudFormation constraint message states both the length and syntax requirements because the console uses one message for either kind of violation.
 
 The current shell orchestrator supports 3-64 groups even though higher route capacity is prepared in the host network template.
 
 ---
-
 # Phase 3 - AWS Resource Provisioning
 
 CloudFormation creates the AWS execution environment, including:
@@ -204,7 +208,7 @@ The verified high-level order is:
 10. start and configure participant containers;
 11. obtain or reuse the HTTPS certificate;
 12. generate nginx and WebSSH configuration;
-13. publish the participant web content and instructions;
+13. publish the participant web content and, when enabled, the integrated instructions;
 14. configure cron jobs;
 15. publish the lab DS to the parent Route 53 zone;
 16. report `DEPLOY DONE`.
@@ -246,6 +250,32 @@ The DS is generated only after the platform zone is signed. It is created by the
 
 ---
 
+# Optional Integrated Instructions
+
+`IntegratedInstructions` is a cross-profile deployment option.
+
+```text
+IntegratedInstructions=YES
+    -> require non-empty INSTRUCTIONS URL
+    -> show the Lab instructions link
+    -> download and parameterize the archive
+    -> build one Jekyll site per group
+    -> publish /var/www/<DOMAIN>/html/grpN/instructions
+
+IntegratedInstructions=NO
+    -> ignore the source URL
+    -> omit the link from each group page
+    -> skip create_instructions and the Jekyll pipeline
+    -> ensure group instruction directories are absent
+```
+
+The shell defaults an absent value to `YES` for compatibility with pre-option configuration files and rejects values other than `YES` or `NO`. The URL requirement is checked at the beginning of `deploy()`. However, the current `--deploy` action invokes `wipe` before it invokes `deploy()`, so an internal redeploy with `YES` and an empty source deletes the existing internal environment before reporting the configuration error. Moving this check ahead of destructive cleanup is a known lifecycle-hardening requirement.
+
+Both modes were validated on 2026-09-01 with Lab Type 1 and three groups. `YES` produced the link and three instruction trees; `NO` produced neither and generated no instruction-build log entries. Both deployments completed with `cloud-init` status `done` and no errors.
+
+When `NO` is selected, `/var/www/<DOMAIN>/html/grpN/instructions` is removed for every selected group without distinguishing platform-generated content from custom content. Alternative material that must survive a redeploy must use another location or an external link.
+
+---
 # Phase 9 - Completion and Validation
 
 The operator should connect through:
@@ -318,13 +348,13 @@ wipe current internal environment
 ```
 
 It preserves the EC2 and CloudFormation resources but deletes and recreates LXD networks, containers, shared DNS services, web content, credentials, and related internal state.
-
 The internal redeploy can generate a new DNSSEC key and updates the parent DS accordingly.
+
+Changing `IntegratedInstructions` in `deploy-parameters.cfg` before an internal redeploy changes the publication behavior without replacing the EC2 host. A transition from `YES` to `NO` omits the link, skips the build, and removes `/var/www/<DOMAIN>/html/grpN/instructions` for every selected group. Content placed manually at that path is not preserved.
 
 Command-line profile and group-count overrides are process-local. They do not update `deploy-parameters.cfg`; edit that file for a persistent change or repeat the same overrides on subsequent lifecycle commands.
 
 ---
-
 # Stack Update Lifecycle
 
 The normal lifecycle is create, operate, and delete. In-place CloudFormation updates of active labs are exceptional.
@@ -373,6 +403,8 @@ This lifecycle has been validated for:
 - recreation with the same `DnsName` immediately after deletion;
 - a `DnsName` containing a hyphen.
 
+Immediate name reuse can still encounter recursive or workstation DNS cache state that CloudFormation does not control. During the verified `testing` reuse cycle, the new authority and public resolvers returned correct A and AAAA data while the workstation resolver briefly lacked the A record. The condition converged without a platform change.
+
 ---
 
 # Failure Boundaries
@@ -399,7 +431,9 @@ A recent example was a transient FRRouting repository index that advertised pack
 - the DS is created outside CloudFormation and deleted by a custom resource;
 - `--deploy` is destructive inside the EC2 host;
 - participant DNS exercise services are activated separately;
-- delete and recreate with the same DNS label is supported.
+- integrated participant instructions are independently selectable from the Lab Type;
+- the active console region, not the S3 template region, controls stack placement;
+- delete and recreate with the same DNS label is supported, subject to external cache convergence.
 
 ---
 

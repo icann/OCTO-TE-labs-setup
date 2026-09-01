@@ -2,7 +2,7 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-08-31
+**Last Updated:** 2026-09-01
 
 ---
 
@@ -96,7 +96,7 @@ Detailed principles are in [`architecture/ENGINEERING-PRINCIPLES.md`](architectu
 
 # Current Verified Implementation Baseline
 
-The 2026-08-31 reconciliation is based on the `nico` branch through implementation commit `b9ce623` and on end-to-end deployment tests completed during August 2026.
+The Handbook baseline was reconciled on 2026-08-31. This update extends the verified current-state baseline through implementation commit `dc719a4` and deployment tests completed on 2026-09-01.
 
 The verified baseline includes:
 
@@ -107,7 +107,11 @@ The verified baseline includes:
 - DNSSEC key generation, DS publication, external validation, and stack-delete cleanup;
 - HTTPS and WebSSH publication;
 - optional shared `labuser` password;
-- DNS labels containing hyphens;
+- optional integrated instructions, validated in both `YES` and `NO` modes;
+- CloudFormation parameter grouping and friendly labels in the console;
+- a verified Quick Create path with editable `LAB-YYYYMMDD-LOCATION` stack-name prefill and an explicit active-region warning;
+- DNS labels containing interior hyphens, with combined 3-32 character and syntax guidance;
+- immediate delete/recreate of the same lab name, including observed transient local DNS-cache convergence;
 - an optional AMI pinning mechanism for deliberate stack updates; the template path is validated, while live update-change-set validation remains pending;
 - resolver scalability testing at 60 groups;
 - documentation of the original implementation's demonstrated operation above 100 groups.

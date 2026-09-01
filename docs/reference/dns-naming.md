@@ -2,7 +2,7 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-08-31
+**Last Updated:** 2026-09-01
 
 ---
 
@@ -43,11 +43,19 @@ first character: letter or digit
 last character: letter or digit
 ```
 
+The CloudFormation console presents one combined constraint message for length or syntax failures:
+
+```text
+Must be 3-32 characters long, contain only lowercase letters, numbers,
+and internal hyphens, and start and end with a letter or number.
+```
+
 Examples accepted:
 
 ```text
 dnstest
 dns-test
+in-nico
 lab-2026
 a1-b2
 ```
@@ -55,11 +63,14 @@ a1-b2
 Examples rejected:
 
 ```text
--dnstest
-dnstest-
-dns_test
-DNS-Test
+in              # fewer than 3 characters
+-testing        # leading hyphen
+testing-        # trailing hyphen
+dns_test        # underscore
+DNS-Test        # uppercase letters
 ```
+
+The console can retain a previously displayed validation banner after the field is corrected, but the backend re-evaluates the corrected value when continuing. A fresh `in-nico` value was accepted without error.
 
 ---
 
@@ -285,7 +296,9 @@ After stack deletion:
 - the custom resource removes the DS;
 - Route 53 should contain no records matching the deleted lab name.
 
-Recursive resolvers may briefly return previous data or a transient validation error while cached DS and denial-of-existence records converge. Record state in Route 53 is the primary cleanup check, followed by public resolver checks after the TTL interval.
+Recursive resolvers may briefly return previous data, negative answers, asymmetric A/AAAA results, or a transient validation error while cached DS and denial-of-existence records converge. Record state in Route 53 and direct authoritative responses are the primary cleanup/publication checks, followed by public resolver checks after the TTL interval.
+
+In the verified delete-and-recreate cycle for `testing.te-labs.training`, the new authority, 1.1.1.1, and 8.8.8.8 returned the new A and AAAA records with a 30-second TTL and a valid DNSSEC chain. The workstation's configured resolver briefly returned AAAA but no A, then converged without a platform change. Immediate name reuse is therefore supported, but external cache state remains outside CloudFormation control.
 
 ---
 

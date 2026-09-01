@@ -2,7 +2,7 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-08-31
+**Last Updated:** 2026-09-01
 
 ---
 
@@ -31,13 +31,31 @@ Important parameters include:
 - `AmiOverride`;
 - `S3Bucket`;
 - `labInstanceType`;
+- `IntegratedInstructions`;
 - `labInstructions`;
 - `labSinglePassword`.
 
-`AmiOverride` is empty for normal deployments.
+`AmiOverride` is empty for normal deployments. `IntegratedInstructions` defaults to `YES`; `labInstructions` is required by the internal deployment only when that capability is enabled.
 
 ---
 
+# Parameter Interface Metadata
+
+`AWS::CloudFormation::Interface` groups all twelve parameters in the console as:
+
+| Group | Parameters |
+|---|---|
+| Lab Identity | `DnsName`, `DnsParent`, `Owner` |
+| Lab Configuration | `LabType`, `Participants`, `labInstanceType` |
+| Lab Instructions | `IntegratedInstructions`, `labInstructions` |
+| Access | `labSinglePassword` |
+| Advanced Deployment | `AmiOverride`, `LatestUbuntu`, `S3Bucket` |
+
+The metadata also provides friendly labels. It affects the CloudFormation console only; CLI and API calls continue to use the logical IDs.
+
+The stack name is not a template parameter. The verified Quick Create URL pre-fills it as `LAB-YYYYMMDD-LOCATION`, while the manual creation path leaves it empty. The operator must always confirm the active CloudFormation region before submission.
+
+---
 # Network Resources
 
 | Logical resource | Type | Responsibility |
@@ -196,7 +214,7 @@ The stack expects these to exist:
 | KMS key used by parent Route 53 DNSSEC | external prerequisite |
 | Branch S3 bucket and rendered content | repository publication workflow |
 | Ubuntu SSM AMI parameter | AWS/Canonical |
-| Participant instruction archive | external URL |
+| Participant instruction archive | external URL required only when `IntegratedInstructions=YES` |
 | VPN peer and endpoint | external routing environment |
 
 The template does not create the parent zone or its DNSSEC signing key.

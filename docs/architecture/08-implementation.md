@@ -2,7 +2,7 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-08-31
+**Last Updated:** 2026-09-01
 
 ---
 
@@ -10,7 +10,7 @@
 
 This document maps the current `nico` branch implementation to the OCTO-TE Labs architecture.
 
-It is an implementation snapshot, not a future design. The baseline was reviewed through implementation commit `b9ce623` and validated with August 2026 deployments.
+It is an implementation snapshot, not a future design. The baseline was reviewed through implementation commit `dc719a4` and includes deployment validation completed on 2026-09-01.
 
 ---
 
@@ -83,6 +83,25 @@ The stack-delete custom resource removes the DS because it is not a native Cloud
 
 ---
 
+# CloudFormation Operator Interface
+
+The template uses `AWS::CloudFormation::Interface` metadata to replace the console's default alphabetical presentation with five groups:
+
+```text
+Lab Identity
+Lab Configuration
+Lab Instructions
+Access
+Advanced Deployment
+```
+
+Friendly labels are shown in the console while logical parameter IDs remain unchanged for CLI/API use. `IntegratedInstructions` and `labInstructions` are intentionally adjacent because one controls the capability and the other supplies its source.
+
+The current Quick Create path can pre-fill `LAB-YYYYMMDD-LOCATION`. The stack is created in the active CloudFormation console region; the current `nico` template artifact is served from S3 in `us-east-1`.
+
+`DnsName` remains a 3-32 character lowercase DNS label with digits and internal hyphens. Its combined constraint message includes both length and syntax because CloudFormation exposes one user-facing message for these violations.
+
+---
 # AMI Selection
 
 Normal deployments use the SSM parameter for Canonical's current Ubuntu 24.04 Noble stable AMI.
@@ -273,7 +292,7 @@ nginx provides:
 
 - the main lab site;
 - per-group Basic Authentication;
-- WebSSH reverse proxy and authentication;
+- the WebSSH reverse proxy; the active WebSSH virtual host still lacks nginx-layer authentication and remains a priority hardening item;
 - shared TLS configuration.
 
 `passwords.sh` generates:
@@ -288,6 +307,8 @@ The credentials file is:
 ```
 
 The generated topology pages link to WebSSH sessions for roles enabled in the selected profile.
+
+Integrated instructions are independent of the profile. `web.sh` injects the **Lab instructions** link only when `IntegratedInstructions=YES`; `setup-lab.sh` then either calls the Jekyll-based builder or removes `/var/www/<DOMAIN>/html/grpN/instructions` for every selected group. The removal is unconditional, so custom content at that path is not preserved. Both modes were validated with clean three-group Type 1 deployments.
 
 ---
 
@@ -356,7 +377,10 @@ These measurements demonstrate the importance of backend count, but they are not
 - Some iptables cleanup commands fail noisily when rules are absent.
 - iptables legacy warnings remain.
 - deployment resolves many external dependencies at runtime.
-- the Jekyll toolchain emits root-user and Sass deprecation warnings.
+- the Jekyll toolchain emits root-user and Sass deprecation warnings when integrated instructions are enabled.
+- the `YES` plus empty-source validation runs only after `wipe` in the current `--deploy` action; it should move ahead of destructive cleanup.
+- disabling integrated instructions removes the entire per-group `instructions` path without ownership markers; custom-content preservation requires an explicit design decision.
+- the publication workflow declares `us-east-2` for S3 synchronization while the current `nico` bucket is actually in `us-east-1`; the value should be aligned or derived.
 - logs are excessively verbose and can expose generated credentials.
 - SOA serials commonly start at `1` rather than `YYYYMMDDnn`.
 - RPKI memory ceilings and runtime behavior require dedicated testing.

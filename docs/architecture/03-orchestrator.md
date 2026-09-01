@@ -2,7 +2,7 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-08-31
+**Last Updated:** 2026-09-01
 
 ---
 
@@ -47,7 +47,8 @@ The script is an imperative shell orchestrator rather than a declarative schedul
 - `LABTYPE`;
 - `NETWORKS`;
 - internal IPv6 prefix;
-- participant instruction URL;
+- `IntegratedInstructions`, which controls the integrated instruction capability;
+- `INSTRUCTIONS`, which provides the source URL when that capability is enabled;
 - optional shared password;
 - VPN parameters used by routing profiles.
 
@@ -170,7 +171,7 @@ passwords
   -> participant containers
   -> start and configure topology
   -> certificate
-  -> nginx/WebSSH/content/instructions
+  -> nginx/WebSSH/content/optional instructions
   -> cron
   -> DS publication
 ```
@@ -208,6 +209,25 @@ This conditional removed hundreds of nonexistent downstream objects from large r
 
 ---
 
+## Integrated instructions condition
+
+`IntegratedInstructions` is not derived from the numeric Lab Type. It is a cross-profile option with strict values `YES` or `NO`.
+
+At configuration load:
+
+- an absent value defaults to `YES` for backward compatibility;
+- any value other than `YES` or `NO` terminates the script.
+
+The empty-source check for `YES` is located at the beginning of `deploy()`. The current `--deploy` action executes `wipe` first and then calls `deploy()`, so this check does not protect an existing internal environment from being wiped before the error is reported. This ordering is a known lifecycle-hardening defect.
+
+During web generation, `web.sh` replaces `%INTEGRATED_INSTRUCTIONS_LINK%` with the relative link only for `YES`. After web content is published:
+
+- `YES` calls `create_instructions`, which downloads, parameterizes, builds, and installs the per-group sites;
+- `NO` does not call the instruction builder and removes `/var/www/<DOMAIN>/html/grpN/instructions` for each selected group, including any manually placed content at that path.
+
+This option was validated independently of Lab Type selection with three-group Type 1 deployments in both modes.
+
+---
 # Start and Stop Sequences
 
 `start_all()` and `stop_all()` use the selected profile flags. Shared DNS follows a frontend/backend dependency rule:
@@ -290,11 +310,10 @@ The orchestrator installs or downloads components during deployment from several
 - ISC BIND PPA;
 - PowerDNS repositories;
 - FRRouting repository;
-- RubyGems;
-- GitHub instruction archives;
+- RubyGems and GitHub instruction archives when `IntegratedInstructions=YES`;
 - Let's Encrypt.
 
-This makes a new deployment sensitive to upstream metadata, package removal, rate limits, and compatibility changes. A 2026-08-31 deployment initially failed because the FRRouting repository index referenced packages that returned HTTP 404; a later identical deployment succeeded when the upstream repository became consistent again.
+Disabling integrated instructions removes the instruction archive and Jekyll path from that deployment, but the remaining runtime dependency set is still sensitive to upstream metadata, package removal, rate limits, and compatibility changes. A 2026-08-31 deployment initially failed because the FRRouting repository index referenced packages that returned HTTP 404; a later identical deployment succeeded when the upstream repository became consistent again.
 
 Version pinning, caching, prebaked images, and clearer retry policy are future hardening topics.
 

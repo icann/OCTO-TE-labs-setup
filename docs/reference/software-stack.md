@@ -2,7 +2,7 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-08-31
+**Last Updated:** 2026-09-01
 
 ---
 
@@ -144,9 +144,11 @@ Current instruction generation uses:
 - pandoc;
 - `MarkdownTools2`.
 
-The deployment currently installs or resolves parts of this toolchain during each redeploy.
+This toolchain is invoked only when `IntegratedInstructions=YES`. When `IntegratedInstructions=NO`, the deployment omits the instruction link, does not call the Jekyll build pipeline, and removes `/var/www/<DOMAIN>/html/grpN/instructions` for every selected group. That removal is unconditional; custom content at the same path is not preserved.
 
-Observed warnings include:
+When enabled, the deployment currently installs or resolves parts of this toolchain during each redeploy.
+
+Observed enabled-mode warnings include:
 
 - Bundler running as root;
 - deprecated Sass `@import`;
@@ -197,8 +199,7 @@ The current deployment depends on:
 - PowerDNS package repository;
 - FRRouting package repository;
 - GitHub releases;
-- GitHub instruction archives;
-- RubyGems;
+- GitHub instruction archives and RubyGems when integrated instructions are enabled;
 - PyPI;
 - Let's Encrypt;
 - RPKI repositories.
@@ -277,8 +278,8 @@ Exact commands can fail before the corresponding exercise package is installed o
 - pip uses `--break-system-packages`.
 - base templates contain fixed `sysadm` and `rtradm` bootstrap credentials that are not uniformly removed or rotated;
 - the active WebSSH virtual host does not reference the generated nginx htpasswd file;
-- Bundler runs as root.
-- Sass/Jekyll deprecations are unresolved.
+- Bundler runs as root when integrated instructions are enabled.
+- Sass/Jekyll deprecations are unresolved in the enabled instruction path.
 - firewall tools show legacy-table warnings.
 - software versions are not captured in one deployment manifest.
 

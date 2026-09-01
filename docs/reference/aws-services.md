@@ -2,7 +2,7 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-08-31
+**Last Updated:** 2026-09-01
 
 ---
 
@@ -54,6 +54,8 @@ cloud-init status
 ```
 
 CloudFormation deletion is the normal lab teardown path.
+
+For console users, `AWS::CloudFormation::Interface` groups and labels the template parameters by operator task. A verified Quick Create URL can pre-fill the editable stack name `LAB-YYYYMMDD-LOCATION`. The active console region determines the stack region; the template URL's S3 region does not select where EC2, VPC, or Lambda resources are created.
 
 ---
 
@@ -120,6 +122,16 @@ The repository publication workflow renders placeholders and publishes branch co
 During UserData, the EC2 role runs a recursive S3 copy into `/root`.
 
 The selected template URL and `S3Bucket` parameter must refer to matching branch content.
+
+The current `nico` branch bucket is `octo-te-labs-setup-nico` in `us-east-1`; its regional template URL is:
+
+```text
+https://octo-te-labs-setup-nico.s3.us-east-1.amazonaws.com/lab-ec2.yaml
+```
+
+Using an endpoint for a different bucket region causes S3's specified-endpoint error. This artifact region is independent of the CloudFormation stack region.
+
+The current GitHub Actions sync step declares `AWS_REGION: us-east-2` even though this bucket is in `us-east-1`. Synchronization currently succeeds, but the mismatch should be aligned or derived to avoid ambiguity and fork-specific failures.
 
 S3 is an external deployment artifact store; the stack does not create the bucket.
 
@@ -230,6 +242,7 @@ Legacy substitutions should be removed or justified so the publication workflow 
 | route or subnet error | VPC |
 | IAM collision or denial | IAM |
 | missing rendered object | S3 |
+| template URL uses the wrong regional S3 endpoint | S3/CloudFormation console |
 | parent-zone record conflict | Route 53 |
 | custom resource timeout | Lambda/CloudFormation |
 | current AMI changed during update | SSM/EC2 replacement planning |
@@ -239,7 +252,8 @@ Legacy substitutions should be removed or justified so the publication workflow 
 
 # Regional Considerations
 
-- The stack region controls EC2, VPC, Lambda, and the SSM AMI lookup.
+- The active CloudFormation console or CLI region controls EC2, VPC, Lambda, and the SSM AMI lookup.
+- The S3 template bucket can be in a different region and must be addressed through its own correct regional endpoint.
 - Route 53 is global but accessed from the stack.
 - Parent DNSSEC KMS requirements are external to the current template.
 - EC2 instance-type availability differs by region.
