@@ -71,6 +71,24 @@ lxc exec hostX -- sh -c 'systemctl reload apparmor'
 lxc stop hostX
 
 ## ================================================================================================"
+## Create identity platform template (identityX) from a clean Ubuntu image
+lxc init local:ubuntu identityX
+lxc start identityX
+lxc exec identityX -- cloud-init status --wait
+
+# Remove the image-provided network definition. The deployed
+# identity-platform instance will receive its static netplan later.
+lxc exec identityX -- sh -c "rm -f /etc/netplan/10-lxc.yaml"
+lxc exec identityX -- sh -c 'printf "network:\n  version: 2\n" > /etc/netplan/10-lxc.yaml'
+lxc exec identityX -- sh -c 'chmod 600 /etc/netplan/10-lxc.yaml'
+
+# Verify the template starts cleanly with the normalized network state.
+lxc stop identityX
+lxc start identityX
+lxc exec identityX -- cloud-init status --wait
+lxc stop identityX
+
+## ================================================================================================"
 ## Create router (rtrX) master (copy from hostX)
 lxc copy hostX rtrX
 lxc start rtrX

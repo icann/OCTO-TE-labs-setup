@@ -27,6 +27,7 @@ eval set -- "$TEMP"
 . ./lab-tools/cron.sh
 . ./lab-tools/dnsdist.sh
 . ./lab-tools/globalvalidators.sh
+. ./lab-tools/identity-platform.sh
 . ./lab-tools/instructions.sh
 . ./lab-tools/letsencrypt.sh
 . ./lab-tools/networks.sh
@@ -184,6 +185,11 @@ start_all () {
         start_border_router
     fi
 
+    #
+    # Shared identity infrastructure
+    #
+    start_identity_platform
+
     start_routers
 
     if [ "$StudentClients" = "YES" ]; then
@@ -240,6 +246,11 @@ stop_all () {
     stop_nginx
     stop_webssh
 
+    #
+    # Stop identity after the web frontends that depend on it.
+    #
+    stop_identity_platform
+
     echo "---> DONE stop_all"
 }
 
@@ -263,6 +274,11 @@ delete_all () {
     delete_auth_rpz
     delete_auth_exercise
     delete_ns1
+
+    #
+    # Shared identity infrastructure
+    #
+    delete_identity_platform
 
     delete_student_RPKI_validator
     delete_global_RPKI_validator
@@ -345,6 +361,12 @@ deploy () {
     echo "---> Recreating environment"
 
     create_passwords
+
+    #
+    # Shared identity infrastructure
+    #
+    create_identity_platform
+
     create_networks
     create_routers
 
