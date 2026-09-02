@@ -2,7 +2,7 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-09-01
+**Last Updated:** 2026-09-02
 
 ---
 
@@ -21,7 +21,10 @@ This file contains short-lived immediate actions. Durable work belongs in the En
 
 # Current Hardening Actions
 
-- [ ] Reproduce the active WebSSH virtual-host configuration and implement explicit authentication/access control.
+- [ ] Review ADR-0003 and implement the `identity-platform` foundation without nginx cutover.
+- [ ] Reserve `100.64.0.60` / `fd89:59e0:0::60` and add lifecycle functions for the identity service.
+- [ ] Pin and install Authelia, OAuth2 Proxy, and Redis; configure the generated users database and SQLite state; validate health checks and restart persistence.
+- [ ] Integrate `<DOMAIN>` and `webssh.<DOMAIN>` only after the standalone identity foundation passes.
 - [ ] Inventory inherited accounts in `hostX`, `rtrX`, shared DNS, routers, validators, and border-router roles.
 - [ ] Remove fixed bootstrap credentials and add regression tests for every role.
 - [ ] Fix TAYGA/NAT64 teardown and repeated iptables cleanup.
@@ -39,6 +42,7 @@ This file contains short-lived immediate actions. Durable work belongs in the En
 - [ ] Count LXD instances through `/1.0/instances`, not repeated address rows.
 - [ ] Test success, failure, deletion, and immediate name reuse for lifecycle changes.
 - [ ] Re-test both `IntegratedInstructions` modes whenever instruction publication or lifecycle ordering changes.
+- [ ] Validate one credential entry per browser/profile, 10-day session expiry, restart persistence, fail-closed behavior, and emergency fallback.
 - [ ] Keep platform deployment validation separate from `do-dns-lab.sh` exercise activation.
 - [ ] Do not claim Types 3 or 4 production-ready before their known blockers are fixed.
 - [ ] Do not raise the 64-group limit before post-hardening capacity tests are complete.

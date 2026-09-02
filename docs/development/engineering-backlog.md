@@ -2,7 +2,7 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-09-01
+**Last Updated:** 2026-09-02
 
 ---
 
@@ -110,7 +110,12 @@ EPIC-001 completes when:
 
 | Item | Type | Priority | Status | Description |
 |---|---|---:|---|---|
-| BUG-0040 | Bug | Critical | Planned | Add authentication and appropriate access controls to the active `webssh.<DOMAIN>` nginx virtual host. |
+| BUG-0040 | Bug | Critical | In Progress | Replace the unauthenticated WebSSH path with the ADR-0003 identity architecture and verify fail-closed protection. |
+| FEAT-0041 | Feature | Critical | In Progress | Implement `identity-platform` with Authelia, a generated local users database, SQLite application state, two OAuth2 Proxy processes, Redis-backed sessions, and one-login access across the main site and WebSSH. |
+| TASK-0041 | Architecture | High | Completed | Define ADR-0003, including host-only cookie boundaries, 10-day sessions, shared/per-group authorization, and emergency fallback. |
+| TASK-0042 | Validation | High | Planned | Validate identity behavior with 3, 30, and 60 groups; Chrome, Firefox, Safari, and Edge; restarts; expiry; fail-closed behavior; and emergency mode. |
+| IMP-0047 | Improvement | High | Planned | Implement explicit `lab-auth` recovery and emergency Basic Authentication commands using `labuser`, never anonymous bypass. |
+| TD-0048 | Technical Debt | Medium | Planned | Review and reduce exposure of SSH credentials carried in WebSSH URLs after identity cutover. |
 | BUG-0041 | Bug | Critical | Planned | Eliminate fixed bootstrap credentials `sysadm:icannws` and `rtradm:icannws`; verify removal or rotation in every template and role. |
 | TD-0040 | Technical Debt | High | Planned | Prevent passwords, VPN values, and other secrets from being printed to deployment logs. |
 | IMP-0040 | Improvement | Medium | Planned | Define a least-privilege and exposure review for every public port and service. |

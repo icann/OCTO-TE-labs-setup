@@ -2,7 +2,7 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-08-31
+**Last Updated:** 2026-09-02
 
 ---
 
@@ -42,6 +42,7 @@ Updated ADRs remain In Review until explicit approval.
 |---|---|---|---|
 | [ADR-0001](ADR-0001-architecture-driven-engineering.md) | Architecture-Driven Engineering | In Review | 2026-07-31 |
 | [ADR-0002](ADR-0002-shared-dns-service-separation.md) | Shared DNS Service Separation | In Review | 2026-08-31 |
+| [ADR-0003](ADR-0003-unified-lab-identity-and-access.md) | Unified Lab Identity and Access | In Review | 2026-09-02 |
 
 ---
 
