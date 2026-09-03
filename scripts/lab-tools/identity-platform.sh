@@ -30,6 +30,182 @@ _identity_platform_state () {
 }
 
 
+apply_identity_platform_hardening () {
+    local instance_name="${1:-}"
+
+    if [ -z "$instance_name" ]; then
+        echo "ERROR: identity instance name is required." >&2
+        return 1
+    fi
+
+    if ! lxc info "$instance_name" >/dev/null 2>&1; then
+        echo "ERROR: identity instance does not exist: $instance_name" >&2
+        return 1
+    fi
+
+    echo "Apply - identity-platform hardening: $instance_name"
+
+    if ! lxc exec "$instance_name" -- \
+        bash -eu -o pipefail -c '
+systemctl mask --now ssh.socket ssh.service
+
+rm -f \
+    /etc/sudoers.d/90-cloud-init-users \
+    /root/.ssh/authorized_keys \
+    /home/ubuntu/.ssh/authorized_keys
+
+if ! getent passwd ubuntu >/dev/null; then
+    echo "ERROR: expected ubuntu account is missing." >&2
+    exit 1
+fi
+
+primary_group=$(id -gn ubuntu)
+
+for group in $(id -nG ubuntu); do
+    if [ "$group" != "$primary_group" ]; then
+        gpasswd -d ubuntu "$group" >/dev/null
+    fi
+done
+
+usermod --lock ubuntu
+usermod --expiredate 1 ubuntu
+usermod --shell /usr/sbin/nologin ubuntu
+'; then
+        echo "ERROR: failed to harden identity instance: $instance_name" >&2
+        return 1
+    fi
+
+    echo "Done - Apply identity-platform hardening: $instance_name"
+}
+
+
+validate_identity_platform_hardening () {
+    local instance_name="${1:-$IDENTITY_PLATFORM_NAME}"
+
+    echo "Validate - identity-platform hardening: $instance_name"
+
+    if ! lxc info "$instance_name" >/dev/null 2>&1; then
+        echo "ERROR: identity instance does not exist: $instance_name" >&2
+        return 1
+    fi
+
+    if ! lxc exec "$instance_name" -- \
+        bash -eu -o pipefail -c '
+if ! getent passwd ubuntu >/dev/null; then
+    echo "ERROR: expected ubuntu account is missing." >&2
+    exit 1
+fi
+
+for account in sysadm rtradm; do
+    if getent passwd "$account" >/dev/null; then
+        echo "ERROR: unexpected account is present: $account" >&2
+        exit 1
+    fi
+done
+
+password_field=$(getent shadow ubuntu | cut -d: -f2)
+
+case "$password_field" in
+    "!"*|"*"*)
+        ;;
+    *)
+        echo "ERROR: ubuntu password is not locked." >&2
+        exit 1
+        ;;
+esac
+
+account_expiry=$(getent shadow ubuntu | cut -d: -f8)
+
+if [ "$account_expiry" != "1" ]; then
+    echo "ERROR: ubuntu account is not expired." >&2
+    echo "Actual shadow expiry field: $account_expiry" >&2
+    exit 1
+fi
+
+account_shell=$(getent passwd ubuntu | cut -d: -f7)
+
+if [ "$account_shell" != "/usr/sbin/nologin" ]; then
+    echo "ERROR: ubuntu account shell is not nologin." >&2
+    echo "Actual shell: $account_shell" >&2
+    exit 1
+fi
+
+primary_group=$(id -gn ubuntu)
+group_list=$(id -nG ubuntu)
+
+if [ "$group_list" != "$primary_group" ]; then
+    echo "ERROR: ubuntu retains supplementary groups." >&2
+    echo "Groups: $group_list" >&2
+    exit 1
+fi
+
+if [ -e /etc/sudoers.d/90-cloud-init-users ]; then
+    echo "ERROR: cloud-init sudoers entry still exists." >&2
+    exit 1
+fi
+
+if grep -RqsE \
+    "^[[:space:]]*ubuntu[[:space:]]" \
+    /etc/sudoers \
+    /etc/sudoers.d; then
+    echo "ERROR: an explicit sudoers entry for ubuntu exists." >&2
+    exit 1
+fi
+
+for file in \
+    /root/.ssh/authorized_keys \
+    /home/ubuntu/.ssh/authorized_keys
+do
+    if [ ! -e "$file" ]; then
+        continue
+    fi
+
+    if [ ! -f "$file" ]; then
+        echo "ERROR: authorized keys path is not a regular file: $file" >&2
+        exit 1
+    fi
+
+    active_key_count=$(
+        awk "NF && \$1 !~ /^#/ {count++} END {print count + 0}" \
+            "$file"
+    )
+
+    if [ "$active_key_count" -ne 0 ]; then
+        echo "ERROR: active authorized keys found in $file: $active_key_count" >&2
+        exit 1
+    fi
+done
+
+for unit in ssh.socket ssh.service; do
+    enabled=$(systemctl is-enabled "$unit" 2>/dev/null || true)
+    active=$(systemctl is-active "$unit" 2>/dev/null || true)
+
+    if [ "$enabled" != "masked" ]; then
+        echo "ERROR: $unit is not masked; enabled=$enabled." >&2
+        exit 1
+    fi
+
+    if [ "$active" = "active" ]; then
+        echo "ERROR: $unit is active." >&2
+        exit 1
+    fi
+done
+
+if ss -lnt \
+    | grep -Eq \
+        "(^|[[:space:]])[^[:space:]]*:22[[:space:]]"; then
+    echo "ERROR: TCP/22 is listening." >&2
+    exit 1
+fi
+'; then
+        echo "ERROR: identity-platform hardening validation failed: $instance_name." >&2
+        return 1
+    fi
+
+    echo "Done - Validate identity-platform hardening: $instance_name"
+}
+
+
 validate_identity_platform () {
     local state
     local expected_hostname
@@ -128,6 +304,11 @@ validate_identity_platform () {
         return 1
     fi
 
+    if ! validate_identity_platform_hardening \
+        "$IDENTITY_PLATFORM_NAME"; then
+        return 1
+    fi
+
     echo "Done - Validate identity-platform foundation"
 }
 
@@ -170,7 +351,19 @@ create_identity_platform () {
 
     lxc copy "$IDENTITY_PLATFORM_TEMPLATE" "$IDENTITY_PLATFORM_NAME"
     lxc start "$IDENTITY_PLATFORM_NAME"
-    lxc exec "$IDENTITY_PLATFORM_NAME" -- cloud-init status --wait
+
+    if ! lxc exec "$IDENTITY_PLATFORM_NAME" -- \
+        cloud-init status --wait; then
+        echo "ERROR: cloud-init failed for $IDENTITY_PLATFORM_NAME." >&2
+        return 1
+    fi
+
+    # A copied container receives a new cloud-init instance identity.
+    # Reapply the security baseline after its first cloud-init run.
+    if ! apply_identity_platform_hardening \
+        "$IDENTITY_PLATFORM_NAME"; then
+        return 1
+    fi
 
     lxc config device add "$IDENTITY_PLATFORM_NAME" eth0 nic \
         name=eth0 \
@@ -202,9 +395,17 @@ create_identity_platform () {
     # Confirm that the static network survives a complete restart.
     lxc stop "$IDENTITY_PLATFORM_NAME"
     lxc start "$IDENTITY_PLATFORM_NAME"
-    lxc exec "$IDENTITY_PLATFORM_NAME" -- cloud-init status --wait
 
-    validate_identity_platform
+    if ! lxc exec "$IDENTITY_PLATFORM_NAME" -- \
+        cloud-init status --wait; then
+        echo "ERROR: cloud-init failed after restarting $IDENTITY_PLATFORM_NAME." >&2
+        return 1
+    fi
+
+    if ! validate_identity_platform; then
+        echo "ERROR: identity-platform creation validation failed." >&2
+        return 1
+    fi
 
     echo "Done - Create identity-platform foundation"
 }
@@ -247,8 +448,16 @@ start_identity_platform () {
             ;;
     esac
 
-    lxc exec "$IDENTITY_PLATFORM_NAME" -- cloud-init status --wait
-    validate_identity_platform
+    if ! lxc exec "$IDENTITY_PLATFORM_NAME" -- \
+        cloud-init status --wait; then
+        echo "ERROR: cloud-init failed while starting $IDENTITY_PLATFORM_NAME." >&2
+        return 1
+    fi
+
+    if ! validate_identity_platform; then
+        echo "ERROR: identity-platform start validation failed." >&2
+        return 1
+    fi
 
     echo "Done - Start identity-platform"
 }

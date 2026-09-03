@@ -2,6 +2,9 @@
 
 set -exou
 
+# Load the shared identity hardening implementation.
+. ./lab-tools/identity-platform.sh
+
 # Init script for creating/upgrading template containers
 
 ## You'll have to run this script only once, right after initiating a new cloud lab instance from scratch
@@ -76,6 +79,13 @@ lxc init local:ubuntu identityX
 lxc start identityX
 lxc exec identityX -- cloud-init status --wait
 
+# Disable network SSH access and retire the image-provided interactive
+# account. identity-platform is administered exclusively through lxc exec.
+if ! apply_identity_platform_hardening "identityX"; then
+    echo "ERROR: failed to harden identityX." >&2
+    exit 1
+fi
+
 # Remove the image-provided network definition. The deployed
 # identity-platform instance will receive its static netplan later.
 lxc exec identityX -- sh -c "rm -f /etc/netplan/10-lxc.yaml"
@@ -85,7 +95,18 @@ lxc exec identityX -- sh -c 'chmod 600 /etc/netplan/10-lxc.yaml'
 # Verify the template starts cleanly with the normalized network state.
 lxc stop identityX
 lxc start identityX
-lxc exec identityX -- cloud-init status --wait
+
+if ! lxc exec identityX -- \
+    cloud-init status --wait; then
+    echo "ERROR: cloud-init failed after restarting identityX." >&2
+    exit 1
+fi
+
+if ! validate_identity_platform_hardening "identityX"; then
+    echo "ERROR: identityX hardening validation failed." >&2
+    exit 1
+fi
+
 lxc stop identityX
 
 ## ================================================================================================"
