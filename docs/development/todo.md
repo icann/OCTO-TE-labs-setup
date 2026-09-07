@@ -2,7 +2,7 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-09-02
+**Last Updated:** 2026-09-07
 
 ---
 
@@ -21,9 +21,9 @@ This file contains short-lived immediate actions. Durable work belongs in the En
 
 # Current Hardening Actions
 
-- [ ] Review ADR-0003 and implement the `identity-platform` foundation without nginx cutover.
-- [ ] Reserve `100.64.0.60` / `fd89:59e0:0::60` and add lifecycle functions for the identity service.
-- [ ] Pin and install Authelia, OAuth2 Proxy, and Redis; configure the generated users database and SQLite state; validate health checks and restart persistence.
+- [ ] Create `configs/identity/versions.env`; pin and install Authelia and OAuth2 Proxy with verified checksums; install Redis and SQLite from Ubuntu Noble; validate health checks and restart persistence.
+- [ ] Implement ADR-0004 `lab-version-check` with bounded, non-mutating software and image freshness checks and the recommendation: `Test available updates in a dedicated disposable VM before updating the pinned versions.`
+- [ ] Implement `deploy-platform.sh`, `lab-report`, and concise success/failure reporting after the Foundation 1B software baseline is stable.
 - [ ] Integrate `<DOMAIN>` and `webssh.<DOMAIN>` only after the standalone identity foundation passes.
 - [ ] Inventory inherited accounts in `hostX`, `rtrX`, shared DNS, routers, validators, and border-router roles.
 - [ ] Remove fixed bootstrap credentials and add regression tests for every role.
@@ -43,6 +43,7 @@ This file contains short-lived immediate actions. Durable work belongs in the En
 - [ ] Test success, failure, deletion, and immediate name reuse for lifecycle changes.
 - [ ] Re-test both `IntegratedInstructions` modes whenever instruction publication or lifecycle ordering changes.
 - [ ] Validate one credential entry per browser/profile, 10-day session expiry, restart persistence, fail-closed behavior, and emergency fallback.
+- [ ] Validate ADR-0004 report states, preserved failure status, unavailable freshness sources, installed-pin mismatch, JSON validity, and absence of secrets.
 - [ ] Keep platform deployment validation separate from `do-dns-lab.sh` exercise activation.
 - [ ] Do not claim Types 3 or 4 production-ready before their known blockers are fixed.
 - [ ] Do not raise the 64-group limit before post-hardening capacity tests are complete.

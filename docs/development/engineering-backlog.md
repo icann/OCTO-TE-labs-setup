@@ -2,7 +2,7 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-09-02
+**Last Updated:** 2026-09-07
 
 ---
 
@@ -139,6 +139,11 @@ EPIC-001 completes when:
 | Item | Type | Priority | Status | Description |
 |---|---|---:|---|---|
 | TD-0041 | Technical Debt | High | Planned | Pin, cache, mirror, or prebake external package and artifact dependencies; define retry behavior. |
+| TASK-0043 | Architecture | High | Completed | Define ADR-0004 for complete deployment reporting, preserved failure status, software/image freshness, and non-mutating update guidance. |
+| FEAT-0042 | Feature | High | Planned | Add `deploy-platform.sh` as the top-level internal deployment wrapper and always generate concise text plus structured JSON results on success or failure. |
+| IMP-0048 | Improvement | Medium | Planned | Add `lab-version-check` with installed, pinned, candidate, and latest-stable comparison states; never upgrade automatically and recommend: `Test available updates in a dedicated disposable VM before updating the pinned versions.` |
+| TASK-0044 | Validation | High | Planned | Validate `PASS`, `PASS_WITH_WARNINGS`, and `FAIL`; early-stage failures; report-generation failure; version mismatch; unavailable freshness sources; JSON validity; and secret exclusion. |
+| TD-0049 | Technical Debt | High | Planned | Classify legacy deployment warnings and make stage and function error propagation explicit so deployment reports cannot hide failures or infer them only from log text. |
 | TD-0042 | Technical Debt | Medium | Planned | Stop reinstalling the Jekyll toolchain on every internal redeploy and remove Bundler-root and Sass deprecation warnings. |
 | TD-0043 | Technical Debt | Medium | Planned | Replace initial SOA serial `1` with UTC `YYYYMMDDnn` and safe same-day increment logic. |
 | TD-0044 | Technical Debt | Low | Planned | Remove or justify the legacy `%KSK_ARN%` substitution from the publication workflow. |
@@ -229,6 +234,9 @@ The original implementation demonstrated more than 100 complete groups and more 
 | `51e3d71` | Clarified DNS-name validation guidance |
 | `dc719a4` | Added the DNS-name length requirement to the validation message |
 | `9e37720` | Documented integrated instructions and deployment UX |
+| `9e29b7e` | Added ADR-0003 for unified lab identity and access |
+| `4a97447` | Added the identity-platform foundation lifecycle |
+| `cfe4c5b` | Hardened and validated the identity-platform foundation |
 
 ---
 

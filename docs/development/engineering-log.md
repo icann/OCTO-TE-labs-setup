@@ -2,7 +2,7 @@
 
 **Status:** In Review
 
-**Last Updated:** 2026-09-01
+**Last Updated:** 2026-09-07
 
 ---
 
@@ -422,6 +422,74 @@ Begin EPIC-004 with the agreed critical security work: protect the active WebSSH
 
 ---
 
+# Entry S-0008 - Identity Platform Foundation and Deployment Reporting Policy
+
+**Date:** 2026-09-07
+
+**Sprint:** EPIC-004 - Deployment and Security Hardening
+
+**Status:** Completed
+
+## Objective
+
+Create and validate the isolated `identity-platform` foundation before installing identity software, and define the deployment-reporting and software-freshness policy that will govern reproducible Foundation 1B installations.
+
+## Architecture Decisions
+
+- Added ADR-0003 for unified lab identity and access.
+- Reserved `identity-platform` at `100.64.0.60` and `fd89:59e0:0::60`.
+- Preserved `webssh.<DOMAIN>` as a separate virtual host.
+- Added ADR-0004 for complete deployment reporting, software/image freshness checks, preserved failure status, secret exclusion, and non-mutating update guidance.
+- Fixed the generic update recommendation as: `Test available updates in a dedicated disposable VM before updating the pinned versions.`
+
+## Implementation Commits
+
+- `9e29b7e` - Add unified lab identity architecture decision.
+- `4a97447` - Add identity platform foundation lifecycle.
+- `cfe4c5b` - Harden identity platform foundation.
+
+## Foundation 1A Work Completed
+
+- Created `identityX` directly from the clean local Ubuntu image instead of inheriting `hostX`.
+- Created `identity-platform` as a shared LXC instance with static IPv4 and IPv6 addresses.
+- Integrated create, validate, start, stop, delete, wipe, and redeploy lifecycle behavior.
+- Enforced the 2 GB LXD memory ceiling inherited from the default profile.
+- Locked and expired the image-provided `ubuntu` account, set `nologin`, removed supplementary groups and sudoers access, removed active authorized keys, masked SSH service and socket activation, and verified TCP/22 remains closed.
+- Reapplied the hardening baseline after clone-specific cloud-init execution.
+- Added explicit validation failure propagation so create/start cannot report false success.
+
+## Validation Evidence
+
+A disposable three-group Lab Type 1 stack with integrated instructions disabled validated:
+
+- fresh CloudFormation and cloud-init completion with no errors;
+- `identityX` stopped and `identity-platform` running;
+- 21 LXD instances, including the template and shared identity service;
+- correct hostname, IPv4, IPv6, default routes, netplan, effective `eth0`, and 2 GB memory limit;
+- absence of inherited `sysadm` and `rtradm` accounts;
+- positive and deliberately induced negative hardening-validation paths;
+- rejection of an active SSH authorized key;
+- idempotent stop/start;
+- complete wipe with `identityX` preserved;
+- internal redeploy with automatic recreation and re-hardening;
+- nginx, HTTPS, public A/AAAA, and `IntegratedInstructions=NO` regression checks.
+
+Known TAYGA/NAT64 and repeated iptables cleanup warnings remained unrelated legacy backlog items.
+
+## Foundation 1B Discovery
+
+The identity container baseline was confirmed as Ubuntu 24.04 amd64 with approximately 2 GiB of memory. Redis and SQLite were absent, while required download and checksum tools were present. The candidate Ubuntu packages and the exact Authelia and OAuth2 Proxy release artifacts were inspected, and both external archives passed SHA-256 verification before installation.
+
+## Outcome
+
+Foundation 1A is approved on `nico-auth`. The stable `nico` branch remains unchanged. Foundation 1B can now introduce a canonical version manifest and reproducible software installation without nginx authentication cutover.
+
+## Next Work
+
+Create `configs/identity/versions.env`, install the verified identity software baseline with services disabled, and then implement ADR-0004 version checks and deployment reporting incrementally.
+
+---
+
 # Engineering Log Index
 
 | Entry | Date | Summary | Status |
@@ -433,6 +501,7 @@ Begin EPIC-004 with the agreed critical security work: protect the active WebSSH
 | S-0005 | 2026-08-31 | dnsdist, DNS-label, and AMI improvements | Completed |
 | S-0006 | 2026-08-31 | Handbook reconciliation and hardening discovery | Completed |
 | S-0007 | 2026-09-01 | Integrated instructions and CloudFormation operator UX | Completed |
+| S-0008 | 2026-09-07 | Identity platform foundation and deployment reporting policy | Completed |
 
 ---
 
@@ -440,4 +509,4 @@ Begin EPIC-004 with the agreed critical security work: protect the active WebSSH
 
 **Current Status:** In Review
 
-**Next Review:** After the first EPIC-004 implementation cycle and the baseline technical review.
+**Next Review:** After the Foundation 1B software baseline and the first ADR-0004 reporting prototype.
