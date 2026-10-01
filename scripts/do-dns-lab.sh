@@ -49,7 +49,7 @@ options {
     directory "/var/cache/bind";
     dnssec-validation no;
     listen-on port 53 { localhost; 100.100.0.0/16; };
-    listen-on-v6 port 53 { localhost; ${IPv6prefix}/32; };
+    listen-on-v6 port 53 { localhost; ${IPv6prefix}::/32; };
     allow-query { any; };
     recursion yes;
 };
